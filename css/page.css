@@ -1,0 +1,14 @@
+/*页码*/
+.page-navigation { width:850px;height:39px; border-top:1px solid #F1F1F1;overflow:hidden;padding-top:6px; margin:auto;}
+.page-navigation .pagenum,.page-navigation .del,.page-navigation .next,.page-navigation .del_btn,.page-navigation .qx { float:left}
+.page-navigation .next { width:120px; padding-top:9px; color:#333333}
+.page-navigation .next .pagen{float:left}
+.page-navigation .next .go{ float:left; margin-left:4px;}
+.page-navigation .next input{ margin:0px 4px;}
+.page-navigation .next .go a{ background: url('../img/next_page.gif'); height:21px; width:28px; display:block; line-height:21px; text-align:center; color:#F1F2F4}
+.page-navigation .pagenum { width:700px; color:#343434; padding-top:8px; font-family:'SimSun'; line-height:26px; margin-left:20px; display:inline;}
+.page-navigation .pagenum a{ border:1px solid #DDDDDD; padding:5px 9px; color:#666666; margin:0px 5px; }
+.page-navigation .pagenum .hover{ font-weight:bold; color:#339115}
+.page-navigation .pagelist { float:right; margin:15px;}
+.page-navigation .pagelist .pgn,.page-navigation .pagelist .pgp{border:1px solid #dddddd; background:#FFF; height:19px; line-height:19px; float:left; margin-left:15px; display:inline; padding-left:4px;padding-right:4px;}
+.page-navigation .pagelist a{color:#666666;}

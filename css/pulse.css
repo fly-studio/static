@@ -1,0 +1,58 @@
+@-webkit-keyframes bigAssButtonPulse {
+	from { background-color: #749a02; -webkit-box-shadow: 0 0 25px #333; }
+	50% { background-color: #91bd09; -webkit-box-shadow: 0 0 50px #91bd09; }
+	to { background-color: #749a02; -webkit-box-shadow: 0 0 25px #333; }
+}
+
+@-webkit-keyframes greenPulse {
+	from { background-color: #749a02; -webkit-box-shadow: 0 0 9px #333; }
+	50% { background-color: #91bd09; -webkit-box-shadow: 0 0 18px #91bd09; }
+	to { background-color: #749a02; -webkit-box-shadow: 0 0 9px #333; }
+}
+
+@-webkit-keyframes bluePulse {
+	from { background-color: #007d9a; -webkit-box-shadow: 0 0 9px #333; }
+	50% { background-color: #2daebf; -webkit-box-shadow: 0 0 18px #2daebf; }
+	to { background-color: #007d9a; -webkit-box-shadow: 0 0 9px #333; }
+}
+
+@-webkit-keyframes redPulse {
+	from { background-color: #bc330d; -webkit-box-shadow: 0 0 9px #333; }
+	50% { background-color: #e33100; -webkit-box-shadow: 0 0 18px #e33100; }
+	to { background-color: #bc330d; -webkit-box-shadow: 0 0 9px #333; }
+}
+
+@-webkit-keyframes magentaPulse {
+	from { background-color: #630030; -webkit-box-shadow: 0 0 9px #333; }
+	50% { background-color: #a9014b; -webkit-box-shadow: 0 0 18px #a9014b; }
+	to { background-color: #630030; -webkit-box-shadow: 0 0 9px #333; }
+}
+
+@-webkit-keyframes orangePulse {
+	from { background-color: #d45500; -webkit-box-shadow: 0 0 9px #333; }
+	50% { background-color: #ff5c00; -webkit-box-shadow: 0 0 18px #ff5c00; }
+	to { background-color: #d45500; -webkit-box-shadow: 0 0 9px #333; }
+}
+
+@-webkit-keyframes orangellowPulse {
+	from { background-color: #fc9200; -webkit-box-shadow: 0 0 9px #333; }
+	50% { background-color: #ffb515; -webkit-box-shadow: 0 0 18px #ffb515; }
+	to { background-color: #fc9200; -webkit-box-shadow: 0 0 9px #333; }
+}
+
+.green-pulse,
+.blue-pulse,
+.red-pulse,
+.magenta-pulse,
+.orange-pulse,
+.orangellow-pulse{
+	-webkit-animation-duration: 2s;
+	-webkit-animation-iteration-count: infinite;
+}
+
+.green-pulse { -webkit-animation-name: greenPulse; -webkit-animation-duration: 3s; }
+.blue-pulse { -webkit-animation-name: bluePulse; -webkit-animation-duration: 4s; }
+.red-pulse { -webkit-animation-name: redPulse; -webkit-animation-duration: 1s; }
+.magenta-pulse { -webkit-animation-name: magentaPulse; -webkit-animation-duration: 2s; }
+.orange-pulse { -webkit-animation-name: orangePulse; -webkit-animation-duration: 3s; }
+.orangellow-pulse { -webkit-animation-name: orangellowPulse; -webkit-animation-duration: 5s; }

@@ -1,0 +1,781 @@
+/**
+ * @author Fly Mirage
+ * 
+ */
+
+var COMMON_LANGUAGE = {
+	'tips' : '&#25552;&#31034;',
+	'ok' : '&#30830;&#23450;',
+	'cancel' : '&#21462;&#28040;',
+	'back' : '&#36820;&#22238;',
+	'unselected' : '&#35831;&#33267;&#23569;&#36873;&#25321;&#19968;&#39033;&#65281;',
+	'network_timeout' : '&#32593;&#32476;&#25925;&#38556;&#65292;&#35831;&#31245;&#21518;&#37325;&#35797;&#65281;'
+};
+/* Avoid `console` errors in browsers that lack a console */
+(function(){var e;var t=function(){};var n=["assert","clear","count","debug","dir","dirxml","error","exception","group","groupCollapsed","groupEnd","info","log","markTimeline","profile","profileEnd","table","time","timeEnd","timeStamp","trace","warn"];var r=n.length;var i=window.console=window.console||{};while(r--){e=n[r];if(!i[e]){i[e]=t}}})();
+
+/*---------- Array.indexOf ----------*/
+if (!Array.prototype.indexOf) {
+	Array.prototype.indexOf = function (searchElement, fromIndex) {
+		if ( this === undefined || this === null ) {
+			throw new TypeError( '"this" is null or not defined' );
+		}
+		var length = this.length >>> 0; // Hack to convert object.length to a UInt32
+		fromIndex = +fromIndex || 0;
+		if (Math.abs(fromIndex) === Infinity) {
+			fromIndex = 0;
+		}
+		if (fromIndex < 0) {
+			fromIndex += length;
+			if (fromIndex < 0) {
+				fromIndex = 0;
+			}
+		}
+		for (;fromIndex < length; fromIndex++) {
+			if (this[fromIndex] === searchElement)
+				return fromIndex;
+		}
+		return -1;
+	};
+}
+/*---------- Array.forEach ----------*/
+if (!Array.prototype.forEach) {
+	Array.prototype.forEach = function(func /*, thisp*/) {
+		if (typeof func != "function") throw new TypeError();
+		var thisp = arguments[1];
+		for (var i = 0, n = this.length; i < n; i++) {
+			if (i in this) func.apply(thisp, [this[i], i, this]);
+		}
+	};
+}
+
+/*---------- Array.map ----------*/
+if (!Array.prototype.map) {
+	Array.prototype.map = function(fun /*, thisp*/) {
+		var len = this.length;
+		if (typeof fun != "function")
+			throw new TypeError();
+	
+		var res = new Array(len);
+		var thisp = arguments[1];
+		for (var i = 0; i < len; i++) {
+			if (i in this)
+				res[i] = fun.call(thisp, this[i], i, this);
+		}
+		return res;
+	};
+}
+
+/*---------- Array.map ----------*/
+if (!Array.prototype.sum) {
+	Array.prototype.sum = function() {
+		var sum = 0;
+		for (key in this) {
+			if (!isNaN(parseFloat(this[key])))
+				sum += parseFloat(this[key]);
+		}
+		return sum;
+	};
+}
+if (!String.prototype.repeat) {
+	String.prototype.repeat = function(len) {
+		var orginal = this;
+		var str = this;
+		while (str.length < len) {
+			str += orginal;
+		}
+		str = str.substr(0, len);
+		return str;
+	};
+}
+String.prototype.toHTML = function() {
+	return this.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#039;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+};
+
+String.prototype.toPre = function() {
+	return this.replace(/\s/g, '&nbsp;').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1<br />$2');
+};
+
+String.prototype.noHTML = function() {
+	return this.replace(/<script[^>]*?>.*?<\/script>/ig, '').replace(/<[\/\!]*?[^<>]*?>/g, '').replace(/<style[^>]*?>.*?<\/style>/ig, '').replace(/<![\s\S]*?--[ \t\n\r]*>/, '').replace(/([\r\n])[\s]+/,'').replace(/&(quot|#34|amp|#38|lt|#60|gt|#62|nbsp|#160)/i,'');
+};
+
+String.prototype.aLength = function() {
+	var a = this.match(/[^\x00-\x80]/g);
+	return this.length + (a ? a.length : 0);
+};
+String.prototype.setCookie = function(value, expiryDays, domain, path, secure) {
+	var builder = [this, "=", escape(value)];
+	if (expiryDays) {
+		var date = new Date();
+		date.setTime(date.getTime() + (expiryDays * 86400000));
+		builder.push(";expires=");
+		builder.push(date.toUTCString());
+	}
+	if (domain) {
+		builder.push(";domain=");
+		builder.push(domain);
+	}
+	if (path) {
+		builder.push(";path=");
+		builder.push(path);
+	}
+	if (secure) {
+		builder.push(";secure");
+	}
+	document.cookie = builder.join("");
+};
+String.prototype.getCookie = function() {
+	var re = new RegExp('\\b' + this + '\\s*=\\s*([^;]*)', 'i');
+	var match = re.exec(document.cookie);
+	return (match && match.length > 1 ? unescape(match[1]) : '');
+};
+/**
+ * [str_pad description]
+ * @example 1: str_pad('Kevin van Zonneveld', 30, '-=', 'STR_PAD_LEFT');
+ * @returns 1: '-=-=-=-=-=-Kevin van Zonneveld'
+ * @example 2: str_pad('Kevin van Zonneveld', 30, '-', 'STR_PAD_BOTH');
+ * @returns 2: '------Kevin van Zonneveld-----'
+ * 
+ * @param  {Int} pad_length 
+ * @param  {String} pad_string 
+ * @param  {String} pad_type   
+ * @return {String}            
+ */
+String.prototype.pad = function(pad_length, pad_string, pad_type) {
+	var half = '',pad_to_go;
+	var str_pad_repeater = function(s, len) {
+		var collect = '',i;
+		while (collect.length < len) {
+			collect += s;
+		}
+		collect = collect.substr(0, len);
+		return collect;
+	};
+
+	var input = this.toString() + '';
+	pad_string = pad_string !== undefined ? pad_string : ' ';
+
+	if (pad_type !== 'STR_PAD_LEFT' && pad_type !== 'STR_PAD_RIGHT' && pad_type !== 'STR_PAD_BOTH')
+		pad_type = 'STR_PAD_LEFT';
+ 
+	if ((pad_to_go = pad_length - input.length) > 0) {
+		if (pad_type === 'STR_PAD_LEFT') {
+			input = str_pad_repeater(pad_string, pad_to_go) + input;
+		} else if (pad_type === 'STR_PAD_RIGHT') {
+			input = input + str_pad_repeater(pad_string, pad_to_go);
+		} else if (pad_type === 'STR_PAD_BOTH') {
+			half = str_pad_repeater(pad_string, Math.ceil(pad_to_go / 2));
+			input = half + input + half;
+			input = input.substr(0, pad_length);
+		}
+	}
+	return input;
+}
+
+Number.prototype.pad = function(pad_length, pad_string, pad_type) {
+	pad_string = pad_string !== undefined ? pad_string : '0';
+	return this.toString().pad(pad_length, pad_string, pad_type);
+}
+
+String.prototype.number_format = function(decimals, dec_point, thousands_sep) {
+	var number = (this + '').replace(/[^0-9+\-Ee.]/g, '');
+	var n = !isFinite(+number) ? 0 : +number,
+		prec = !isFinite(+decimals) ? 0 : Math.abs(decimals),
+		sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
+		dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
+		s = '',
+		toFixedFix = function(n, prec) {
+			var k = Math.pow(10, prec);
+			return '' + (Math.round(n * k) / k).toFixed(prec);
+		};
+  	// Fix for IE parseFloat(0.55).toFixed(0) = 0;
+  	s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
+	if (s[0].length > 3) {
+		s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
+  	}
+	if ((s[1] || '').length < prec) {
+		s[1] = s[1] || '';
+		s[1] += new Array(prec - s[1].length + 1)
+		.join('0');
+ 	}
+	return s.join(dec);
+}
+
+Number.prototype.number_format = function(decimals, dec_point, thousands_sep) {
+	return this.toString().number_format(decimals, dec_point, thousands_sep);
+}
+
+String.prototype.toDate = function() {
+	var t = this;
+	if (!isNaN(this))
+		t = parseInt(this);
+	t = new Date(t);
+	if (isNaN(t.getTime()))
+		t = new Date();
+	return t;
+}
+
+Number.prototype.toDate = function() {
+	return this.toString().toDate();
+}
+
+Date.prototype.toDate = function() {
+	return this;
+}
+
+Date.prototype.toString = function(format_string) {
+	var array_week = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', '&#26085;', '&#19968;', '&#20108;', '&#19977;', '&#22235;', '&#20116;', '&#20845;'];
+	var array_month = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+  
+	var y, m, d, h, i, s, ms, w, t;
+	y = this.getFullYear();
+	m = this.getMonth() + 1;
+	d = this.getDate();
+	h = this.getHours();
+	i = this.getMinutes();
+	s = this.getSeconds();
+	ms = this.getMilliseconds();
+	w = this.getDay();
+	t = parseInt(this.getTime() / 1000);
+
+	format_string = format_string === undefined ? '%c' : format_string;
+	var f = format_string.toString();
+	f = f.replace(/%%/g, '{-+-+-}%{/-+-+-}');
+	f = f.replace(/%D/g, '%m/%d/%y');
+	f = f.replace(/%T/g, '%H:%M:%S'); 
+	f = f.replace(/%F/g, '%y-%m-%d');
+	f = f.replace(/%R/g, '%H:%M');
+	f = f.replace(/%h/g, '%b');
+	f = f.replace(/%n/g, '\n');
+	f = f.replace(/%t/g, '\t');
+	f = f.replace(/%S/g, s.pad(2,'0')); //Second
+	f = f.replace(/%s/g, t.toString()); //Stamp
+	f = f.replace(/%MS/g, ms.toString()); //Millisecond
+	f = f.replace(/%M/g, i.pad(2,'0')); //Minute
+	f = f.replace(/%H/g, h.pad(2,'0')); //Hour
+	f = f.replace(/%d/g, d.pad(2,'0')); //Day
+	f = f.replace(/%m/g, m.pad(2,'0')); //Month(Int)
+	f = f.replace(/%B/g, array_month[m]); //January
+	f = f.replace(/%b/g, array_month[m + 12]); //Jan
+	f = f.replace(/%Y/g, y.toString()); //Year
+	f = f.replace(/%y/g, (y % 100).pad(2,'0')); //Year 00~99
+	f = f.replace(/%w/g, w.toString()); //Week(Int)
+	f = f.replace(/%W/g, w.toString()); //Week(Int)
+	f = f.replace(/%A/g, array_week[w]); //Monday
+	f = f.replace(/%a/g, array_week[w + 7]); //Mon
+	f = f.replace(/%x/g, this.toLocaleDateString()); 
+	f = f.replace(/%X/g, this.toLocaleTimeString());
+	f = f.replace(/%c/g, this.toLocaleString());
+	f = f.replace('{-+-+-}%{/-+-+-}', '%');
+	return f;
+}
+
+
+String.prototype.toTimeString = function(format_string) {
+	return this.toDate().toString(format_string);
+}
+
+Number.prototype.toTimeString = function(format_string) {
+	return this.toString().toDate().toString(format_string);
+}
+
+String.prototype.toCountDownString = function(format_string){
+	var count_down_ms = parseInt(this);
+	return isNaN(count_down_ms) ? this : count_down_ms.toCountDownString();
+}
+
+Number.prototype.toCountDownString = function(format_string){
+		var d,h,m,s,ms,minus=false;
+		//if (this < 0) minus = true;
+		var count_down_ms = Math.abs(parseInt(this));
+		var t = parseInt(count_down_ms / 1000);
+		d = parseInt(t / 60 / 60 / 24);
+		if (format_string.indexOf('%D') < 0) d = 0;
+		h = parseInt(t / 60 / 60 - d * 24);
+		if (format_string.indexOf('%H') < 0) h = 0;
+		m = parseInt(t / 60 - d * 24 * 60 - h * 60);
+		if (format_string.indexOf('%M') < 0) m = 0;
+		s = t - d * 24 * 60 * 60 - h * 60 * 60 - m * 60;
+		ms = count_down_ms - t * 1000;
+		var f = format_string.replace(/%S/g,s.pad(2,'0'));//Second
+		f = f.replace(/%s/g,t.toString());//Stamp
+		f = f.replace(/%MS/g,ms.toString());//Millisecond
+		f = f.replace(/%ms/g,count_down_ms.toString());//Millisecond Stamp
+		f = f.replace(/%M/g,m.pad(2,'0'));//Minute
+		f = f.replace(/%H/g,h.pad(2,'0'));//Hour
+		f = f.replace(/%D/g,d.pad(2,'0'));//Day
+		return f;
+};
+Math.indexToColumn = function(index) {
+		var r = 26;
+		var str = '';
+		if (index == 0) return 'A';
+		while(index > 0) {
+			if (str.length > 0) --index;
+			var mr = index % r;
+			str = String.fromCharCode(mr + 65) + str; 
+			index = Math.floor((index - mr) / r);
+		}
+		return str;
+	}
+Math.columnToIndex = function(no) {
+	no = no.toUpperCase();
+	if (no == 'A') return 0;
+	var r = 26;
+	var index = 0;
+	var length = no.length;
+	for(var i = 0;i < length;++i) {
+		var ch = no.substr(i,1);
+		index += (String.charCodeAt(ch)  - 65 + 1) * Math.pow(r, length - i - 1);
+	}
+	return index - 1;
+}
+
+String.prototype.getQuery = function(param) {
+		param = param.replace(/([\\\?\(\)\[\]\*\.\$\^\{\}])/g,"\\$1");
+		param += '((?:\[[^\]]*\]){0,})';
+		var reg = new RegExp('(?:\\?|&)'+param+'=(.*?)(?=&|$|#)','ig'), temp;
+		var p = [];
+		while((temp = reg.exec(this)) != null)
+		{
+			if (temp[1] == '') return decodeURIComponent(temp[2]);
+			p.push({key: temp[1], value: decodeURIComponent(temp[2]), '0': temp[1], '1': decodeURIComponent(temp[2])});
+		}
+		return p.length ? p : null;
+}
+
+if (window.location) {
+//support: ?id=123&a[]=1&a[2]=2&a[3][]=3
+window.location.query = function(param) {
+	return window.location.search.toString().getQuery(param);
+};
+}
+
+function clone(obj) {
+	var o;
+	if (typeof obj == "object") {
+		if (obj === null) {
+			o = null;
+		} else {
+			if (obj instanceof Array) {
+				o = [];
+				for (var i = 0, len = obj.length; i < len; i++)
+					o.push(clone(obj[i]));
+			} else {
+				o = {};
+				for (var j in obj)
+					o[j] = clone(obj[j]);
+			}
+		}
+	} else {
+		o = obj;
+	}
+	return o;
+};
+
+function resizeImg(img, maxWidth, maxHeight) {
+	var HeightWidth = img.offsetHeight / img.offsetWidth;//ÉèÖÃ¸ß¿í±È 
+	var WidthHeight = img.offsetWidth / img.offsetHeight;//ÉèÖÃ¿í¸ß±È 
+	if(img.offsetWidth > maxWidth)
+		jQuery(img).css({width : maxWidth, height : maxWidth * HeightWidth}); 
+	if(img.offsetHeight > maxHeight)
+		jQuery(img).css({width : maxHeight * WidthHeight, height : maxHeight}); 
+}
+
+function rand(min, max) {
+  var argc = arguments.length;
+  if (argc === 0) {
+	min = 0;
+	max = 2147483647;
+  } else if (argc === 1) {
+	throw new Error('Warning: rand() expects exactly 2 parameters, 1 given');
+  }
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function probability_rand(arr) { 
+	var result = false; 
+	//概率数组的总概率精度 
+	var sum = arr.sum(); 
+	//arsort($arr);
+	//概率数组循环 
+	for (var k in arr) { 
+		var randNum = rand(1, sum);
+		var v = parseFloat(arr[k]);
+		if (randNum <= v) {
+			result = k;
+			break; 
+		} else {
+			sum -= v;
+		}
+	} 
+	return result; 
+} 
+
+
+(function($){
+	$.OS = {
+		is_phone : /(Android|webOS|iPhone|Windows\sPhone|iPod|BlackBerry|SymbianOS)/i.test(navigator.userAgent),
+		ios : /(iPod|iPhone|iPad)/i.test(navigator.userAgent),
+		android : /Android/i.test(navigator.userAgent),
+		symbian : /SymbianOS/i.test(navigator.userAgent),
+		blackberry : /BlackBerry/i.test(navigator.userAgent),
+		webos : /webOS/i.test(navigator.userAgent),
+		wp : /Windows\sPhone/i.test(navigator.userAgent),
+		wechat : /MicroMessenger/i.test(navigator.userAgent)
+	};
+	var scripts = document.getElementsByTagName("script");
+	var thiscript = scripts[ scripts.length - 1 ];
+	$.baseuri = thiscript.src.toString().match(/[^\/:](\/.*)static\/js\/common\.js/i)[1];
+	if (!$.baseuri) $.baseuri = '/';
+	/* Gets window width cross browser */
+	$.window_size = function(){
+		return {'width' : window.innerWidth
+				|| document.documentElement.clientWidth
+				|| document.body.clientWidth,
+				'height' : window.innerHeight
+				|| document.documentElement.clientHeight
+				|| document.body.clientHeight,
+			};
+	};
+	$.getAnsiLength = function(b, ansi) {
+		if (!(typeof b == 'string') || !ansi) {
+			return b.length;
+		}
+		var a = b.match(/[^\x00-\x80]/g);
+		return b.length + (a ? a.length : 0);
+	};
+	$.isUndefined = function(obj) {
+		return typeof obj == 'undefined';
+	}
+	$.isjQuery = function(obj) {
+		return obj instanceof jQuery;
+	}
+	if ($.noty) {
+		$.noty.defaults = {
+			layout: 'center',
+			theme: 'defaultTheme',
+			type: 'alert',
+			text: '',
+			dismissQueue: true, // If you want to use queue feature set this true
+			template: '<div class="noty_message"><span class="noty_text"></span><div class="noty_close"></div></div>',
+			animation: {
+				open: {height: 'toggle'},
+				close: {height: 'toggle'},
+				easing: 'swing',
+				speed: $.OS.is_phone ? 0 : 500 // opening & closing animation speed
+			},
+			timeout: 2000, // delay for closing event. Set false for sticky notifications
+			force: false, // adds notification to the beginning of queue when set to true
+			modal: true,
+			maxVisible: 15, // you can set max visible notification for dismissQueue true option
+			closeWith: ['click'], // ['click', 'button', 'hover']
+			callback: {
+				onShow: function() {},
+				afterShow: function() {},
+				onClose: function() {},
+				afterClose: function() {}
+			},
+			buttons: false // an array of buttons
+		};
+	}
+	$.showtips = function(tips, redirect) {
+
+		var _tips = clone(tips);
+		_tips.result == 'failure' && (_tips.result = 'warning');
+		var _redirect = $.isUndefined(redirect) ? true : redirect;
+//		console.log(_tips);
+		var setting = {
+			text : '<div style="text-align:left;"><h4>' + _tips.message.title + '</h4><div>'+ _tips.message.content +'</div></div>',
+			type : _tips.result,
+			timeout : _tips.url === false ? false : 1500,
+			buttons : _tips.url === false ? [
+			{
+				addClass: 'btn btn-warning',
+				text: COMMON_LANGUAGE.back,
+				onClick: function($noty) {
+					$noty.close();
+				}
+			}
+			] : false
+		};
+		if ($.noty) {
+			var $noty = noty(setting);
+			$('button:eq(0)',$noty.$buttons).focus();
+		} else
+			alert(_tips.message.content.noHTML());
+
+		if (_redirect) {
+			if (_tips.url !== true && _tips.url !== false) {
+				setTimeout(function() {
+					self.location.href = _tips.url;
+				}, 1500);
+				
+			} else if (_tips.url === true) {
+				setTimeout(function() {
+					self.location.reload();
+				}, 1500);
+			}
+		}
+			
+	}
+	/**
+	 * post or get a url
+	 * @example post it when [data] isn't null
+	 * @example get it when [data] is null/undefined
+	 * @example show tips when [alert_it] is true
+	 * 
+	 * @param  {String}   		url      query URL
+	 * @param  {String/Object}	data     form data
+	 * @param  {Function} 		callback call it when query success
+	 * @param  {Boolean}   		alert_it show tips when true
+	 */
+	$.query = function(url, data, method, callback, alert_it) {
+		if ($.isUndefined(alert_it)) alert_it = true;
+		if ($.isUndefined(method)) method = data ? 'POST' : 'GET';
+		var _this = this, _result = null;
+		$.ajax({
+			url : url,
+			data : data ? data : null,
+			async : callback !== false, 
+			cache : false,
+			type : method,
+			timeout : 20000,
+			dataType : /[\?&](jsonp|callback)=\?/i.test(url) ? 'jsonp' : 'json',
+			success : function(json) {
+				if (json) {
+					if (json.result && alert_it){
+						$.showtips(json);
+					}
+				}
+				if (callback === false)	{
+						_result = json;
+						return _result;
+				}
+				if (callback && $.isFunction(callback))
+					callback.call(_this, json);
+			},
+			error : function(XMLHttpRequest, textStatus, errorThrown) {
+				if (alert_it)
+				{
+					switch(textStatus)
+					{
+						case 'timeout':
+							$.tips(COMMON_LANGUAGE.network_timeout);
+							break;
+						case 'error':
+							break;
+						case 'notmodified':
+							break;
+						case 'parsererror':
+							break;
+						default:
+							break;
+					}
+				}
+			}
+		});
+		return _result;
+	}
+
+	$.GET = function(url, data, callback, alert_it) {
+		return $.query.call(this, url, data, 'GET', callback, alert_it);
+	}
+
+	$.POST = function(url, data, callback, alert_it) {
+		return $.query.call(this, url, data, 'POST', callback, alert_it)
+	}
+
+	/**
+	 * [alert description]
+	 * @param  {String} msg              [description]
+	 * @param  {[type]} confirm_callback [description]
+	 * @return {[type]}                  [description]
+	 */
+	$.alert = function(msg, confirm_callback) {
+		var setting = {
+			text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><div>'+ msg +'</div></div>',
+			type : 'success',
+			timeout :  confirm_callback ? false : 1500 ,
+			buttons : confirm_callback ? [
+				{
+					addClass: 'btn btn-primary',
+					text: COMMON_LANGUAGE.ok,
+					onClick: function($noty) {
+						$noty.close();
+						if (confirm_callback && $.isFunction(confirm_callback))
+							confirm_callback.call(this);
+					}
+				}
+			] : false 
+		};
+		if ($.noty) {
+			var $noty = noty(setting);
+			$('button:eq(0)',$noty.$buttons).focus();
+		} else {
+			alert(msg);
+			if (confirm_callback && $.isFunction(confirm_callback))
+				confirm_callback.call(this);
+		}
+	}
+
+	$.tips = function(msg, timeout) {
+		var setting = {
+			text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><div>'+ msg +'</div></div>',
+			type : 'warning',
+			timeout :  timeout ? timeout : 1500
+		};
+		if ($.noty)
+			noty(setting);
+		else
+			alert(msg);
+	}
+
+	$.confirm = function(msg, confirm_callback, cancel_callback) {
+		var setting = {
+			text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><div>'+ msg +'</div></div>',
+			type : 'warning',
+			timeout :  false ,
+			buttons : [
+				{
+					addClass: 'btn btn-primary',
+					text: COMMON_LANGUAGE.ok,
+					onClick: function($noty) {
+						$noty.close();
+						if (confirm_callback && $.isFunction(confirm_callback)) confirm_callback.call(this);
+					}
+				},{
+					addClass: 'btn btn-danger',
+					text: COMMON_LANGUAGE.cancel,
+					onClick: function($noty) {
+						$noty.close();
+						if (cancel_callback && $.isFunction(confirm_callback)) cancel_callback.call(this);
+					}
+				}
+			]
+		};
+		if ($.noty) {
+			var $noty = noty(setting);
+			$('button:eq(1)',$noty.$buttons).focus();
+		} else {
+			if (confirm(msg)) {
+				if (confirm_callback && $.isFunction(confirm_callback)) confirm_callback.call(this);
+			} else {
+				if (cancel_callback && $.isFunction(confirm_callback)) cancel_callback.call(this);
+			}
+		}
+	}
+
+	$.fn.extend({checkAll : function($selector, callback) {
+		if(!$.isjQuery($selector)) $selector = $($selector);
+		var t = this;
+		$selector.on('click change', function(){
+			var length = $selector.length;
+			var checked_length = $selector.filter(':checked').length;
+			t.prop({"checked": length == checked_length && length != 0, "indeterminate" : length != checked_length && checked_length != 0 });
+			if (callback && $.isFunction(callback)) callback.call(t.add($selector), t.prop("checked"), t.prop("indeterminate"));
+		});
+		return this.each(function(){
+			$(this).on('click change', function(){
+				$selector.prop('checked', this.checked);
+				if (callback && $.isFunction(callback)) callback.call(t.add($selector), this.checked, false);
+			});
+		});
+	}, count_down : function(format, delta, duration){ //delta = server microtime - client microtime
+		if (format === false) return this.each(function(){
+			var interval = $(this).data('count-down-interval');clearInterval(interval); interval = null;
+		});
+		if ($.isUndefined(delta)) delta = 0;
+		return this.data({'count-down-delta' : delta, 'count-down-format' : format}).each(function(){
+			var $this = $(this);
+			var count_down_method = function() {
+				var count_down = $this.data('count-down');
+				var format =  $this.data('count-down-format');
+				if (count_down) {
+					var target = count_down.toDate();
+					$this.data('count_down',target);
+					var delta = parseInt($this.data('count-down-delta'));
+					var cd = target.getTime() - (new Date()).getTime() + delta;
+					var text = '';
+					if ( cd > 0 ) {
+						if (format) {
+							text = cd.toCountDownString(format);
+							if($this.is(':input:not(button[value])')) $this.val(text); else $this.html(text);
+						}
+						$this.triggerHandler('count-down-ing',[cd, text]);
+					} else {
+						var interval = $this.data('count-down-interval');
+						clearInterval(interval); interval = null;
+						if (format) {
+							cd = 0; //to 0
+							text = cd.toCountDownString(format);
+							if($this.is(':input:not(button[value])')) $this.val(text); else $this.html(text);
+						}
+						$this.triggerHandler('count-down-stop',[cd, text]);
+					}
+				}
+			}
+			var interval = setInterval(count_down_method, $.isUndefined(duration) || duration < 10 ? 500 : parseInt(duration));
+			$this.data('count-down-interval', interval);
+			$this.triggerHandler('count-down-start',[0, '']);
+			count_down_method.call(this); //call it
+		});
+	}, query : function(callback, alert_it) {
+		return this.each(function() {
+			var $this = $(this);
+			var is_form = $this.is('form');
+			var validator = is_form ? $this.data('validator') : null;
+			if (validator) validator.settings.submitHandler = function(f,e) {};
+			$this.on(is_form ? 'submit': 'click', function(e){
+				var selector = $this.attr('selector');
+				var $selector = is_form ? $this.add(selector) : $(selector);
+				if (validator && !$.isEmptyObject(validator.invalid)) //validator is invalid
+					return false;
+				
+				if((selector || is_form) && $selector.serializeArray().length <= 0) //selector is set,but nothing to query
+				{
+					$.tips(COMMON_LANGUAGE.unselected);
+					return false;
+				}
+
+				if (is_form)
+				{ //disabled the submit button
+					$(':submit,:image',$this).each(function(){
+						var $t = $(this);
+						if ($t.prop('disabled') || $t.hasClass('disabled')) return false;
+						$t.prop('disabled',true).attr('disabled','disabled');
+						var submit_val =  $t.is(':not([value])') ? $t.html() : $t.val();
+						if (submit_val) {
+							$t.filter('[value]').val(submit_val + '...');
+							$t.filter(':not([value])').html(submit_val + '...');
+						}
+						$t.delay(5000).queue(function(){
+							$t.prop('disabled',false).removeAttr('disabled');
+							if (submit_val) {
+								$t.filter('[value]').val(submit_val);
+								$t.filter(':not([value])').html(submit_val);
+							}
+							$t.dequeue();
+						});
+					});
+				}
+
+				var url = $this.attr(is_form ? 'action' : 'href');
+				var method = $this.attr('method');
+				var msg = $this.attr('confirm');
+				var query = function(){
+					$.query.call($this, url, $selector.serialize(), method, callback, alert_it);
+				}
+				if (msg) {
+					msg = msg.replace('%L', $selector.serializeArray().length)
+					$.confirm(msg, query);
+				} else
+					query.call(this);
+				e.stopImmediatePropagation();
+				return false;
+			});
+		});
+	}
+	});
+})(jQuery);

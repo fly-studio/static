@@ -1,0 +1,279 @@
+@-webkit-keyframes win8-auto-circle {
+0% {background-position:0 0;}
+2.94% {background-position:0 -10px;}
+5.88% {background-position:0 -20px;}
+8.82% {background-position:0 -30px;}
+11.7% {background-position:0 -40px;}
+14.64% {background-position:0 -50px;}
+17.58% {background-position:0 -60px;}
+20.52% {background-position:0 -70px;}
+23.46% {background-position:0 -80px;}
+26.4% {background-position:0 -90px;}
+29.34% {background-position:0 -100px;}
+32.28% {background-position:0 -110px;}
+35.22% {background-position:0 -120px;}
+38.16% {background-position:0 -130px;}
+41.1% {background-position:0 -140px;}
+44.04% {background-position:0 -150px;}
+46.98% {background-position:0 -160px;}
+49.92% {background-position:0 -170px;}
+52.86% {background-position:0 -180px;}
+55.8% {background-position:0 -190px;}
+58.74% {background-position:0 -200px;}
+61.68% {background-position:0 -210px;}
+64.62% {background-position:0 -220px;}
+67.56% {background-position:0 -230px;}
+70.5% {background-position:0 -240px;}
+73.44% {background-position:0 -250px;}
+76.38% {background-position:0 -260px;}
+79.32% {background-position:0 -270px;}
+82.26% {background-position:0 -280px;}
+85.2% {background-position:0 -290px;}
+88.14% {background-position:0 -300px;}
+91.08% {background-position:0 -310px;}
+94.02% {background-position:0 -320px;}
+96.96% {background-position:0 -330px;}
+99.9% {background-position:0 -340px;}
+}
+@-moz-keyframes win8-auto-circle {
+0% {background-position:0 0;}
+2.94% {background-position:0 -10px;}
+5.88% {background-position:0 -20px;}
+8.82% {background-position:0 -30px;}
+11.7% {background-position:0 -40px;}
+14.64% {background-position:0 -50px;}
+17.58% {background-position:0 -60px;}
+20.52% {background-position:0 -70px;}
+23.46% {background-position:0 -80px;}
+26.4% {background-position:0 -90px;}
+29.34% {background-position:0 -100px;}
+32.28% {background-position:0 -110px;}
+35.22% {background-position:0 -120px;}
+38.16% {background-position:0 -130px;}
+41.1% {background-position:0 -140px;}
+44.04% {background-position:0 -150px;}
+46.98% {background-position:0 -160px;}
+49.92% {background-position:0 -170px;}
+52.86% {background-position:0 -180px;}
+55.8% {background-position:0 -190px;}
+58.74% {background-position:0 -200px;}
+61.68% {background-position:0 -210px;}
+64.62% {background-position:0 -220px;}
+67.56% {background-position:0 -230px;}
+70.5% {background-position:0 -240px;}
+73.44% {background-position:0 -250px;}
+76.38% {background-position:0 -260px;}
+79.32% {background-position:0 -270px;}
+82.26% {background-position:0 -280px;}
+85.2% {background-position:0 -290px;}
+88.14% {background-position:0 -300px;}
+91.08% {background-position:0 -310px;}
+94.02% {background-position:0 -320px;}
+96.96% {background-position:0 -330px;}
+99.9% {background-position:0 -340px;}
+}
+@keyframes win8-auto-circle {
+0% {background-position:0 0;}
+2.94% {background-position:0 -10px;}
+5.88% {background-position:0 -20px;}
+8.82% {background-position:0 -30px;}
+11.7% {background-position:0 -40px;}
+14.64% {background-position:0 -50px;}
+17.58% {background-position:0 -60px;}
+20.52% {background-position:0 -70px;}
+23.46% {background-position:0 -80px;}
+26.4% {background-position:0 -90px;}
+29.34% {background-position:0 -100px;}
+32.28% {background-position:0 -110px;}
+35.22% {background-position:0 -120px;}
+38.16% {background-position:0 -130px;}
+41.1% {background-position:0 -140px;}
+44.04% {background-position:0 -150px;}
+46.98% {background-position:0 -160px;}
+49.92% {background-position:0 -170px;}
+52.86% {background-position:0 -180px;}
+55.8% {background-position:0 -190px;}
+58.74% {background-position:0 -200px;}
+61.68% {background-position:0 -210px;}
+64.62% {background-position:0 -220px;}
+67.56% {background-position:0 -230px;}
+70.5% {background-position:0 -240px;}
+73.44% {background-position:0 -250px;}
+76.38% {background-position:0 -260px;}
+79.32% {background-position:0 -270px;}
+82.26% {background-position:0 -280px;}
+85.2% {background-position:0 -290px;}
+88.14% {background-position:0 -300px;}
+91.08% {background-position:0 -310px;}
+94.02% {background-position:0 -320px;}
+96.96% {background-position:0 -330px;}
+99.9% {background-position:0 -340px;}
+}
+.win8-loading-blue {
+	background:transparent url('../img/loading/animate-loading-blue.png') 0 0
+}
+.win8-loading-white {
+	background:transparent url('../img/loading/animate-loading-white.png') 0 0
+}
+.win8-loading-blue, .win8-loading-white {
+	-webkit-animation:win8-auto-circle 1.7s step-end infinite;
+	-moz-animation:win8-auto-circle 1.7s step-end infinite;
+	animation:win8-auto-circle 1.7s step-end infinite;
+	height:10px;
+	width:70px
+}
+
+@-webkit-keyframes rotateplane{0%{-webkit-transform:perspective(120px)}50%{-webkit-transform:perspective(120px) rotateY(180deg)}100%{-webkit-transform:perspective(120px) rotateY(180deg) rotateX(180deg)}}
+@keyframes rotateplane{0%{transform:perspective(120px) rotateX(0deg) rotateY(0deg);-webkit-transform:perspective(120px) rotateX(0deg) rotateY(0deg)}50%{transform:perspective(120px) rotateX(-180.1deg) rotateY(0deg);-webkit-transform:perspective(120px) rotateX(-180.1deg) rotateY(0deg)}100%{transform:perspective(120px) rotateX(-180deg) rotateY(-179.9deg);-webkit-transform:perspective(120px) rotateX(-180deg) rotateY(-179.9deg)}}
+
+.flip-loading{position:absolute;left:0;right:0;top:0;bottom:0;margin:auto;width:60px;height:60px;background-color:#00aacf;-webkit-animation:rotateplane 1.2s infinite ease-in-out;animation:rotateplane 1.2s infinite ease-in-out}
+
+@-webkit-keyframes rotate-spin {
+	0%   { 
+		-webkit-transform: rotate(0deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+		-ms-transform: rotate(0deg);  /* IE 9 */
+		transform: rotate(0deg);  /* Firefox 16+, IE 10+, Opera */
+	}
+	100% {
+		-webkit-transform: rotate(360deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+		-ms-transform: rotate(360deg);  /* IE 9 */
+		transform: rotate(360deg);  /* Firefox 16+, IE 10+, Opera */
+	}
+}
+@keyframes rotate-spin {
+	0%   { 
+		-webkit-transform: rotate(0deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+		-ms-transform: rotate(0deg);  /* IE 9 */
+		transform: rotate(0deg);  /* Firefox 16+, IE 10+, Opera */
+	}
+	100% {
+		-webkit-transform: rotate(360deg);  /* Chrome, Opera 15+, Safari 3.1+ */
+		-ms-transform: rotate(360deg);  /* IE 9 */
+		transform: rotate(360deg);  /* Firefox 16+, IE 10+, Opera */
+	}
+}
+	
+.rgb-loading {
+	display: block;
+	width: 150px;
+	height: 150px;
+	border-radius: 50%;
+	border: 3px solid transparent;
+	border-top-color: #3498db;
+
+	-webkit-animation: rotate-spin 2s linear infinite; /* Chrome, Opera 15+, Safari 5+ */
+	animation: rotate-spin 2s linear infinite; /* Chrome, Firefox 16+, IE 10+, Opera */
+	z-index: 1001;
+}
+
+.rgb-loading:before {
+	content: "";
+	position: absolute;
+	top: 5px;
+	left: 5px;
+	right: 5px;
+	bottom: 5px;
+	border-radius: 50%;
+	border: 3px solid transparent;
+	border-top-color: #e74c3c;
+
+	-webkit-animation: rotate-spin 3s linear infinite; /* Chrome, Opera 15+, Safari 5+ */
+	animation: rotate-spin 3s linear infinite; /* Chrome, Firefox 16+, IE 10+, Opera */
+}
+
+.rgb-loading:after {
+	content: "";
+	position: absolute;
+	top: 15px;
+	left: 15px;
+	right: 15px;
+	bottom: 15px;
+	border-radius: 50%;
+	border: 3px solid transparent;
+	border-top-color: #f9c922;
+
+	-webkit-animation: rotate-spin 1.5s linear infinite; /* Chrome, Opera 15+, Safari 5+ */
+	animation: rotate-spin 1.5s linear infinite; /* Chrome, Firefox 16+, IE 10+, Opera */
+}
+/**/
+@-webkit-keyframes loading-box-rotate{
+	0%{-webkit-transform:rotateX(0deg) rotateY(0deg) rotateZ(0deg);-webkit-transform-origin: center center;}
+	100%{-webkit-transform:rotateX(180deg) rotateY(180deg) rotateZ(180deg);-webkit-transform-origin: center center; }
+
+}
+@keyframes loading-box-rotate{
+	0%{-webkit-transform:rotateX(0deg) rotateY(0deg) rotateZ(0deg);-webkit-transform-origin: center center;}
+	100%{-webkit-transform:rotateX(180deg) rotateY(180deg) rotateZ(180deg);-webkit-transform-origin: center center; }
+}
+.loading-box {            
+	height: 200px;
+	width:200px;
+	position: absolute;
+	/*top:50%;left:50%;
+	margin-left:-100px;
+	margin-top:-200px;*/
+	-webkit-transform-style: preserve-3d;
+	transform-style: preserve-3d;
+	-webkit-perspective: 0px;
+	perspective: 0px;
+	-webkit-animation: loading-box-rotate 5s ease infinite;
+	animation: loading-box-rotate 5s ease infinite;
+}
+.loading-box .box {
+	width: 200px;
+	height: 200px;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin: -100px 0 0 -100px;
+	line-height: 200px;
+	text-align: center;
+	font-size: 48px;
+	color: white;
+}
+.loading-box .box1 {
+	-webkit-transform: rotatey(90deg) translatez(-100px);
+	-moz-transform: rotatey(90deg) translatez(-100px);
+	transform: rotatey(90deg) translatez(-100px);
+	background: rgba(128,0,128,.5);
+}
+.loading-box .box2 {
+	-webkit-transform: rotatey(90deg) translatez(100px);
+	-moz-transform: rotatey(90deg) translatez(100px);
+	transform: rotatey(90deg) translatez(100px);
+	background: rgba(255,0,255,.5);
+}
+.loading-box .box3 {
+	-webkit-transform: rotatex(90deg) translatez(100px);
+	-moz-transform: rotatex(90deg) translatez(100px);
+	transform: rotatex(90deg) translatez(100px);
+	background: rgba(255,153,204,.5);
+}
+.loading-box .box4 {
+	-webkit-transform: rotatex(90deg) translatez(-100px);
+	-moz-transform: rotatex(90deg) translatez(-100px);
+	transform: rotatex(90deg) translatez(-100px);
+	background: rgba(0,204,255,.5);
+}
+.loading-box .box5 {
+	-webkit-transform: translatez(-100px);
+	-moz-transform: translatez(-100px);
+	transform: translatez(-100px);
+	background: rgba(153,204,255,.5);
+}
+.loading-box .box6 {
+	-webkit-transform: translatez(100px);
+	-moz-transform: translatez(100px);
+	transform: translatez(100px);
+	background: rgba(0,255,255,.5);
+}
+/*
+<div class="loading-box">
+<div class="box1 box">Side 1</div>
+<div class="box2 box">Side 2</div>
+<div class="box3 box">Side 3</div>
+<div class="box4 box">Side 4</div>
+<div class="box5 box">Side 5</div>
+<div class="box6 box">Side 6</div>
+</div>
+*/
