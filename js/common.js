@@ -91,15 +91,12 @@ if (!String.prototype.repeat) {
 String.prototype.toHTML = function() {
 	return this.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#039;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 };
-
 String.prototype.toPre = function() {
 	return this.replace(/\s/g, '&nbsp;').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1<br />$2');
 };
-
 String.prototype.noHTML = function() {
 	return this.replace(/<script[^>]*?>.*?<\/script>/ig, '').replace(/<[\/\!]*?[^<>]*?>/g, '').replace(/<style[^>]*?>.*?<\/style>/ig, '').replace(/<![\s\S]*?--[ \t\n\r]*>/, '').replace(/([\r\n])[\s]+/,'').replace(/&(quot|#34|amp|#38|lt|#60|gt|#62|nbsp|#160)/i,'');
 };
-
 String.prototype.aLength = function() {
 	var a = this.match(/[^\x00-\x80]/g);
 	return this.length + (a ? a.length : 0);
@@ -171,13 +168,11 @@ String.prototype.pad = function(pad_length, pad_string, pad_type) {
 		}
 	}
 	return input;
-}
-
+};
 Number.prototype.pad = function(pad_length, pad_string, pad_type) {
 	pad_string = pad_string !== undefined ? pad_string : '0';
 	return this.toString().pad(pad_length, pad_string, pad_type);
-}
-
+};
 String.prototype.number_format = function(decimals, dec_point, thousands_sep) {
 	var number = (this + '').replace(/[^0-9+\-Ee.]/g, '');
 	var n = !isFinite(+number) ? 0 : +number,
@@ -200,12 +195,10 @@ String.prototype.number_format = function(decimals, dec_point, thousands_sep) {
 		.join('0');
  	}
 	return s.join(dec);
-}
-
+};
 Number.prototype.number_format = function(decimals, dec_point, thousands_sep) {
 	return this.toString().number_format(decimals, dec_point, thousands_sep);
-}
-
+};
 String.prototype.toDate = function() {
 	var t = this;
 	if (!isNaN(this))
@@ -214,16 +207,13 @@ String.prototype.toDate = function() {
 	if (isNaN(t.getTime()))
 		t = new Date();
 	return t;
-}
-
+};
 Number.prototype.toDate = function() {
 	return this.toString().toDate();
-}
-
+};
 Date.prototype.toDate = function() {
 	return this;
-}
-
+};
 Date.prototype.toString = function(format_string) {
 	var array_week = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', '&#26085;', '&#19968;', '&#20108;', '&#19977;', '&#22235;', '&#20116;', '&#20845;'];
 	var array_month = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
@@ -269,22 +259,17 @@ Date.prototype.toString = function(format_string) {
 	f = f.replace(/%c/g, this.toLocaleString());
 	f = f.replace('{-+-+-}%{/-+-+-}', '%');
 	return f;
-}
-
-
+};
 String.prototype.toTimeString = function(format_string) {
 	return this.toDate().toString(format_string);
-}
-
+};
 Number.prototype.toTimeString = function(format_string) {
 	return this.toString().toDate().toString(format_string);
-}
-
+};
 String.prototype.toCountDownString = function(format_string){
 	var count_down_ms = parseInt(this);
 	return isNaN(count_down_ms) ? this : count_down_ms.toCountDownString();
-}
-
+};
 Number.prototype.toCountDownString = function(format_string){
 		var d,h,m,s,ms,minus=false;
 		//if (this < 0) minus = true;
@@ -308,17 +293,17 @@ Number.prototype.toCountDownString = function(format_string){
 		return f;
 };
 Math.indexToColumn = function(index) {
-		var r = 26;
-		var str = '';
-		if (index == 0) return 'A';
-		while(index > 0) {
-			if (str.length > 0) --index;
-			var mr = index % r;
-			str = String.fromCharCode(mr + 65) + str; 
-			index = Math.floor((index - mr) / r);
-		}
-		return str;
+	var r = 26;
+	var str = '';
+	if (index == 0) return 'A';
+	while(index > 0) {
+		if (str.length > 0) --index;
+		var mr = index % r;
+		str = String.fromCharCode(mr + 65) + str; 
+		index = Math.floor((index - mr) / r);
 	}
+	return str;
+};
 Math.columnToIndex = function(no) {
 	no = no.toUpperCase();
 	if (no == 'A') return 0;
@@ -330,8 +315,7 @@ Math.columnToIndex = function(no) {
 		index += (String.charCodeAt(ch)  - 65 + 1) * Math.pow(r, length - i - 1);
 	}
 	return index - 1;
-}
-
+};
 String.prototype.getQuery = function(param) {
 		param = param.replace(/([\\\?\(\)\[\]\*\.\$\^\{\}])/g,"\\$1");
 		param += '((?:\[[^\]]*\]){0,})';
@@ -343,15 +327,13 @@ String.prototype.getQuery = function(param) {
 			p.push({key: temp[1], value: decodeURIComponent(temp[2]), '0': temp[1], '1': decodeURIComponent(temp[2])});
 		}
 		return p.length ? p : null;
-}
-
+};
 if (window.location) {
 //support: ?id=123&a[]=1&a[2]=2&a[3][]=3
 window.location.query = function(param) {
 	return window.location.search.toString().getQuery(param);
 };
-}
-
+};
 function clone(obj) {
 	var o;
 	if (typeof obj == "object") {
@@ -373,7 +355,6 @@ function clone(obj) {
 	}
 	return o;
 };
-
 function resizeImg(img, maxWidth, maxHeight) {
 	var HeightWidth = img.offsetHeight / img.offsetWidth;//ÉèÖÃ¸ß¿í±È 
 	var WidthHeight = img.offsetWidth / img.offsetHeight;//ÉèÖÃ¿í¸ß±È 
@@ -381,8 +362,7 @@ function resizeImg(img, maxWidth, maxHeight) {
 		jQuery(img).css({width : maxWidth, height : maxWidth * HeightWidth}); 
 	if(img.offsetHeight > maxHeight)
 		jQuery(img).css({width : maxHeight * WidthHeight, height : maxHeight}); 
-}
-
+};
 function rand(min, max) {
   var argc = arguments.length;
   if (argc === 0) {
@@ -392,8 +372,7 @@ function rand(min, max) {
 	throw new Error('Warning: rand() expects exactly 2 parameters, 1 given');
   }
   return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
+};
 function probability_rand(arr) { 
 	var result = false; 
 	//概率数组的总概率精度 
@@ -411,9 +390,18 @@ function probability_rand(arr) {
 		}
 	} 
 	return result; 
-} 
-
-
+};
+/*jQuery deparam*/
+(function(h){h.deparam=function(i,j){var d={},k={"true":!0,"false":!1,"null":null};h.each(i.replace(/\+/g," ").split("&"),function(i,l){var m;var a=l.split("="),c=decodeURIComponent(a[0]),g=d,f=0,b=c.split("]["),e=b.length-1;/\[/.test(b[0])&&/\]$/.test(b[e])?(b[e]=b[e].replace(/\]$/,""),b=b.shift().split("[").concat(b),e=b.length-1):e=0;if(2===a.length)if(a=decodeURIComponent(a[1]),j&&(a=a&&!isNaN(a)?+a:"undefined"===a?void 0:void 0!==k[a]?k[a]:a),e)for(;f<=e;f++)c=""===b[f]?g.length:b[f],m=g[c]=
+f<e?g[c]||(b[f+1]&&isNaN(b[f+1])?{}:[]):a,g=m;else h.isArray(d[c])?d[c].push(a):d[c]=void 0!==d[c]?[d[c],a]:a;else c&&(d[c]=j?void 0:"")});return d}})(jQuery);
+/*!
+ * jQuery Cookie Plugin v1.4.1
+ * https://github.com/carhartl/jquery-cookie
+ *
+ * Copyright 2006, 2014 Klaus Hartl
+ * Released under the MIT license
+ */
+(function(a){if(typeof define==="function"&&define.amd){define(["jquery"],a)}else{if(typeof exports==="object"){module.exports=a(require("jquery"))}else{a(jQuery)}}}(function(f){var a=/\+/g;function d(i){return b.raw?i:encodeURIComponent(i)}function g(i){return b.raw?i:decodeURIComponent(i)}function h(i){return d(b.json?JSON.stringify(i):String(i))}function c(i){if(i.indexOf('"')===0){i=i.slice(1,-1).replace(/\\"/g,'"').replace(/\\\\/g,"\\")}try{i=decodeURIComponent(i.replace(a," "));return b.json?JSON.parse(i):i}catch(j){}}function e(j,i){var k=b.raw?j:c(j);return f.isFunction(i)?i(k):k}var b=f.cookie=function(q,p,v){if(arguments.length>1&&!f.isFunction(p)){v=f.extend({},b.defaults,v);if(typeof v.expires==="number"){var r=v.expires,u=v.expires=new Date();u.setMilliseconds(u.getMilliseconds()+r*86400000)}return(document.cookie=[d(q),"=",h(p),v.expires?"; expires="+v.expires.toUTCString():"",v.path?"; path="+v.path:"",v.domain?"; domain="+v.domain:"",v.secure?"; secure":""].join(""))}var w=q?undefined:{},s=document.cookie?document.cookie.split("; "):[],o=0,m=s.length;for(;o<m;o++){var n=s[o].split("="),j=g(n.shift()),k=n.join("=");if(q===j){w=e(k,p);break}if(!q&&(k=e(k))!==undefined){w[j]=k}}return w};b.defaults={};f.removeCookie=function(j,i){f.cookie(j,"",f.extend({},i,{expires:-1}));return !f.cookie(j)}}));
 (function($){
 	$.OS = {
 		is_phone : /(Android|webOS|iPhone|Windows\sPhone|iPod|BlackBerry|SymbianOS)/i.test(navigator.userAgent),
@@ -429,6 +417,15 @@ function probability_rand(arr) {
 	var thiscript = scripts[ scripts.length - 1 ];
 	$.baseuri = thiscript.src.toString().match(/[^\/:](\/.*)static\/js\/common\.js/i)[1];
 	if (!$.baseuri) $.baseuri = '/';
+	//init csrf
+	$.csrf = $('meta[name="csrf-token"]').attr('content');
+	if ($.csrf) {
+		$.ajaxSetup({
+			headers: {
+				'X-CSRF-TOKEN': $.csrf
+			}
+		});
+	}
 	/* Gets window width cross browser */
 	$.window_size = function(){
 		return {'width' : window.innerWidth
@@ -448,10 +445,10 @@ function probability_rand(arr) {
 	};
 	$.isUndefined = function(obj) {
 		return typeof obj == 'undefined';
-	}
+	};
 	$.isjQuery = function(obj) {
 		return obj instanceof jQuery;
-	}
+	};
 	if ($.noty) {
 		$.noty.defaults = {
 			layout: 'center',
@@ -481,7 +478,6 @@ function probability_rand(arr) {
 		};
 	}
 	$.showtips = function(tips, redirect) {
-
 		var _tips = clone(tips);
 		_tips.result == 'failure' && (_tips.result = 'warning');
 		var _redirect = $.isUndefined(redirect) ? true : redirect;
@@ -511,15 +507,13 @@ function probability_rand(arr) {
 				setTimeout(function() {
 					self.location.href = _tips.url;
 				}, 1500);
-				
 			} else if (_tips.url === true) {
 				setTimeout(function() {
 					self.location.reload();
 				}, 1500);
 			}
 		}
-			
-	}
+	};
 	/**
 	 * post or get a url
 	 * @example post it when [data] isn't null
@@ -534,13 +528,21 @@ function probability_rand(arr) {
 	$.query = function(url, data, method, callback, alert_it) {
 		if ($.isUndefined(alert_it)) alert_it = true;
 		if ($.isUndefined(method)) method = data ? 'POST' : 'GET';
-		var _this = this, _result = null;
+		var _this = this, _result = null, _headers = {}, _data = data;
+		if (data && data instanceof String) _data = $.deparam(data);
+		if (typeof _data['_method'] != undefined) {
+			method = _data['_method'];
+			headers['X-HTTP-Method-Override'] = method;
+		};
+		if (typeof _data['_token'] != undefined) //add csrf
+			headers['X-CSRF-TOKEN'] = _data['_token'];
 		$.ajax({
 			url : url,
-			data : data ? data : null,
+			data : _data ? _data : null,
 			async : callback !== false, 
 			cache : false,
-			type : method,
+			type : method.toUpperCase(),
+			headers: _headers,
 			timeout : 20000,
 			dataType : /[\?&](jsonp|callback)=\?/i.test(url) ? 'jsonp' : 'json',
 			success : function(json) {
@@ -559,8 +561,7 @@ function probability_rand(arr) {
 			error : function(XMLHttpRequest, textStatus, errorThrown) {
 				if (alert_it)
 				{
-					switch(textStatus)
-					{
+					switch(textStatus) {
 						case 'timeout':
 							$.tips(COMMON_LANGUAGE.network_timeout);
 							break;
@@ -577,16 +578,19 @@ function probability_rand(arr) {
 			}
 		});
 		return _result;
-	}
-
+	};
 	$.GET = function(url, data, callback, alert_it) {
 		return $.query.call(this, url, data, 'GET', callback, alert_it);
-	}
-
+	};
 	$.POST = function(url, data, callback, alert_it) {
 		return $.query.call(this, url, data, 'POST', callback, alert_it)
-	}
-
+	};
+	$.PUT = function(url, data, callback, alert_it) {
+		return $.query.call(this, url, data, 'PUT', callback, alert_it)
+	};
+	$.DELETE = function(url, data, callback, alert_it) {
+		return $.query.call(this, url, data, 'DELETE', callback, alert_it)
+	};
 	/**
 	 * [alert description]
 	 * @param  {String} msg              [description]
@@ -618,7 +622,7 @@ function probability_rand(arr) {
 			if (confirm_callback && $.isFunction(confirm_callback))
 				confirm_callback.call(this);
 		}
-	}
+	};
 
 	$.tips = function(msg, timeout) {
 		var setting = {
@@ -630,8 +634,7 @@ function probability_rand(arr) {
 			noty(setting);
 		else
 			alert(msg);
-	}
-
+	};
 	$.confirm = function(msg, confirm_callback, cancel_callback) {
 		var setting = {
 			text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><div>'+ msg +'</div></div>',
@@ -665,8 +668,7 @@ function probability_rand(arr) {
 				if (cancel_callback && $.isFunction(confirm_callback)) cancel_callback.call(this);
 			}
 		}
-	}
-
+	};
 	$.fn.extend({checkAll : function($selector, callback) {
 		if(!$.isjQuery($selector)) $selector = $($selector);
 		var t = this;
@@ -738,7 +740,6 @@ function probability_rand(arr) {
 					$.tips(COMMON_LANGUAGE.unselected);
 					return false;
 				}
-
 				if (is_form)
 				{ //disabled the submit button
 					$(':submit,:image',$this).each(function(){
@@ -765,7 +766,7 @@ function probability_rand(arr) {
 				var method = $this.attr('method');
 				var msg = $this.attr('confirm');
 				var query = function(){
-					$.query.call($this, url, $selector.serialize(), method, callback, alert_it);
+					$.query.call($this, url, $selector.serializeArray(), method, callback, alert_it);
 				}
 				if (msg) {
 					msg = msg.replace('%L', $selector.serializeArray().length)
