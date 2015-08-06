@@ -530,12 +530,12 @@ f<e?g[c]||(b[f+1]&&isNaN(b[f+1])?{}:[]):a,g=m;else h.isArray(d[c])?d[c].push(a):
 		if ($.isUndefined(method)) method = data ? 'POST' : 'GET';
 		var _this = this, _result = null, _headers = {}, _data = data;
 		if (data && data instanceof String) _data = $.deparam(data);
-		if (typeof _data['_method'] != undefined) {
+		if (typeof _data['_method'] != 'undefined') {
 			method = _data['_method'];
-			headers['X-HTTP-Method-Override'] = method;
+			_headers['X-HTTP-Method-Override'] = method;
 		};
-		if (typeof _data['_token'] != undefined) //add csrf
-			headers['X-CSRF-TOKEN'] = _data['_token'];
+		if (typeof _data['_token'] != 'undefined') //add csrf
+			_headers['X-CSRF-TOKEN'] = _data['_token'];
 		$.ajax({
 			url : url,
 			data : _data ? _data : null,
@@ -590,6 +590,12 @@ f<e?g[c]||(b[f+1]&&isNaN(b[f+1])?{}:[]):a,g=m;else h.isArray(d[c])?d[c].push(a):
 	};
 	$.DELETE = function(url, data, callback, alert_it) {
 		return $.query.call(this, url, data, 'DELETE', callback, alert_it)
+	};
+	$.HEAD = function(url, data, callback, alert_it) {
+		return $.query.call(this, url, data, 'HEAD', callback, alert_it)
+	};
+	$.PATCH = function(url, data, callback, alert_it) {
+		return $.query.call(this, url, data, 'PATCH', callback, alert_it)
 	};
 	/**
 	 * [alert description]
