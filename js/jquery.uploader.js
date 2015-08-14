@@ -2,341 +2,392 @@
 	if(typeof COMMON_LANGUAGE == 'undefined')
 		throw('this javascript file need behind \'common.js\'');
 	var scripts = document.getElementsByTagName("script");
- 	var thiscript = scripts[ scripts.length - 1 ];
- 	$.session_id = thiscript.src.toString().getQuery('session_id');
- 	if (flash_version !== false)
- 	{
- 		$('<script src="'+$.baseuri + 'static/js/swfupload/swfupload.js"></script>').appendTo('head');
- 	}
+	var thiscript = scripts[ scripts.length - 1 ];
+	$.session_id = thiscript.src.toString().getQuery('session_id');
+	
 	$.fn.extend({
-		uploader : function(max_width, max_height, filesize, filetype) {
+		uploader : function(max_width, max_height, filesize, filetype, filelimit) {
 			max_width = $.isUndefined(max_width) ? 0 : parseFloat(max_width);
 			max_height = $.isUndefined(max_height) ? 0 : parseFloat(max_height);
-			filesize = $.isUndefined(filesize) ? '2 MB' : filesize;
-			filetype = $.isUndefined(filetype) ? '*.jpg;*.jpeg;*.png;*.bmp;*.gif' : filetype;
-			var img_types = ['.jpg','.jpeg','.png','.bmp','.gif'];
+			filesize = $.isUndefined(filesize) ? 2 * 1024 * 1024 : filesize; //2 MB
+			filetype = $.isUndefined(filetype) ? 'jpg,jpeg,png,bmp,gif' : filetype;
+			filelimit = isNaN(filelimit) ? 1 : parseInt(filelimit);
+			var img_types = ['jpg','jpeg','png','bmp','gif'];
 			return this.each(function(){
 				var t = $(this);
 				var method = {};
-				var nonce = rand(10000,99999);
-				var placeholder_id = 'placeholder_id_' + nonce, progress_id = 'progress_id_' + nonce, thumbnails_id = 'thumbnails_' + nonce;
-				var $upload_noty = null;
-				var $container = $('<div class="btn btn-info">\
-						<span id="'+placeholder_id+'"></span>\
-					</div>'
-					+ '&nbsp;<span class="label label-success">' + filetype.replace(/;/g,'</span>&nbsp;<span class="label label-success">') + '</span>'
-					+ (max_width > 0 && max_height > 0 ? '<small>&nbsp;\u56fe\u7247\u4f1a\u81ea\u52a8\u7b49\u6bd4\u7f29\u653e\u81f3\uff1a' + max_width.toString().toHTML() + 'x' + max_height.toString().toHTML() + '</small>': '')  +
-					'<div id="'+progress_id+'" style="height: 75px;" class="hide"></div>\
-					<div id="'+thumbnails_id+'" class="upload-preview hide" style="width:302px;height:202px;margin:15px 0;overflow:hidden;">\
-						<img data-src="" alt="" src="'+$.baseuri+'placeholder?size=300x200&text='+encodeURIComponent('\u6b63\u5728\u8f7d\u5165...')+'" onload="javascript:resizeImg(this,300,200);" onerror="this.src=\''+ $.baseuri +'placeholder?size=300x200&text=\'+encodeURIComponent(\'\u6587\u4ef6\u8bfb\u53d6\u4e2d...\');" />\
-						<div class="actions">\
-							<a title="&#39044;&#35272;" href="#" name="preview_link" target="_blank"><i class="icon-search icon-white glyphicon glyphicon-search" style="color:white;"></i></a>\
-							<a title="&#31227;&#38500;" href="#" name="preview_delete"><i class="icon-remove icon-white glyphicon glyphicon-remove" style="color:white;"></i></a>\
-						</div>\
-					</div><div class="clearfix"></div>').insertAfter(t);
+				var nonce = function(){
+					return rand(10000,99999);
+				};
+				var uploader_id = 'uploader-id-' + nonce(), pick_id = 'pick-id-' + nonce();
+				var progresses_id = uploader_id + '-progresses',thumbnails_id = uploader_id + '-thumbnails', input_id = uploader_id + '-input';
+				//添加容器到input下
+				$('<div class="'+uploader_id+'" id=""><input type="hidden" id="'+input_id+'" value="">\
+					<span id="'+pick_id+'">选择文件('+bytesToSize(filesize)+')</span>'
+					+ '&nbsp;<span class="label label-success">' + filetype.replace(/,/g,'</span>&nbsp;<span class="label label-success">') + '</span>'
+					+ (max_width > 0 && max_height > 0 ? '<small>&nbsp;\u56fe\u7247\u4f1a\u81ea\u52a8\u7b49\u6bd4\u7f29\u653e\u81f3\uff1a' + max_width.toString().toHTML() + 'x' + max_height.toString().toHTML() + '</small>': '')
+					+ '</div><div class="clearfix"></div>\
+					<div id="'+progresses_id+'" class="progresses"></div><div class="clearfix"></div>\
+					<div id="'+thumbnails_id+'" class="thumbnails row"></div><div class="clearfix"></div>').insertAfter(t);
+				var uploader = WebUploader.create({
+					// swf文件路径
+					swf: $.baseuri + "static/js/webuploader/Uploader.swf",
+					// 文件接收服务端。
+					server: $.baseuri + "attachment/uploader_query?of=json",
+					// 选择文件的按钮。可选。内部根据当前运行是创建，可能是input元素，也可能是flash
+					pick: {
+						id: '#' + pick_id,
+						multiple: false,
+					},
+					//表单附加数据
+					formData: {"PHPSESSIONID": $.session_id, '_token': $.csrf},
+					//文件表单name
+					fileVal: 'Filedata',
+					//METHOD
+					method: 'POST',
+					//二进制上传，php://input都为文件内容，其他参数在$_GET中
+					sendAsBinary: false,
+					//可提交文件数量限制
+					fileNumLimit: 0,
+					//总文件大小限制
+					//fileSizeLimit: 1024 * 1024 * 1024, //1G
+					//单文件大小限制
+					fileSingleSizeLimit: filesize,
+					//是否去重
+					duplicate: true,
+					// 文件选择筛选。
+					/*accept: {
+						title: '选择文件',
+						extensions: filetype,
+						mimeTypes: 'image/*'
+					},*/
+					//是否允许在文件传输时提前把下一个文件的分片,MD5准备好
+					prepareNextFile: true,
+					//分多大一片？ 默认大小为5M.
+					chunkSize: 5242880,
+					//分片允许自动重传多少次
+					chunkRetry: 2,
+					//是否分片上传。
+					chunked: true,
+					//同时上传并发数
+					threads: 3,
+					//指定拖拽的容器
+					dnd: '#' +pick_id,
+					//全局禁用拉拽，防止默认打开文件
+					disableGlobalDnd: true,
+					//可以粘贴的容器
+					paste: document.body,
+					thumb: {// 缩略图
+						width: 75,
+						height: 75,
+						// 图片质量，只有type为`image/jpeg`的时候才有效。
+						quality: 70,
+						// 是否允许放大，如果想要生成小图的时候不失真，此选项应该设置为false.
+						allowMagnify: false,
+						// 是否允许裁剪。
+						crop: true,
+						// 为空的话则保留原有图片格式。
+						// 否则强制转换成指定的类型。
+						//type: 'image/jpeg'
+					},
+					// 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！
+					resize: false,
+					compress: null
+				});
+				// 修改后图片上传前，尝试将图片压缩到1600 * 1600
+				if (max_width > 0 && max_height > 0)
+					uploader.option( 'compress', {
+						width: max_width,
+						height: max_height,
+						// 图片质量，只有type为`image/jpeg`的时候才有效。
+						quality: 100,
+						// 是否允许放大，如果想要生成小图的时候不失真，此选项应该设置为false.
+						allowMagnify: false,
+						// 是否允许裁剪。
+						crop: false,
+						// 是否保留头部meta信息。
+						preserveHeaders: true,
+						// 如果发现压缩后文件大小比原来还大，则使用原来图片。此属性可能会影响图片自动纠正功能
+						noCompressIfLarger: true,
+						// 单位字节，如果图片大小小于此值，不会采用压缩。
+						compressSize: 0
+					});
 
-				var $progress = $('<div class="progressWrapper">\
-					<div class="progressContainer">\
-						<a href="#" class="progressCancel" style="display:none;"> </a>\
-						<div class="progressName"></div>\
-						<div class="progressBarStatus">&nbsp;</div>\
-						<div class="progressBarInProgress" name="progress_bar"></div>\
-					</div>\
-				</div>').appendTo('#'+progress_id);
+				var $progresses = {};
+				var progress = function(file){
+					if (!$progresses[file.id])
+						$progresses[file.id] = $('<div class="media alert alert-warning fade in"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>\
+							<div class="media-left media-middle"><img class="media-object" src="" alt=""></div>\
+							<div class="media-body"><h4 class="media-heading">'+file.name.toHTML()+'</h4>\
+							<div class="media-message"></div>\
+							<div class="progress">\
+								<div class="progress-bar progress-bar-warning progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">\
+									<span class=""></span>\
+								</div>\
+							</div>\
+							</div>\
+						</div>').appendTo('#'+progresses_id).on('closed.bs.alert', function(){
+							if (file.getStatus() == 'complete')
+								progress(file).remove();
+							else
+								progress(file).cancel();
+						});
 
-				method.hideProgress = function() {
-					$('#'+progress_id).hide();
-				};
-				method.initProgress = function() {
-					$('#'+progress_id).removeClass("hide hidden").show();
-					$('.progressContainer', $progress).removeClass('red green blue');
-					$('[name="progress_bar"]', $progress).removeClass().width("0");
-				};
-				method.setProgress = function (percentage) {
-					method.initProgress(); 
-					$('.progressContainer', $progress).addClass("green");
-					$('[name="progress_bar"]', $progress).addClass("progressBarInProgress").width(percentage + "%");
-				}
-				method.setComplete = function () {
-					method.initProgress(); 
-					$('.progressContainer', $progress).addClass("blue");
-					$('[name="progress_bar"]', $progress).addClass("progressBarComplete").width("100%");
-				};
-				method.setError = function () {
-					method.initProgress();
-					$('.progressContainer', $progress).addClass("red");
-					$('[name="progress_bar"]', $progress).addClass("progressBarError");
-				};
-				method.setCancelled = function () {
-					method.initProgress();
-					$('[name="progress_bar"]', $progress).addClass("progressBarError");
-				};
-				method.setStatus = function (status) {
-					$('.progressBarStatus', $progress).html(status);
-				};
-				method.setFileName = function (file) {
-					$('.progressName', $progress).html(file.name.toHTML());
-				}
-				method.toggleCancel = function (show, swfuploadInstance) {
-					var $obj = $('.progressCancel', $progress);
-					if (show) $obj.show(); else $obj.hide();
-				};
+					return {
+						init: function(){
+							$progresses[file.id].removeClass('alert-info alert-danger alert-success alert-warning');
+							return this;
+						},
+						initProgress: function(){
+							 $('.progress-bar', $progresses[file.id]).removeClass('progress-bar-info progress-bar-danger progress-bar-success progress-bar-warning');
+						},
+						thumb: function(){
+							uploader.makeThumb( file, function( error, ret ) {
+								$('.media-object', $progresses[file.id]).attr('src', error ? $.baseuri+'placeholder?text='+file.ext+'&size=75x75&fontsize=35' : ret);
+							});
+						},
+						name: function(name){
+							$('.progressName', $progresses[file.id]).html(name.toHTML());
+							return this;
+						},
+						message: function(message){
+							$('.media-message', $progresses[file.id]).html(message);
+							return this;
+						},
+						error: function(message) {
+							this.init();
+							this.initProgress();
+							$progresses[file.id].addClass("alert-danger");
+							$('.progress-bar', $progresses[file.id]).addClass("progress-bar-danger");
+							return this.message(message);
+						},
+						progressing: function (percentage) {
+							this.init();
+							this.initProgress();
+							$progresses[file.id].addClass("alert-info");
+							var $bar = $('.progress-bar', $progresses[file.id]).width(percentage + "%");
+							$('.progress-bar span', $progresses[file.id]).text(percentage + "%");
+							if (percentage < 20)
+								$bar.addClass('progress-bar-warning');
+							else if (percentage < 95)
+								$bar.addClass('progress-bar-info');
+							else
+								$bar.addClass('progress-bar-success');
+							if (percentage < 100) $bar.addClass('active'); else $bar.removeClass('active');
+							return this.message('正在上传文件...');
+						},
+						success: function() {
+							this.progressing(100);
+							this.init();
+							$progresses[file.id].addClass("alert-success");
 
-				method.preview = function(id, filename, fileext) {
-					var id = parseInt(id);
-					t.val(id);
-					if (!id) 
-					{
-						method.remove();
-						return;
-					}
-					$('#'+progress_id)/*.empty().hide()*/;
-					var $thumbnails_id = $('#'+thumbnails_id).hide();
-					$('a[name="preview_link"]', $container).attr('href',$.baseuri+'attachment?id='+id);
-					var $img = $('img', '#'+thumbnails_id).css({'width':'auto','height':'auto'});
-					if (!fileext) 
-					{
-						$.GET($.baseuri + 'attachment/info?id='+id, null, function(json){
-							if (json.result == 'success' && json.data.ext)
-							{
-								var pic = img_types.indexOf('.' + json.data.ext.toLowerCase()) > -1 ? $.baseuri+'attachment/preview?id='+id : $.baseuri+'placeholder?size=300x200&text='+encodeURIComponent(json.data.displayname.toHTML());
-								$thumbnails_id.removeClass('hide hidden').show();
-								$img.attr('src',pic);
-							}
-						},false);
-					}
-					else
-					{
-						var pic = img_types.indexOf(fileext.toLowerCase()) > -1 ? $.baseuri+'attachment/preview?id='+id: $.baseuri+'placeholder?size=300x200&text='+encodeURIComponent(filename.toHTML());
-						$thumbnails_id.removeClass('hide hidden').show();
-						$img.attr('src',pic);
-					}
-					
-					
+							$progresses[file.id].delay(1500).queue(function(){
+								$(this).alert('close').dequeue();
+							});
+							return this.message('上传成功!');
+						},
+						cancel: function() {
+							uploader.cancelFile(file);
+							return this.remove();
+						},
+						remove: function() {
+							$progresses[file.id].remove();
+							delete $progresses[file.id];
+							return this;
+						}
+					};
 				}
-				method.remove = function()
+				var $thumbnails = {};
+				var preview = function(id, filename, fileext)
 				{
-					t.val('0');
-					$('#'+thumbnails_id).hide();
-					$('img', '#'+thumbnails_id).attr('src','');
-					$('a[name="preview_link"]', $container).attr('href','#');
-					$('#'+progress_id)/*.empty()*/.hide();
-					t.triggerHandler("upload-remove-success");
+					if (!!id && !$thumbnails[id])
+					{
+						$thumbnails[id] = $('<div class="col-xs-6 col-md-3 alert"><div class="thumbnail">\
+							<a href="'+$.baseuri+'attachment?id='+id+'"  target="_blank"><img src="'+$.baseuri+'placeholder?size=300x200&text='+encodeURIComponent('\u6b63\u5728\u8f7d\u5165...')+'" alt="" class="img-responsive center-block" onerror="this.src=\''+ $.baseuri +'placeholder?size=300x200&text=\'+encodeURIComponent(\'\u6587\u4ef6\u8bfb\u53d6\u4e2d...\');"></a>\
+							<div class="caption">\
+        					<h4><span class="title">'+(filename ? filename.toHTML() : '')+'</span><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></h4>\
+							</div>\
+							</div></div>').appendTo('#' + thumbnails_id).on('closed.bs.alert', function(){
+								preview(id).remove();
+							});
+						if (!fileext) 
+						{
+							$.GET($.baseuri + 'attachment/info?id='+id, null, function(json){
+								if (json.result == 'success' && json.data.ext)
+								{
+									var pic = img_types.indexOf(json.data.ext.toLowerCase()) > -1 ? $.baseuri+'attachment/preview?id='+id : $.baseuri+'placeholder?size=300x200&text='+encodeURIComponent(json.data.ext);
+									$('.title', $thumbnails[id]).text(json.data.displayname);
+									$('img', $thumbnails[id]).attr('src',pic);
+								}
+							},false);
+						}
+						else
+						{
+							var pic = img_types.indexOf(fileext.toLowerCase()) > -1 ? $.baseuri+'attachment/preview?id='+id: $.baseuri+'placeholder?size=300x200&text='+encodeURIComponent(fileext);
+							$('img', $thumbnails[id]).attr('src',pic);
+						}
+					}
+					
+					return {
+						build: function(){
+							attachment().add(id);
+							return this;
+						},
+						remove: function(){
+							if (this.getFile()) uploader.removeFile(this.getFile(), true);
+							attachment().remove(id);
+							$thumbnails[id].remove();
+							delete $thumbnails[id];
+							return this;
+						},
+						setFile: function(file){
+							$thumbnails[id].data("file", file);
+							return this;
+						},
+						getFile: function(){
+							return $thumbnails[id].data("file");
+						},
+						removeAll: function(){
+							for (var id in $thumbnails) {
+								preview(id).remove();
+							};
+						},
+						rebuildAll: function() {
+							//remove all files
+							files = uploader.getFiles();
+							for(var i = 0;i < files.length;i++)
+								uploader.removeFile(files[i], true);
+							//remove all preview
+							this.removeAll();
+							//build
+							var aids = attachment().get();
+							for (var i = 0; i < aids.length; i++) {
+								preview(aids[i]).build();
+							};
+							return this;
+						}
+					};
+				}
+				var attachment = function() {
+					var aid = t.val();
+					if (aid == '0') aid = '';
+					aids = aid ? aid.split(',') : [];
+					return {
+						write: function() {
+							t.val(aids);
+							return this;
+						},
+						add: function(id) {
+							if (filelimit == 1) aids = [id];
+							var i = aids.indexOf(id.toString());
+							if (i == -1) aids.push(id);
+							return this.write();
+						},
+						remove: function(id) {
+							var i = aids.indexOf(id.toString());
+							if (i != -1) aids.splice(i,1);
+							return this.write();
+						},
+						removeAll: function(){
+							aids = [];
+							return this.write();
+						},
+						get: function(){
+							return aids;
+						}
+					};
 				}
 
-				$('a[name="preview_delete"]', $container).on('click',function(){
-					method.remove();
-					return false;
-				});
-
-				t.on('upload-remove', function(e){
-					method.remove();
-				});
-
-				t.on('upload-preview', function(e, id, filename, fileext){
-					id = parseInt(!!id ? id : t.val());
-					if (!isNaN(id) && id > 0) method.preview(id, filename, fileext); else method.remove();
-				}).triggerHandler('upload-preview', [t.val()]);
 
 				//---------------------------------------
-
-				method.preLoad = function() {
-					if (!this.support.loading) {
-						$.alert("\u4f60\u9700\u8981\u5b89\u88c5Flash Player\u624d\u80fd\u8fd0\u884cSWFUpload\u3002");
-						return false;
-					} else if (!this.support.imageResize) {
-						$.alert("\u4f60\u9700\u8981\u5b89\u88c5Flash Player 10\u4ee5\u4e0a\u7684\u7248\u672c\uff0c\u624d\u80fd\u88c1\u51cf\u56fe\u7247\u5927\u5c0f\u3002");
+				method.beforeFileQueued = function(file) {
+					if (filelimit > 1 &&  attachment().get().length >= filelimit) {
+						$.alert('只允许上传' + filelimit + '个文件，请删减后重试!');
 						return false;
 					}
 				}
-				method.loadFailed = function() {
-					$.alert("Something went wrong while loading SWFUpload. If this were a real application we'd clean up and then give you an alternative");
+				method.fileQueued = function(file) {
+					progress(file).init().thumb();
+					this.md5File( file ).progress(function(percentage) {
+						progress(file).progressing(percentage).message('正在效验文件...');
+					}).then(function(val) {
+						$.POST($.baseuri + 'attachment/hash_query', {
+							hash: val,
+							_token: $.csrf,
+							filename: file.name,
+							ext: file.ext,
+							size: file.size
+						}, function(json){
+							if (json && json.result == 'success'){
+								uploader.skipFile(file);
+								progress(file).success().message('云端文件存在，文件秒传成功!');
+								if (filelimit == 1) preview().removeAll();
+								preview(json.data.id, json.data.displayname, json.data.ext).build().setFile(file);
+								t.triggerHandler('uploader.upload.success',[json, file]);
+							} else {
+								uploader.upload(file);
+							}
+						},false);
+					});
 				}
-				method.fileQueueError = function(file, errorCode, message) {
-					try {
-						switch (errorCode) {
-							case SWFUpload.errorCode_QUEUE_LIMIT_EXCEEDED:
-								$.alert('\u8bf7\u52ff\u540c\u65f6\u4e0a\u4f20\u4e86\u8fc7\u591a\u6587\u4ef6.');
-								break;
-							case SWFUpload.QUEUE_ERROR.ZERO_BYTE_FILE:
-								$.alert('\u8bf7\u52ff\u4e0a\u4f200\u5b57\u8282\u7684\u6587\u4ef6.');
-								break;
-							case SWFUpload.QUEUE_ERROR.FILE_EXCEEDS_SIZE_LIMIT:
-								$.alert('\u60a8\u4e0a\u4f20\u6587\u4ef6\u5927\u5c0f\u8d85\u51fa\u9650\u5236\uff1a'+ filesize.toHTML());
-								break;
-							case SWFUpload.QUEUE_ERROR.INVALID_FILETYPE:
-								$.alert('\u60a8\u4e0a\u4f20\u6587\u4ef6('+file.name.toHTML()+')\uff0c\u7c7b\u578b\u4e0d\u7b26\u5408\u8981\u6c42: ' + filetype.toHTML());
-								break;
-							default:
-								$.alert('\u5931\u8d25\uff1a' + message);
-								break;
-						}
-					} catch (ex) {
-						this.debug(ex);
+				//上传过程中触发，携带上传进度。
+				method.uploadProgress = function(file, percentage) {
+					progress(file).progressing(percentage);
+				}
+				//当文件上传成功时触发。
+				method.uploadSuccess = function(file, json) {
+					if (json && json.result == 'success') {
+						progress(file).success();
+						if (filelimit == 1) preview().removeAll();
+						preview(json.data.id, json.data.displayname, json.data.ext).build().setFile(file);
+						t.triggerHandler('uploader.upload.success',[json, file]);
+					} else {
+						progress(file).error("\u5931\u8d25:" + json.message.content.toHTML());
+						//$.alert(json.message.content);
 					}
 				}
-				method.fileDialogComplete = function(numFilesSelected, numFilesQueued) {
-					try {
-						if (numFilesQueued > 0) {
-							if ($.noty)
-								$upload_noty = noty({text:'<img src="'+ $.baseuri +'static/img/loading.gif" /> \u6b63\u5728\u4e0a\u4f20\uff0c\u8bf7\u8010\u5fc3\u7b49\u5f85\u2026\u2026',timeout:false,type:'success'});
-							var file = this.getFile(0);
-							if (img_types.indexOf(file.type.toLowerCase()) > -1 && this.customSettings.thumbnail_height > 0 && this.customSettings.thumbnail_width > 0)
-								this.startResizedUpload(file.ID, this.customSettings.thumbnail_width, this.customSettings.thumbnail_height, file.type.toLowerCase() == '.png' ? SWFUpload.RESIZE_ENCODING.PNG : SWFUpload.RESIZE_ENCODING.JPEG, this.customSettings.thumbnail_quality, false);
-							else
-								this.startUpload(file.ID);
-						}
-					} catch (ex) {
-						this.debug(ex);
-					}
+				
+				//当文件上传出错时触发。
+				method.uploadError = function(file, reason) {
+					progress(file).error("\u5931\u8d25:" + reason);
 				}
-				method.uploadProgress = function(file, bytesLoaded) {
-					try {
-						var percent = Math.ceil((bytesLoaded / file.size) * 100);
-
-						method.setFileName(file);
-						method.setProgress(percent);
-						method.setStatus("\u4e0a\u4f20\u4e2d...");
-						method.toggleCancel(true, this);
-					} catch (ex) {
-						this.debug(ex);
-					}
-				}
-				method.uploadSuccess = function(file, serverData) {
-					//try {
-						if($upload_noty && $.noty) $upload_noty.close();
-						method.setFileName(file);
-						method.toggleCancel(false);
-						var json = $.parseJSON(serverData);
-						if (json && json.result == 'success') {
-							method.preview(json.data.id.toHTML(), json.data.displayname.toHTML(), '.'+json.data.ext.toHTML());
-							t.triggerHandler('upload-success',[json, file]);
-							method.setStatus("\u4e0a\u4f20\u5b8c\u6210.");
-							method.setComplete();
-						} else {
-							method.setError();
-							method.setStatus("\u5931\u8d25:" + json.message.content.toHTML());
-							$.alert(json.message.content);
-						}
-					//} catch (ex) {
-					//	this.debug(ex);
-					//}
-				}
+				//不管成功或者失败，文件上传完成时触发。
 				method.uploadComplete = function(file) {
-					try {
-						/*  I want the next upload to continue automatically so I'll call startUpload here */
-						if (this.getStats().files_queued > 0) {
-							var file = this.getFile(0);
-							if (img_types.indexOf(file.type.toLowerCase()) > -1 && this.customSettings.thumbnail_height > 0 && this.customSettings.thumbnail_width > 0)
-								this.startResizedUpload(file.ID, this.customSettings.thumbnail_width, this.customSettings.thumbnail_height, file.type.toLowerCase() == '.png' ? SWFUpload.RESIZE_ENCODING.PNG : SWFUpload.RESIZE_ENCODING.JPEG, this.customSettings.thumbnail_quality, false);
-							else
-								this.startUpload(file.ID);
-						} else {
-							//method.setFileName(file);
-							//method.setComplete();
-							//method.setStatus("\u6587\u4ef6\u5df2\u63a5\u6536\u5b8c\u6210.");
-							//method.toggleCancel(false);
-						}
-					} catch (ex) {
-						this.debug(ex);
-					}
+					
 				}
-				method.uploadError = function(file, errorCode, message) {
-					if($upload_noty && $.noty) $upload_noty.close();
-					method.setFileName(file);
-					try {
-						switch (errorCode) {
-						case SWFUpload.UPLOAD_ERROR.FILE_CANCELLED:
-							try {
-								method.setCancelled();
-								method.setStatus("\u5df2\u53d6\u6d88");
-								method.toggleCancel(false);
-							}
-							catch (ex1) {
-								this.debug(ex1);
-							}
+				method.error = function(code, max, file) {
+					switch(code)
+					{
+						case 'Q_EXCEED_NUM_LIMIT':
+							$.alert('只能上传' + max + '个文件!');
 							break;
-						case SWFUpload.UPLOAD_ERROR.UPLOAD_STOPPED:
-							try {
-								method.setCancelled();
-								method.setStatus("\u5df2\u505c\u6b62");
-								method.toggleCancel(true);
-							}
-							catch (ex2) {
-								this.debug(ex2);
-							}
-						case SWFUpload.UPLOAD_ERROR.UPLOAD_LIMIT_EXCEEDED:
-							try {
-								method.setStatus("\u6587\u4ef6\u6570\u91cf\u8d85\u51fa\u9650\u5236");
-								method.toggleCancel(true);
-							}
-							catch (ex2) {
-								this.debug(ex2);
-							}
+						case 'Q_EXCEED_SIZE_LIMIT':
+							$.alert('文件总大小超出!');
+							break;
+						case 'F_EXCEED_SIZE':
+							$.alert('文件大小超出'+bytesToSize(filesize)+'!');
+							break;
+						case 'F_DUPLICATE':
+							$.alert('上传队列中有重复文件!');
+							break;
+						case 'Q_TYPE_DENIED':
+							$.alert('当前文件类型不匹配!');
 							break;
 						default:
-							$.alert('\u5931\u8d25\uff1a' + message);
+							$.alert(code);
 							break;
-						}
-					} catch (ex3) {
-						this.debug(ex3);
 					}
-
 				}
-				
-				var swfupload = new SWFUpload({
-					// Backend Settings
-					upload_url: $.baseuri + "attachment/uploader_query?of=json",
-					post_params: {"PHPSESSIONID": $.session_id, "_token": $.csrf},
 
-					// File Upload Settings
-					file_size_limit : filesize,	// 5MB
-					file_types : filetype,
-					file_types_description : "\u8bf7\u9009\u62e9\u6587\u4ef6",
-					file_upload_limit : 0,
-
-					swfupload_preload_handler : method.preLoad,
-					swfupload_load_failed_handler : method.loadFailed,
-					file_queue_error_handler : method.fileQueueError,
-					file_dialog_complete_handler : method.fileDialogComplete,
-					upload_progress_handler : method.uploadProgress,
-					upload_error_handler : method.uploadError,
-					upload_success_handler : method.uploadSuccess,
-					upload_complete_handler : method.uploadComplete,
-
-					// Button Settings
-					button_image_url : $.baseuri + 'static/js/swfupload/img/SmallSpyGlassWithTransperancy_17x18.png',
-					button_placeholder_id : placeholder_id,
-					button_action: SWFUpload.BUTTON_ACTION.SELECT_FILE, //单选
-					button_width: 180,
-					button_height: 18,
-					button_text : '<span class="button">\u8bf7\u9009\u62e9\u6587\u4ef6 <span class="buttonSmall">(\u6700\u5927 '+filesize+')</span></span>',
-					button_text_style : '.button { font-family: Helvetica, Arial, sans-serif; font-size: 12pt; color:#F7F7F7;} .buttonSmall { font-size: 10pt; }',
-					button_text_top_padding: 0,
-					button_text_left_padding: 18,
-					button_window_mode: SWFUpload.WINDOW_MODE.TRANSPARENT,
-					button_cursor: SWFUpload.CURSOR.HAND,
-					
-					// Flash Settings
-					flash_url : $.baseuri + 'static/js/swfupload/swfupload.swf',
-					flash9_url : $.baseuri + 'static/js/swfupload/swfupload_FP9.swf',
-
-					custom_settings : {
-						upload_target : progress_id,
-						thumbnail_height: max_height,
-						thumbnail_width: max_width,
-						thumbnail_quality: 100
-					},
-					
-					// Debug Settings
-					debug: false
-				});
-				
-				$('.progressCancel', $container).on('click',function(){
-					swfupload.cancelUpload(null, false);
-					method.hideProgress();
-					return false;
-				});
+				uploader.on('beforeFileQueued', method.beforeFileQueued)
+				uploader.on('fileQueued', method.fileQueued)
+				uploader.on('uploadProgress', method.uploadProgress)
+				uploader.on('uploadSuccess', method.uploadSuccess)
+				uploader.on('uploadError', method.uploadError)
+				uploader.on('uploadComplete', method.uploadComplete)
+				uploader.on('error', method.error)
+				//init
+				preview().rebuildAll();
 
 			});
 			
