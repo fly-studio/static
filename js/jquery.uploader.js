@@ -4,7 +4,10 @@
 	var scripts = document.getElementsByTagName("script");
  	var thiscript = scripts[ scripts.length - 1 ];
  	$.session_id = thiscript.src.toString().getQuery('session_id');
-
+ 	if (flash_version !== false)
+ 	{
+ 		$('<script src="'+$.baseuri + 'static/js/swfupload/swfupload.js"></script>').appendTo('head');
+ 	}
 	$.fn.extend({
 		uploader : function(max_width, max_height, filesize, filetype) {
 			max_width = $.isUndefined(max_width) ? 0 : parseFloat(max_width);
@@ -283,7 +286,7 @@
 				
 				var swfupload = new SWFUpload({
 					// Backend Settings
-					upload_url: $.baseuri + "attachment/upload_query?of=json",
+					upload_url: $.baseuri + "attachment/uploader_query?of=json",
 					post_params: {"PHPSESSIONID": $.session_id, "_token": $.csrf},
 
 					// File Upload Settings

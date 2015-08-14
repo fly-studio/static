@@ -91,6 +91,9 @@ if (!String.prototype.repeat) {
 String.prototype.toHTML = function() {
 	return this.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#039;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 };
+Number.prototype.toHTML = function() {
+	return this.toString().toHTML();
+};
 String.prototype.toPre = function() {
 	return this.replace(/\s/g, '&nbsp;').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1<br />$2');
 };
@@ -184,16 +187,16 @@ String.prototype.number_format = function(decimals, dec_point, thousands_sep) {
 			var k = Math.pow(10, prec);
 			return '' + (Math.round(n * k) / k).toFixed(prec);
 		};
-  	// Fix for IE parseFloat(0.55).toFixed(0) = 0;
-  	s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
+	// Fix for IE parseFloat(0.55).toFixed(0) = 0;
+	s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
 	if (s[0].length > 3) {
 		s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
-  	}
+	}
 	if ((s[1] || '').length < prec) {
 		s[1] = s[1] || '';
 		s[1] += new Array(prec - s[1].length + 1)
 		.join('0');
- 	}
+	}
 	return s.join(dec);
 };
 Number.prototype.number_format = function(decimals, dec_point, thousands_sep) {
@@ -356,8 +359,8 @@ function clone(obj) {
 	return o;
 };
 function resizeImg(img, maxWidth, maxHeight) {
-	var HeightWidth = img.offsetHeight / img.offsetWidth;//ÉèÖÃ¸ß¿í±È 
-	var WidthHeight = img.offsetWidth / img.offsetHeight;//ÉèÖÃ¿í¸ß±È 
+	var HeightWidth = img.offsetHeight / img.offsetWidth;
+	var WidthHeight = img.offsetWidth / img.offsetHeight;
 	if(img.offsetWidth > maxWidth)
 		jQuery(img).css({width : maxWidth, height : maxWidth * HeightWidth}); 
 	if(img.offsetHeight > maxHeight)
@@ -391,6 +394,42 @@ function probability_rand(arr) {
 	} 
 	return result; 
 };
+function flash_version()
+{
+	var a = !1,
+	b = "";
+
+	function c(d) {
+		d = d.match(/[\d]+/g);
+		d.length = 3;
+		return d.join(".")
+	}
+	if (navigator.plugins && navigator.plugins.length) {
+		var e = navigator.plugins["Shockwave Flash"];
+		e && (a = !0, e.description && (b = c(e.description)));
+		navigator.plugins["Shockwave Flash 2.0"] && (a = !0, b = "2.0.0.11")
+	} else {
+		if (navigator.mimeTypes && navigator.mimeTypes.length) {
+			var f = navigator.mimeTypes["application/x-shockwave-flash"];
+			(a = f && f.enabledPlugin) && (b = c(f.enabledPlugin.description))
+		} else {
+			try {
+				var g = new ActiveXObject("ShockwaveFlash.ShockwaveFlash.7"),
+					a = !0,
+					b = c(g.GetVariable("$version"))
+			} catch (h) {
+				try {
+					g = new ActiveXObject("ShockwaveFlash.ShockwaveFlash.6"), a = !0, b = "6.0.21"
+				} catch (i) {
+					try {
+						g = new ActiveXObject("ShockwaveFlash.ShockwaveFlash"), a = !0, b = c(g.GetVariable("$version"))
+					} catch (j) {}
+				}
+			}
+		}
+	}
+	return a ? b : false;
+}
 /*jQuery deparam*/
 (function(h){h.deparam=function(i,j){var d={},k={"true":!0,"false":!1,"null":null};h.each(i.replace(/\+/g," ").split("&"),function(i,l){var m;var a=l.split("="),c=decodeURIComponent(a[0]),g=d,f=0,b=c.split("]["),e=b.length-1;/\[/.test(b[0])&&/\]$/.test(b[e])?(b[e]=b[e].replace(/\]$/,""),b=b.shift().split("[").concat(b),e=b.length-1):e=0;if(2===a.length)if(a=decodeURIComponent(a[1]),j&&(a=a&&!isNaN(a)?+a:"undefined"===a?void 0:void 0!==k[a]?k[a]:a),e)for(;f<=e;f++)c=""===b[f]?g.length:b[f],m=g[c]=
 f<e?g[c]||(b[f+1]&&isNaN(b[f+1])?{}:[]):a,g=m;else h.isArray(d[c])?d[c].push(a):d[c]=void 0!==d[c]?[d[c],a]:a;else c&&(d[c]=j?void 0:"")});return d}})(jQuery);
