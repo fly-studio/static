@@ -24,6 +24,15 @@ $.validator.prototype.getLength = function (value, element) {
 	}	
 	return $.getAnsiLength(value, ansi);
 };
+$.validator.methods.equalTo = function( value, element, param ) {
+	var target = $( param, element.closest('form') );
+	if ( this.settings.onfocusout ) {
+		target.off( ".validate-equalTo" ).on( "blur.validate-equalTo", function() {
+			$( element ).valid();
+		});
+	}
+	return value === target.val();
+};
 $.validator.addMethod('timestamp',function(value, element, params) {
 	return this.optional(element) || (new RegExp('^(1[1-9]\\d{2}|20\\d{2}|2100)-([0-1]?[1-9]|1[0-2])-([0-2]?[1-9]|3[0-1]|[1-2]0)(\\s([0-1]?\\d|2[0-3]):([0-5]?\\d)(:([0-5]?\\d))?)?$','ig')).test(value);
 });
