@@ -10,7 +10,7 @@
 			max_width = $.isUndefined(max_width) ? 0 : parseFloat(max_width);
 			max_height = $.isUndefined(max_height) ? 0 : parseFloat(max_height);
 			filesize = $.isUndefined(filesize) ? 2 * 1024 * 1024 : filesize; //2 MB
-			filetype = $.isUndefined(filetype) ? 'jpg,jpeg,png,bmp,gif' : filetype;
+			filetype = $.isUndefined(filetype) ? 'jpg,jpeg,png,bmp,gif' : filetype.toLowerCase();
 			filelimit = isNaN(filelimit) ? 1 : parseInt(filelimit);
 			var img_types = ['jpg','jpeg','png','bmp','gif'];
 			return this.each(function(){
@@ -22,9 +22,9 @@
 				var uploader_id = 'uploader-id-' + nonce(), pick_id = 'pick-id-' + nonce();
 				var progresses_id = uploader_id + '-progresses',thumbnails_id = uploader_id + '-thumbnails', input_id = uploader_id + '-input';
 				//添加容器到input下
-				$('<div class="'+uploader_id+'" id=""><input type="hidden" id="'+input_id+'" value="">\
+				$('<div class="uploader-container" id="'+uploader_id+'"><div class="drop-tips text-info">拖到文件到这里</div>\
 					<span id="'+pick_id+'">选择文件('+bytesToSize(filesize)+')</span>'
-					+ '&nbsp;<span class="label label-success">' + filetype.replace(/,/g,'</span>&nbsp;<span class="label label-success">') + '</span>'
+					+ '&nbsp;<span class="label label-success">.' + filetype.replace(/,/g,'</span>&nbsp;<span class="label label-success">.') + '</span>'
 					+ (max_width > 0 && max_height > 0 ? '<small>&nbsp;\u56fe\u7247\u4f1a\u81ea\u52a8\u7b49\u6bd4\u7f29\u653e\u81f3\uff1a' + max_width.toString().toHTML() + 'x' + max_height.toString().toHTML() + '</small>': '')
 					+ '</div><div class="clearfix"></div>\
 					<div id="'+progresses_id+'" class="progresses"></div><div class="clearfix"></div>\
@@ -54,13 +54,13 @@
 					//单文件大小限制
 					fileSingleSizeLimit: filesize,
 					//是否去重
-					duplicate: true,
+					duplicate: false,
 					// 文件选择筛选。
-					/*accept: {
+					accept: {
 						title: '选择文件',
 						extensions: filetype,
-						mimeTypes: 'image/*'
-					},*/
+						mimeTypes: typeof mimeType != 'undefined' ? filetype.split(',').map(function(v){return mimeType.lookup('name.'+v)}).join(',') : '*/*'
+					},
 					//是否允许在文件传输时提前把下一个文件的分片,MD5准备好
 					prepareNextFile: true,
 					//分多大一片？ 默认大小为5M.
@@ -72,7 +72,7 @@
 					//同时上传并发数
 					threads: 3,
 					//指定拖拽的容器
-					dnd: '#' +pick_id,
+					dnd: '#' + uploader_id,
 					//全局禁用拉拽，防止默认打开文件
 					disableGlobalDnd: true,
 					//可以粘贴的容器
@@ -113,13 +113,15 @@
 						compressSize: 0
 					});
 
+				
+
 				var $progresses = {};
 				var progress = function(file){
 					if (!$progresses[file.id])
 						$progresses[file.id] = $('<div class="media alert alert-warning fade in"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>\
 							<div class="media-left media-middle"><img class="media-object" src="" alt=""></div>\
-							<div class="media-body"><h4 class="media-heading">'+file.name.toHTML()+'</h4>\
-							<div class="media-message"></div>\
+							<div class="media-body"><h4 class="media-heading text-justify">'+file.name.toHTML()+'('+bytesToSize(file.size)+')</h4>\
+							<div class="media-message text-justify"></div>\
 							<div class="progress">\
 								<div class="progress-bar progress-bar-warning progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">\
 									<span class=""></span>\
@@ -132,7 +134,7 @@
 							else
 								progress(file).cancel();
 						});
-
+						//console.log(file);
 					return {
 						init: function(){
 							$progresses[file.id].removeClass('alert-info alert-danger alert-success alert-warning');
@@ -203,12 +205,23 @@
 					if (!!id && !$thumbnails[id])
 					{
 						$thumbnails[id] = $('<div class="col-xs-6 col-md-3 alert"><div class="thumbnail">\
-							<a href="'+$.baseuri+'attachment?id='+id+'"  target="_blank"><img src="'+$.baseuri+'placeholder?size=300x200&text='+encodeURIComponent('\u6b63\u5728\u8f7d\u5165...')+'" alt="" class="img-responsive center-block" onerror="this.src=\''+ $.baseuri +'placeholder?size=300x200&text=\'+encodeURIComponent(\'\u6587\u4ef6\u8bfb\u53d6\u4e2d...\');"></a>\
+							<div class="file-panel"><span class="cancel" data-dismiss="alert" aria-label="Close">删除</span><span class="rotateRight">向右旋转</span><span class="rotateLeft">向左旋转</span></div>\
+							<a href="'+$.baseuri+'attachment?id='+id+'"  target="_blank"><img src="'+$.baseuri+'placeholder?size=300x200&text='+encodeURIComponent('\u6b63\u5728\u8f7d\u5165...')+'" alt="" class="img-responsive center-block"  onload="javascript:resizeImg(this,300,200);" onerror="this.src=\''+ $.baseuri +'placeholder?size=300x200&text=\'+encodeURIComponent(\'\u6587\u4ef6\u8bfb\u53d6\u4e2d...\');"></a>\
 							<div class="caption">\
         					<h4><span class="title">'+(filename ? filename.toHTML() : '')+'</span><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></h4>\
 							</div>\
 							</div></div>').appendTo('#' + thumbnails_id).on('closed.bs.alert', function(){
 								preview(id).remove();
+							});
+							$('.rotateLeft,.rotateRight', $thumbnails[id]).on('click', function(){
+								var rotation = parseInt($thumbnails[id].data('rotation')) || 0;
+								rotation += $(this).is('.rotateLeft') ? -90 : 90;
+								deg = 'rotate(' + rotation + 'deg)';
+								$('img', $thumbnails[id]).css(
+									$.supportTransition ? {'-webkit-transform': deg,'-mos-transform': deg,'-o-transform': deg,'transform': deg}
+								     : {filter: 'progid:DXImageTransform.Microsoft.BasicImage(rotation='+ (~~((rotation/90)%4 + 4)%4) +')'}
+								);
+								$thumbnails[id].data('rotation', rotation);
 							});
 						if (!fileext) 
 						{
@@ -278,9 +291,9 @@
 							return this;
 						},
 						add: function(id) {
-							if (filelimit == 1) aids = [id];
+							if (filelimit == 1) aids = [id.toString()];
 							var i = aids.indexOf(id.toString());
-							if (i == -1) aids.push(id);
+							if (i == -1) aids.push(id.toString());
 							return this.write();
 						},
 						remove: function(id) {
@@ -301,10 +314,15 @@
 
 				//---------------------------------------
 				method.beforeFileQueued = function(file) {
+					if (filetype.split(',').indexOf(file.ext.toLowerCase()) == -1){
+						$.alert('请上传' + filetype + '文件!');
+						return false;
+					}
 					if (filelimit > 1 &&  attachment().get().length >= filelimit) {
 						$.alert('只允许上传' + filelimit + '个文件，请删减后重试!');
 						return false;
 					}
+					return true;
 				}
 				method.fileQueued = function(file) {
 					progress(file).init().thumb();
@@ -320,7 +338,7 @@
 						}, function(json){
 							if (json && json.result == 'success'){
 								uploader.skipFile(file);
-								progress(file).success().message('云端文件存在，文件秒传成功!');
+								progress(file).success().message('云端文件已存在，文件秒传成功!');
 								if (filelimit == 1) preview().removeAll();
 								preview(json.data.id, json.data.displayname, json.data.ext).build().setFile(file);
 								t.triggerHandler('uploader.upload.success',[json, file]);
@@ -371,7 +389,7 @@
 							$.alert('上传队列中有重复文件!');
 							break;
 						case 'Q_TYPE_DENIED':
-							$.alert('当前文件类型不匹配!');
+							$.alert('上传的文件只能为' + filetype);
 							break;
 						default:
 							$.alert(code);

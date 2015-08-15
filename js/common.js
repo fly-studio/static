@@ -471,6 +471,16 @@ f<e?g[c]||(b[f+1]&&isNaN(b[f+1])?{}:[]):a,g=m;else h.isArray(d[c])?d[c].push(a):
 			}
 		});
 	}
+	$.supportTransition = (function(){
+		var s = document.createElement('p').style,
+		r = 'transition' in s ||
+			'WebkitTransition' in s ||
+			'MozTransition' in s ||
+			'msTransition' in s ||
+			'OTransition' in s;
+		s = null;
+		return r;
+	})();
 	/* Gets window width cross browser */
 	$.window_size = function(){
 		return {'width' : window.innerWidth
