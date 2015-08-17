@@ -26,9 +26,9 @@
 					<span id="'+pick_id+'">选择文件('+bytesToSize(filesize)+')</span>'
 					+ '&nbsp;<span class="label label-success">.' + filetype.replace(/,/g,'</span>&nbsp;<span class="label label-success">.') + '</span>'
 					+ (max_width > 0 && max_height > 0 ? '<small>&nbsp;\u56fe\u7247\u4f1a\u81ea\u52a8\u7b49\u6bd4\u7f29\u653e\u81f3\uff1a' + max_width.toString().toHTML() + 'x' + max_height.toString().toHTML() + '</small>': '')
-					+ '</div><div class="clearfix"></div>\
+					+ '<div class="clearfix"></div>\
 					<div id="'+progresses_id+'" class="progresses"></div><div class="clearfix"></div>\
-					<div id="'+thumbnails_id+'" class="thumbnails row"></div><div class="clearfix"></div>').insertAfter(t);
+					<div id="'+thumbnails_id+'" class="thumbnails row"></div><div class="clearfix"></div></div>').insertAfter(t);
 				var uploader = WebUploader.create({
 					// swf文件路径
 					swf: $.baseuri + "static/js/webuploader/Uploader.swf",
@@ -37,7 +37,7 @@
 					// 选择文件的按钮。可选。内部根据当前运行是创建，可能是input元素，也可能是flash
 					pick: {
 						id: '#' + pick_id,
-						multiple: false,
+						multiple: true
 					},
 					//表单附加数据
 					formData: {"PHPSESSIONID": $.session_id, '_token': $.csrf},
@@ -94,7 +94,7 @@
 					resize: false,
 					compress: null
 				});
-				// 修改后图片上传前，尝试将图片压缩到1600 * 1600
+				// 修改后图片上传前，尝试将图片压缩到max_width * max_height
 				if (max_width > 0 && max_height > 0)
 					uploader.option( 'compress', {
 						width: max_width,
@@ -120,8 +120,8 @@
 					if (!$progresses[file.id])
 						$progresses[file.id] = $('<div class="media alert alert-warning fade in"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>\
 							<div class="media-left media-middle"><img class="media-object" src="" alt=""></div>\
-							<div class="media-body"><h4 class="media-heading text-justify">'+file.name.toHTML()+'('+bytesToSize(file.size)+')</h4>\
-							<div class="media-message text-justify"></div>\
+							<div class="media-body"><h4 class="media-heading">'+file.name.toHTML()+'('+bytesToSize(file.size)+')</h4>\
+							<div class="media-message"></div>\
 							<div class="progress">\
 								<div class="progress-bar progress-bar-warning progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">\
 									<span class=""></span>\
