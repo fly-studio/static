@@ -45,6 +45,9 @@ $.validator.addMethod('phone',function(value, element, params) {
 $.validator.addMethod('id_card',function(value, element, params) {
 	return this.optional(element) || (new RegExp('^(^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$)|(^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])((\d{4})|\d{3}[x])$)$','ig')).test(value);
 });
+$.validator.addMethod('not_zero',function(value, element, params) {
+	return this.optional(element) || parseFloat(value) == 0;
+});
 $.validator.addMethod('regex', function(value, element, params) {
 	var pattern = params;
 	pattern = pattern.replace(/(\\x\{([a-f0-9]{0,4})\})/gi,'\\u$2'); /*replace php's regexp to javascript*/
