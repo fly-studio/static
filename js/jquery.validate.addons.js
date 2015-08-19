@@ -42,11 +42,11 @@ $.validator.addMethod('timetick',function(value, element, params) {
 $.validator.addMethod('phone',function(value, element, params) {
 	return this.optional(element) || (new RegExp('^(((\+86|086|17951)[\-\s])?1(3[0-9]|5[0-9]|7[678]|8[0-9]|4[57])[\-\s]?[0-9]{4}[\-\s]?[0-9]{4}|(^0\d{2}-?\d{8}$)|(^0\d{3}-?\d{7}$)|(^\(0\d{2}\)-?\d{8}$)|(^\(0\d{3}\)-?\d{7}$))$','ig')).test(value);
 });
-$.validator.addMethod('id_card',function(value, element, params) {
+$.validator.addMethod('idcard',function(value, element, params) {
 	return this.optional(element) || (new RegExp('^(^[1-9]\d{7}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])\d{3}$)|(^[1-9]\d{5}[1-9]\d{3}((0\d)|(1[0-2]))(([0|1|2]\d)|3[0-1])((\d{4})|\d{3}[x])$)$','ig')).test(value);
 });
-$.validator.addMethod('not_zero',function(value, element, params) {
-	return this.optional(element) || parseFloat(value) == 0;
+$.validator.addMethod('notzero',function(value, element, params) {
+	return this.optional(element) || parseFloat(value) != 0;
 });
 $.validator.addMethod('regex', function(value, element, params) {
 	var pattern = params;
@@ -71,7 +71,8 @@ $.extend(jQuery.validator.messages, {
 	number: "\u8bf7\u8f93\u5165\u5408\u6cd5\u7684\u6570\u5b57",
 	digits: "\u53ea\u80fd\u8f93\u5165\u6574\u6570",
 	timestamp: "\u8bf7\u8f93\u5165\u5408\u6cd5\u7684\u65e5\u671f(\u6216\u65f6\u95f4)",
-	id_card: "\u7c7b\u578b\u4e0d\u5339\u914d",
+	idcard: "\u7c7b\u578b\u4e0d\u5339\u914d",
+	notzero: "\u4e0d\u80fd\u4e3a0",
 	phone: "\u7c7b\u578b\u4e0d\u5339\u914d", 
 	timetick: "\u8bf7\u8f93\u5165\u5408\u6cd5\u7684\u65f6\u95f4", 
 	creditcard: "\u8bf7\u8f93\u5165\u5408\u6cd5\u7684\u4fe1\u7528\u5361\u53f7",
