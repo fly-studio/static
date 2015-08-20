@@ -531,27 +531,34 @@ f<e?g[c]||(b[f+1]&&isNaN(b[f+1])?{}:[]):a,g=m;else h.isArray(d[c])?d[c].push(a):
 			},
 			buttons: false // an array of buttons
 		};
+		$.noty.tips_exchange = {
+			'success': 'success',
+			'failure': 'warning',
+			'warning': 'warning',
+			'error': 'error',
+			'notice': 'alert',
+			'information': 'information'
+		};
 	}
 	$.showtips = function(tips, redirect) {
 		var _tips = clone(tips);
-		_tips.result == 'failure' && (_tips.result = 'warning');
 		var _redirect = $.isUndefined(redirect) ? true : redirect;
 //		console.log(_tips);
-		var setting = {
-			text : '<div style="text-align:left;"><h4>' + _tips.message.title + '</h4><div>'+ _tips.message.content +'</div></div>',
-			type : _tips.result,
-			timeout : _tips.url === false ? false : 1500,
-			buttons : _tips.url === false ? [
-			{
-				addClass: 'btn btn-warning',
-				text: COMMON_LANGUAGE.back,
-				onClick: function($noty) {
-					$noty.close();
-				}
-			}
-			] : false
-		};
 		if ($.noty) {
+			var setting = {
+				text : '<div style="text-align:left;"><h4>' + _tips.message.title + '</h4><div>'+ _tips.message.content +'</div></div>',
+				type : $.noty.tips_exchange[_tips.result] ? $.noty.tips_exchange[_tips.result] : 'alert',
+				timeout : _tips.url === false ? false : 1500,
+				buttons : _tips.url === false ? [
+				{
+					addClass: 'btn btn-warning',
+					text: COMMON_LANGUAGE.back,
+					onClick: function($noty) {
+						$noty.close();
+					}
+				}
+				] : false
+			};
 			var $noty = noty(setting);
 			$('button:eq(0)',$noty.$buttons).focus();
 		} else

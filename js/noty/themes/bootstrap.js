@@ -1,4 +1,3 @@
-(function($){
 $.noty.themes.bootstrapTheme = {
     name: 'bootstrapTheme',
     modal: {
@@ -56,4 +55,4 @@ $.noty.themes.bootstrapTheme = {
         onClose: function() {  }
     }
 };
-})(jQuery);
+
