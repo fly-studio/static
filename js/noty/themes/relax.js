@@ -1,3 +1,4 @@
+(function($){
 $.noty.themes.relax = {
     name    : 'relax',
     helpers : {},
@@ -149,3 +150,4 @@ $.noty.themes.relax = {
         }
     }
 };
+})(jQuery);

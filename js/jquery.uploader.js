@@ -22,13 +22,15 @@
 				var uploader_id = 'uploader-id-' + nonce(), pick_id = 'pick-id-' + nonce();
 				var progresses_id = uploader_id + '-progresses',thumbnails_id = uploader_id + '-thumbnails', input_id = uploader_id + '-input';
 				//添加容器到input下
-				$('<div class="uploader-container" id="'+uploader_id+'"><div class="drop-tips text-info">拖到文件到这里</div>\
-					<span id="'+pick_id+'">选择文件('+bytesToSize(filesize)+')</span>'
-					+ '&nbsp;<span class="label label-success">.' + filetype.replace(/,/g,'</span>&nbsp;<span class="label label-success">.') + '</span>'
-					+ (max_width > 0 && max_height > 0 ? '<small>&nbsp;\u56fe\u7247\u4f1a\u81ea\u52a8\u7b49\u6bd4\u7f29\u653e\u81f3\uff1a' + max_width.toString().toHTML() + 'x' + max_height.toString().toHTML() + '</small>': '')
-					+ '<div class="clearfix"></div>\
+				var $container = $('<div class="uploader-container" id="'+uploader_id+'"><div class="drop-tips text-info">拖到文件到这里</div>\
+					<div class="pull-left"><span id="'+pick_id+'">选择文件('+bytesToSize(filesize)+')</span></div>'
+					+ '<div class="pull-left tags">&nbsp;<span class="label label-success">.' + filetype.replace(/,/g,'</span>&nbsp;<span class="label label-success">.') + '</span>'
+					+ '&nbsp;<span class="label label-warning" data-toggle="tooltip" data-placement="top" title="可以使用Ctrl+V直接粘贴截图（需现代浏览器）">Ctrl+V 截图</span>&nbsp;<span class="label label-warning" data-toggle="tooltip" data-placement="top" title="支持从Windows中拖动文件到这里上传（需现代浏览器）">拖放文件</span>'
+					+ (max_width > 0 && max_height > 0 ? '<br /><div class="pull-left"><small>&nbsp;\u56fe\u7247\u4f1a\u81ea\u52a8\u7b49\u6bd4\u7f29\u653e\u81f3\uff1a' + max_width.toString().toHTML() + 'x' + max_height.toString().toHTML() + '</small>': '')
+					+ '<div class="clearfix"></div></div>\
 					<div id="'+progresses_id+'" class="progresses"></div><div class="clearfix"></div>\
 					<div id="'+thumbnails_id+'" class="thumbnails row"></div><div class="clearfix"></div></div>').insertAfter(t);
+					if ($.fn.tooltip) $('[data-toggle="tooltip"]', $container).tooltip();
 				var uploader = WebUploader.create({
 					// swf文件路径
 					swf: $.baseuri + "static/js/webuploader/Uploader.swf",

@@ -1,3 +1,4 @@
+(function($){
 $.noty.themes.defaultTheme = {
     name    : 'defaultTheme',
     helpers : {
@@ -182,3 +183,4 @@ $.noty.themes.defaultTheme = {
         }
     }
 };
+})(jQuery);
