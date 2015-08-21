@@ -25,7 +25,7 @@
 				var $container = $('<div class="uploader-container" id="'+uploader_id+'"><div class="drop-tips text-info">\u62d6\u5230\u6587\u4ef6\u5230\u8fd9\u91cc</div>\
 					<div class="pull-left"><span id="'+pick_id+'">\u9009\u62e9\u6587\u4ef6('+bytesToSize(filesize)+')</span></div>'
 					+ '<div class="pull-left tags">&nbsp;<span class="label label-success">.' + filetype.replace(/,/g,'</span>&nbsp;<span class="label label-success">.') + '</span>'
-					+ '&nbsp;<span class="label label-warning" data-toggle="tooltip" data-placement="top" title="\u53ef\u4ee5\u4f7f\u7528Ctrl+V\u76f4\u63a5\u7c98\u8d34\u622a\u56fe\uff08\u9700\u73b0\u4ee3\u6d4f\u89c8\u5668\uff09">Ctrl+V \u622a\u56fe</span>&nbsp;<span class="label label-warning" data-toggle="tooltip" data-placement="top" title="\u652f\u6301\u4eceWindows\u4e2d\u62d6\u52a8\u6587\u4ef6\u5230\u8fd9\u91cc\u4e0a\u4f20\uff08\u9700\u73b0\u4ee3\u6d4f\u89c8\u5668\uff09">\u62d6\u653e\u6587\u4ef6</span>'
+					+ '&nbsp;<span class="label label-warning" data-toggle="tooltip" data-placement="top" title="\u53ef\u4ee5\u4f7f\u7528Ctrl+V\u76f4\u63a5\u7c98\u8d34\u622a\u56fe\uff08\u9700\u73b0\u4ee3\u6d4f\u89c8\u5668\uff09"><small class="glyphicon glyphicon-info-sign"></small> Ctrl+V \u622a\u56fe</span>&nbsp;<span class="label label-warning" data-toggle="tooltip" data-placement="top" title="\u652f\u6301\u4eceWindows\u4e2d\u62d6\u52a8\u6587\u4ef6\u5230\u8fd9\u91cc\u4e0a\u4f20\uff08\u9700\u73b0\u4ee3\u6d4f\u89c8\u5668\uff09"><small class="glyphicon glyphicon-info-sign"></small> \u62d6\u653e\u6587\u4ef6</span>'
 					+ (max_width > 0 && max_height > 0 ? '<br /><small>&nbsp;\u56fe\u7247\u4f1a\u81ea\u52a8\u7b49\u6bd4\u7f29\u653e\u81f3\uff1a' + max_width.toString().toHTML() + 'x' + max_height.toString().toHTML() + '</small>': '')
 					+ '</div><div class="clearfix"></div>\
 					<div id="'+progresses_id+'" class="progresses"></div><div class="clearfix"></div>\
@@ -245,14 +245,19 @@
 					
 					return {
 						build: function(){
+							if (t.triggerHandler('uploader.previewing', [this.getFile(), id]) === false) return this;
 							attachment().add(id);
+							t.triggerHandler('uploader.previewed',[this.getFile(), id]);
 							return this;
 						},
 						remove: function(){
-							if (this.getFile()) uploader.removeFile(this.getFile(), true);
+							var file = this.getFile();
+							if (t.triggerHandler('uploader.removing', [file, id]) === false) return this;
+							if (file) uploader.removeFile(file, true);
 							attachment().remove(id);
 							$thumbnails[id].remove();
 							delete $thumbnails[id];
+							t.triggerHandler('uploader.removed',[file, id]);
 							return this;
 						},
 						setFile: function(file){
@@ -327,6 +332,7 @@
 					return true;
 				}
 				method.fileQueued = function(file) {
+					if (t.triggerHandler('uploader.uploading', [file]) === false) return false;
 					progress(file).init().thumb();
 					this.md5File( file ).progress(function(percentage) {
 						progress(file).progressing(percentage).message('\u6b63\u5728\u6548\u9a8c\u6587\u4ef6...');
@@ -343,15 +349,17 @@
 								progress(file).success().message('\u4e91\u7aef\u6587\u4ef6\u5df2\u5b58\u5728\uff0c\u6587\u4ef6\u79d2\u4f20\u6210\u529f!');
 								if (filelimit == 1) preview().removeAll();
 								preview(json.data.id, json.data.displayname, json.data.ext).build().setFile(file);
-								t.triggerHandler('uploader.upload.success',[json, file]);
+								t.triggerHandler('uploader.uploaded',[file, json]);
 							} else {
 								uploader.upload(file);
 							}
 						},false);
 					});
+					return true;
 				}
 				//上传过程中触发，携带上传进度。
 				method.uploadProgress = function(file, percentage) {
+					t.triggerHandler('uploader.progressing',[file, percentage]);
 					progress(file).progressing(percentage);
 				}
 				//当文件上传成功时触发。
@@ -360,9 +368,10 @@
 						progress(file).success();
 						if (filelimit == 1) preview().removeAll();
 						preview(json.data.id, json.data.displayname, json.data.ext).build().setFile(file);
-						t.triggerHandler('uploader.upload.success',[json, file]);
+						t.triggerHandler('uploader.uploaded',[file, json]);
 					} else {
 						progress(file).error("\u5931\u8d25:" + json.message.content.toHTML());
+						t.triggerHandler('uploader.error',[file, json.message.content]);
 						//$.alert(json.message.content);
 					}
 				}
@@ -370,6 +379,7 @@
 				//当文件上传出错时触发。
 				method.uploadError = function(file, reason) {
 					progress(file).error("\u5931\u8d25:" + reason);
+					t.triggerHandler('uploader.error',[file, reason]);
 				}
 				//不管成功或者失败，文件上传完成时触发。
 				method.uploadComplete = function(file) {
