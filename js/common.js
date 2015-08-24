@@ -540,7 +540,7 @@ f<e?g[c]||(b[f+1]&&isNaN(b[f+1])?{}:[]):a,g=m;else h.isArray(d[c])?d[c].push(a):
 			'information': 'information'
 		};
 	}
-	$.showtips = function(tips, redirect) {
+	$.showtips = function(tips, redirect, noty_config) {
 		var _tips = clone(tips);
 		var _redirect = $.isUndefined(redirect) ? true : redirect;
 //		console.log(_tips);
@@ -559,6 +559,9 @@ f<e?g[c]||(b[f+1]&&isNaN(b[f+1])?{}:[]):a,g=m;else h.isArray(d[c])?d[c].push(a):
 				}
 				] : false
 			};
+			if (typeof noty_config == 'object')
+				setting = $.extend(setting, noty_config);
+
 			var $noty = noty(setting);
 			$('button:eq(0)',$noty.$buttons).focus();
 		} else
@@ -585,7 +588,7 @@ f<e?g[c]||(b[f+1]&&isNaN(b[f+1])?{}:[]):a,g=m;else h.isArray(d[c])?d[c].push(a):
 	 * @param  {String}   		url      query URL
 	 * @param  {String/Object}	data     form data
 	 * @param  {Function} 		callback call it when query success
-	 * @param  {Boolean}   		alert_it show tips when true
+	 * @param  {Boolean/Object} alert_it show tips when true or noty's config
 	 */
 	$.query = function(url, data, method, callback, alert_it) {
 		if ($.isUndefined(alert_it)) alert_it = true;
@@ -610,7 +613,7 @@ f<e?g[c]||(b[f+1]&&isNaN(b[f+1])?{}:[]):a,g=m;else h.isArray(d[c])?d[c].push(a):
 			success : function(json) {
 				if (json) {
 					if (json.result && alert_it){
-						$.showtips(json);
+						$.showtips(json, true, alert_it);
 					}
 				}
 				if (callback === false)	{
