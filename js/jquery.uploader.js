@@ -23,7 +23,7 @@
 				var progresses_id = uploader_id + '-progresses',thumbnails_id = uploader_id + '-thumbnails', input_id = uploader_id + '-input';
 				//添加容器到input下
 				var $container = $('<div class="uploader-container" id="'+uploader_id+'"><div class="drop-tips text-info">\u62d6\u5230\u6587\u4ef6\u5230\u8fd9\u91cc</div>\
-					<div class="pull-left"><span id="'+pick_id+'">\u9009\u62e9\u6587\u4ef6('+bytesToSize(filesize)+')</span></div>'
+					<div class="pull-left"><span id="'+pick_id+'">\u9009\u62e9\u6587\u4ef6(\u2264 '+bytesToSize(filesize)+')</span></div>'
 					+ '<div class="pull-left tags">&nbsp;<span class="label label-success">.' + filetype.replace(/,/g,'</span>&nbsp;<span class="label label-success">.') + '</span>'
 					+ '&nbsp;<span class="label label-warning" data-toggle="tooltip" data-placement="top" title="\u53ef\u4ee5\u4f7f\u7528Ctrl+V\u76f4\u63a5\u7c98\u8d34\u622a\u56fe\uff08\u9700\u73b0\u4ee3\u6d4f\u89c8\u5668\uff09"><small class="glyphicon glyphicon-info-sign"></small> Ctrl+V \u622a\u56fe</span>&nbsp;<span class="label label-warning" data-toggle="tooltip" data-placement="top" title="\u652f\u6301\u4eceWindows\u4e2d\u62d6\u52a8\u6587\u4ef6\u5230\u8fd9\u91cc\u4e0a\u4f20\uff08\u9700\u73b0\u4ee3\u6d4f\u89c8\u5668\uff09"><small class="glyphicon glyphicon-info-sign"></small> \u62d6\u653e\u6587\u4ef6</span>'
 					+ (max_width > 0 && max_height > 0 ? '<br /><small>&nbsp;\u56fe\u7247\u4f1a\u81ea\u52a8\u7b49\u6bd4\u7f29\u653e\u81f3\uff1a' + max_width.toString().toHTML() + 'x' + max_height.toString().toHTML() + '</small>': '')
