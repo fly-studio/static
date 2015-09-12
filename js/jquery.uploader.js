@@ -2,8 +2,8 @@
 	if(typeof COMMON_LANGUAGE == 'undefined')
 		throw('this javascript file need behind \'common.js\'');
 	var scripts = document.getElementsByTagName("script");
-	var thiscript = scripts[ scripts.length - 1 ];
-	$.session_id = thiscript.src.toString().getQuery('session_id');
+	var querys = $.deparam.querystring((scripts[ scripts.length - 1 ]).src);
+	$.session_id = querys['session_id'];
 	
 	$.fn.extend({
 		uploader : function(max_width, max_height, filesize, filetype, filelimit) {
@@ -42,7 +42,7 @@
 						multiple: true
 					},
 					//表单附加数据
-					formData: {"PHPSESSIONID": $.session_id, '_token': $.csrf},
+					formData: $.extend($.session_id ? {"PHPSESSIONID": $.session_id} : {}, $.csrf ? {'_token': $.csrf} : {}, {}),
 					//文件表单name
 					fileVal: 'Filedata',
 					//METHOD
