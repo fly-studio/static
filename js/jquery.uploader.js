@@ -7,14 +7,26 @@
 	
 	$.fn.extend({
 		uploader : function(max_width, max_height, filesize, filetype, filelimit) {
-			max_width = $.isUndefined(max_width) ? 0 : parseFloat(max_width);
+			if (max_width !== true)
+				max_width = $.isUndefined(max_width) ? 0 : parseFloat(max_width);
 			max_height = $.isUndefined(max_height) ? 0 : parseFloat(max_height);
 			filesize = $.isUndefined(filesize) ? 2 * 1024 * 1024 : filesize; //2 MB
-			filetype = $.isUndefined(filetype) ? 'jpg,jpeg,png,bmp,gif' : filetype.toLowerCase();
+			filetype = $.isUndefined(filetype) ? 'jpg,jpeg,png,bmp,gif,webp,svg' : filetype.toLowerCase();
 			filelimit = isNaN(filelimit) ? 1 : parseInt(filelimit);
-			var img_types = ['jpg','jpeg','png','bmp','gif'];
+			var img_types = ['jpg','jpeg','png','bmp','gif','webp','svg'];
 			return this.each(function(){
 				var t = $(this);
+
+				var flex_uploader = t.prop('flex_uploader') ? t.prop('flex_uploader') : {};
+				if (flex_uploader && flex_uploader.uploader)
+				{ //删除原有的控件
+					delete flex_uploader.uploader;
+					flex_uploader.$container.remove();
+					t.prop('flex_uploader', {});
+				}
+				//删除该控件，下面的不用执行
+				if (max_width === true) return;
+
 				var method = {};
 				var nonce = function(){
 					return rand(10000,99999);
@@ -22,16 +34,16 @@
 				var uploader_id = 'uploader-id-' + nonce(), pick_id = 'pick-id-' + nonce();
 				var progresses_id = uploader_id + '-progresses',thumbnails_id = uploader_id + '-thumbnails', input_id = uploader_id + '-input';
 				//添加容器到input下
-				var $container = $('<div class="uploader-container" id="'+uploader_id+'"><div class="drop-tips text-info">\u62d6\u5230\u6587\u4ef6\u5230\u8fd9\u91cc</div>\
+				flex_uploader.$container = $('<div class="uploader-container " id="'+uploader_id+'"><div class="drop-tips text-info">\u62d6\u5230\u6587\u4ef6\u5230\u8fd9\u91cc</div>\
 					<div class="pull-left"><span id="'+pick_id+'">\u9009\u62e9\u6587\u4ef6(\u2264 '+bytesToSize(filesize)+')</span></div>'
 					+ '<div class="pull-left tags">&nbsp;<span class="label label-success">.' + filetype.replace(/,/g,'</span>&nbsp;<span class="label label-success">.') + '</span>'
-					+ '&nbsp;<span class="label label-warning" data-toggle="tooltip" data-placement="top" title="\u53ef\u4ee5\u4f7f\u7528Ctrl+V\u76f4\u63a5\u7c98\u8d34\u622a\u56fe\uff08\u9700\u73b0\u4ee3\u6d4f\u89c8\u5668\uff09"><small class="glyphicon glyphicon-info-sign"></small> Ctrl+V \u622a\u56fe</span>&nbsp;<span class="label label-warning" data-toggle="tooltip" data-placement="top" title="\u652f\u6301\u4eceWindows\u4e2d\u62d6\u52a8\u6587\u4ef6\u5230\u8fd9\u91cc\u4e0a\u4f20\uff08\u9700\u73b0\u4ee3\u6d4f\u89c8\u5668\uff09"><small class="glyphicon glyphicon-info-sign"></small> \u62d6\u653e\u6587\u4ef6</span>'
+					+ '&nbsp;<span class="label label-warning enable-tooltip" data-placement="top" title="\u53ef\u4ee5\u4f7f\u7528Ctrl+V\u76f4\u63a5\u7c98\u8d34\u622a\u56fe\uff08\u9700\u73b0\u4ee3\u6d4f\u89c8\u5668\uff09"><small class="glyphicon glyphicon-info-sign"></small> Ctrl+V \u622a\u56fe</span>&nbsp;<span class="label label-warning enable-tooltip" data-placement="top" title="\u652f\u6301\u4eceWindows\u4e2d\u62d6\u52a8\u6587\u4ef6\u5230\u8fd9\u91cc\u4e0a\u4f20\uff08\u9700\u73b0\u4ee3\u6d4f\u89c8\u5668\uff09"><small class="glyphicon glyphicon-info-sign"></small> \u62d6\u653e\u6587\u4ef6</span>'
 					+ (max_width > 0 && max_height > 0 ? '<br /><small>&nbsp;\u56fe\u7247\u4f1a\u81ea\u52a8\u7b49\u6bd4\u7f29\u653e\u81f3\uff1a' + max_width.toString().toHTML() + 'x' + max_height.toString().toHTML() + '</small>': '')
 					+ '</div><div class="clearfix"></div>\
 					<div id="'+progresses_id+'" class="progresses"></div><div class="clearfix"></div>\
 					<div id="'+thumbnails_id+'" class="thumbnails row"></div><div class="clearfix"></div></div>').insertAfter(t);
-					if ($.fn.tooltip) $('[data-toggle="tooltip"]', $container).tooltip();
-				var uploader = WebUploader.create({
+				if ($.fn.tooltip) $('.enable-tooltip', flex_uploader.$container).tooltip();
+				flex_uploader.uploader = WebUploader.create({
 					// swf文件路径
 					swf: $.baseuri + "static/js/webuploader/Uploader.swf",
 					// 文件接收服务端。
@@ -98,7 +110,7 @@
 				});
 				// 修改后图片上传前，尝试将图片压缩到max_width * max_height
 				if (max_width > 0 && max_height > 0)
-					uploader.option( 'compress', {
+					flex_uploader.uploader.option( 'compress', {
 						width: max_width,
 						height: max_height,
 						// 图片质量，只有type为`image/jpeg`的时候才有效。
@@ -146,7 +158,7 @@
 							 $('.progress-bar', $progresses[file.id]).removeClass('progress-bar-info progress-bar-danger progress-bar-success progress-bar-warning');
 						},
 						thumb: function(){
-							uploader.makeThumb( file, function( error, ret ) {
+							flex_uploader.uploader.makeThumb( file, function( error, ret ) {
 								$('.media-object', $progresses[file.id]).attr('src', error ? $.baseuri+'placeholder?text='+file.ext+'&size=75x75&fontsize=35' : ret);
 							});
 						},
@@ -191,7 +203,7 @@
 							return this.message('\u4e0a\u4f20\u6210\u529f!');
 						},
 						cancel: function() {
-							uploader.cancelFile(file);
+							flex_uploader.uploader.cancelFile(file);
 							return this.remove();
 						},
 						remove: function() {
@@ -206,13 +218,13 @@
 				{
 					if (!!id && !$thumbnails[id])
 					{
-						$thumbnails[id] = $('<div class="col-xs-6 col-md-3 alert"><div class="thumbnail">\
+						$thumbnails[id] = $('<div class="col-xs-6 col-md-4 alert"><div class="thumbnail">\
 							<div class="file-panel"><span class="cancel" data-dismiss="alert" aria-label="Close">\u5220\u9664</span><span class="rotateRight">\u5411\u53f3\u65cb\u8f6c</span><span class="rotateLeft">\u5411\u5de6\u65cb\u8f6c</span></div>\
-							<a href="'+$.baseuri+'attachment?id='+id+'"  target="_blank"><img src="'+$.baseuri+'placeholder?size=300x200&text='+encodeURIComponent('\u6b63\u5728\u8f7d\u5165...')+'" alt="" class="img-responsive center-block"  onload="javascript:resizeImg(this,300,200);" onerror="this.src=\''+ $.baseuri +'placeholder?size=300x200&text=\'+encodeURIComponent(\'\u6587\u4ef6\u8bfb\u53d6\u4e2d...\');"></a>\
+							<a href="'+$.baseuri+'attachment?id='+id+'"  target="_blank"><img src="'+$.baseuri+'placeholder?size=300x200&text='+encodeURIComponent('\u6b63\u5728\u8f7d\u5165...')+'" alt="" class="img-responsive center-block"  onerror="this.src=\''+ $.baseuri +'placeholder?size=300x200&text=\'+encodeURIComponent(\'\u6587\u4ef6\u8bfb\u53d6\u4e2d...\');"></a>\
 							<div class="caption">\
         					<h4><span class="title">'+(filename ? filename.toHTML() : '')+'</span><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></h4>\
-							</div>\
-							</div></div>').appendTo('#' + thumbnails_id).on('closed.bs.alert', function(){
+							</div><div class="clearfix"></div>\
+							</div><div class="clearfix"></div></div>').appendTo('#' + thumbnails_id).on('closed.bs.alert', function(){
 								preview(id).remove();
 							});
 							$('.rotateLeft,.rotateRight', $thumbnails[id]).on('click', function(){
@@ -253,7 +265,7 @@
 						remove: function(){
 							var file = this.getFile();
 							if (t.triggerHandler('uploader.removing', [file, id]) === false) return this;
-							if (file) uploader.removeFile(file, true);
+							if (file) flex_uploader.uploader.removeFile(file, true);
 							attachment().remove(id);
 							$thumbnails[id].remove();
 							delete $thumbnails[id];
@@ -274,9 +286,9 @@
 						},
 						rebuildAll: function() {
 							//remove all files
-							files = uploader.getFiles();
+							files = flex_uploader.uploader.getFiles();
 							for(var i = 0;i < files.length;i++)
-								uploader.removeFile(files[i], true);
+								flex_uploader.uploader.removeFile(files[i], true);
 							//remove all preview
 							this.removeAll();
 							//build
@@ -334,6 +346,14 @@
 				method.fileQueued = function(file) {
 					if (t.triggerHandler('uploader.uploading', [file]) === false) return false;
 					progress(file).init().thumb();
+
+					//前台压缩图片，为避免产生BUG，不检查md5
+					if (max_width > 0 && max_height > 0)
+					{
+						flex_uploader.uploader.upload(file);
+						return true;
+					}
+
 					this.md5File( file ).progress(function(percentage) {
 						progress(file).progressing(percentage).message('\u6b63\u5728\u6548\u9a8c\u6587\u4ef6...');
 					}).then(function(val) {
@@ -345,13 +365,13 @@
 							size: file.size
 						}, function(json){
 							if (json && json.result == 'success'){
-								uploader.skipFile(file);
+								flex_uploader.uploader.skipFile(file);
 								progress(file).success().message('\u4e91\u7aef\u6587\u4ef6\u5df2\u5b58\u5728\uff0c\u6587\u4ef6\u79d2\u4f20\u6210\u529f!');
 								if (filelimit == 1) preview().removeAll();
 								preview(json.data.id, json.data.displayname, json.data.ext).build().setFile(file);
 								t.triggerHandler('uploader.uploaded',[file, json]);
 							} else {
-								uploader.upload(file);
+								flex_uploader.uploader.upload(file);
 							}
 						},false);
 					});
@@ -409,16 +429,16 @@
 					}
 				}
 
-				uploader.on('beforeFileQueued', method.beforeFileQueued)
-				uploader.on('fileQueued', method.fileQueued)
-				uploader.on('uploadProgress', method.uploadProgress)
-				uploader.on('uploadSuccess', method.uploadSuccess)
-				uploader.on('uploadError', method.uploadError)
-				uploader.on('uploadComplete', method.uploadComplete)
-				uploader.on('error', method.error)
+				flex_uploader.uploader.on('beforeFileQueued', method.beforeFileQueued)
+				flex_uploader.uploader.on('fileQueued', method.fileQueued)
+				flex_uploader.uploader.on('uploadProgress', method.uploadProgress)
+				flex_uploader.uploader.on('uploadSuccess', method.uploadSuccess)
+				flex_uploader.uploader.on('uploadError', method.uploadError)
+				flex_uploader.uploader.on('uploadComplete', method.uploadComplete)
+				flex_uploader.uploader.on('error', method.error)
 				//init
 				preview().rebuildAll();
-
+				t.prop('flex_uploader', flex_uploader);
 			});
 			
 		}

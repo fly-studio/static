@@ -343,6 +343,7 @@ function clone(obj) {
 	return o;
 };
 function resizeImg(img, maxWidth, maxHeight) {
+	jQuery(img).css({'maxHeight': maxHeight, 'maxWidth': maxWidth});
 	var HeightWidth = img.offsetHeight / img.offsetWidth;
 	var WidthHeight = img.offsetWidth / img.offsetHeight;
 	if(img.offsetWidth > maxWidth)
