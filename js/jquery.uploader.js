@@ -34,7 +34,7 @@
 				var uploader_id = 'uploader-id-' + nonce(), pick_id = 'pick-id-' + nonce();
 				var progresses_id = uploader_id + '-progresses',thumbnails_id = uploader_id + '-thumbnails', input_id = uploader_id + '-input';
 				//添加容器到input下
-				flex_uploader.$container = $('<div class="uploader-container" id="'+uploader_id+'"><div class="drop-tips text-info">\u62d6\u5230\u6587\u4ef6\u5230\u8fd9\u91cc</div>\
+				flex_uploader.$container = $('<div class="uploader-container" id="'+uploader_id+'"><div class="drop-tips text-info"><h2>\u62d6\u5230\u6587\u4ef6\u5230\u8fd9\u91cc</h2><br /><br /><div class="btn btn-info" onclick="javascript:jQuery(this).parent().hide().parent(\'.uploader-container\').removeClass(\'webuploader-dnd-over\');"><i class="glyphicon glyphicon-remove"></i> \u5173;\u95ed;</div></div>\
 					<div class="pull-left"><span id="'+pick_id+'">\u9009\u62e9\u6587\u4ef6(\u2264 '+bytesToSize(filesize)+')</span></div>'
 					+ '<div class="pull-left tags">&nbsp;<span class="label label-success">.' + filetype.replace(/,/g,'</span>&nbsp;<span class="label label-success">.') + '</span>'
 					+ '&nbsp;<span class="label label-warning enable-tooltip" data-placement="top" title="\u53ef\u4ee5\u4f7f\u7528Ctrl+V\u76f4\u63a5\u7c98\u8d34\u622a\u56fe\uff08\u9700\u73b0\u4ee3\u6d4f\u89c8\u5668\uff09"><small class="glyphicon glyphicon-info-sign"></small> Ctrl+V \u622a\u56fe</span>&nbsp;<span class="label label-warning enable-tooltip" data-placement="top" title="\u652f\u6301\u4eceWindows\u4e2d\u62d6\u52a8\u6587\u4ef6\u5230\u8fd9\u91cc\u4e0a\u4f20\uff08\u9700\u73b0\u4ee3\u6d4f\u89c8\u5668\uff09"><small class="glyphicon glyphicon-info-sign"></small> \u62d6\u653e\u6587\u4ef6</span>'
@@ -303,9 +303,15 @@
 				var attachment = function() {
 					var aid = t.val();
 					if (aid == '0') aid = '';
-					aids = aid ? aid.split(',') : [];
+					aids = aid ? ( aid instanceof Array ? aid : aid.split(',') ) : [];
 					return {
 						write: function() {
+							if (t.is('select')){
+								t.empty();
+								aids.forEach(function(i){
+									t.append('<option value="'+i+'">'+i+'</option>');
+								});
+							}
 							t.val(aids);
 							return this;
 						},
@@ -348,7 +354,7 @@
 					progress(file).init().thumb();
 
 					//前台压缩图片，为避免产生BUG，不检查md5
-					if (max_width > 0 && max_height > 0)
+					if (max_width > 0 && max_height > 0 && (file.ext == 'jpg' || file.ext == 'jpeg'))
 					{
 						flex_uploader.uploader.upload(file);
 						return true;
