@@ -46,7 +46,8 @@ if (!Array.prototype.forEach) {
 		if (typeof func != "function") throw new TypeError();
 		var thisp = arguments[1];
 		for (var i = 0, n = this.length; i < n; i++) {
-			if (i in this) func.apply(thisp, [this[i], i, this]);
+			if (i in this)
+				if (func.apply(thisp, [this[i], i, this]) === false) break;
 		}
 	};
 }
