@@ -1,7 +1,66 @@
 document.getElementsByTagName('html')[0].setAttribute('ng-app', 'app');
-var $app = angular.module('app', []).run(function($http, $rootScope) {
+//jquery ajax
+angular.module('jquery.ajax', []).provider("$ajax", function(){
+	this.$get = ['$rootScope', function($rootScope){
+		function query(options){
+			var $dfd = jQuery.Deferred();
+			jQuery.ajax(options).done(function(data){
+				$rootScope.$apply(function() {
+					$dfd.resolve(data);
+				});
+			}).fail(function() {
+				var failArgs = arguments;
+				$rootScope.$apply(function() {
+					$dfd.reject.apply($dfd, failArgs);
+				});
+			});
+			return $dfd.promise();
+		}
+		['get','post','head','patch','put','delete'].forEach(function(method){
+			query[method] = function(url, data, callback, alert_it)
+			{
+				if (callback === false) callback = nulll
+				var $dfd = jQuery.Deferred();
+				jQuery.query(url, data, method, callback, alert_it).done(function(data){
+					$rootScope.$apply(function() {
+						$dfd.resolve(data);
+					});
+				}).fail(function() {
+					var failArgs = arguments;
+					$rootScope.$apply(function() {
+						$dfd.reject.apply($dfd, failArgs);
+					});
+				});
+				return $dfd.promise();
+			}
+		});
+		return query;
+	}];
+	//this.$get.$inject = ['$rootScope'];
+	//return this;
+});
+//nl2br
+angular.module('untils', []).filter('nl2br', function($sce) {
+	return function(input) {
+		if (input !== void 0) {
+			return $sce.trustAsHtml(input.replace(/\n/g, '<br>'));
+		}
+	};
+}).filter('byte2size', function() {
+	return function(input) {
+		if (input !== void 0) {
+			return bytesToSize(input);
+		}
+	};
+}).filter("trustUrl", ['$sce', function ($sce) {
+	return function (recordingUrl) {
+		return $sce.trustAsResourceUrl(recordingUrl);
+	};
+}]);
+var $app = angular.module('app', ['jquery.ajax', 'ui.bootstrap', 'untils']).run(function($http, $rootScope) {
 	//$http.defaults.headers.common.method = 'get';
-	$rootScope.reload = function(page, filters, orders) {};
+	$rootScope.load = function(page, filters, orders) {};
+	$rootScope.reload = function() {};
 }).directive('a', function() {
 	return {
 		restrict: 'E',

@@ -655,7 +655,7 @@ window.location.query = function(param) {
 		};
 		if (_data && _data['_token']) //add csrf
 			_headers['X-CSRF-TOKEN'] = _data['_token'];
-		$.ajax({
+		var ajax = $.ajax({
 			url : url,
 			data : _data ? _data : null,
 			async : callback !== false, 
@@ -671,8 +671,8 @@ window.location.query = function(param) {
 					}
 				}
 				if (callback === false)	{
-						_result = json;
-						return _result;
+					_result = json;
+					return _result;
 				}
 				if (callback && $.isFunction(callback))
 					callback.call(_this, json);
@@ -698,7 +698,7 @@ window.location.query = function(param) {
 				}
 			}
 		});
-		return _result;
+		return callback === false ? _result : ajax;
 	};
 	$.GET = function(url, data, callback, alert_it) {
 		return $.query.call(this, url, data, 'GET', callback, alert_it);
