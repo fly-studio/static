@@ -6,7 +6,7 @@
 	$.session_id = querys['session_id'];
 	
 	$.fn.extend({
-		uploader : function(max_width, max_height, filesize, filetype, filelimit) {
+		uploader : function(max_width, max_height, filesize, filetype, filelimit, id) {
 			if (max_width !== true)
 				max_width = $.isUndefined(max_width) ? 0 : parseFloat(max_width);
 			max_height = $.isUndefined(max_height) ? 0 : parseFloat(max_height);
@@ -257,19 +257,19 @@
 					
 					return {
 						build: function(){
-							if (t.triggerHandler('uploader.previewing', [this.getFile(), id]) === false) return this;
+							if (t.triggerHandler('uploader.previewing', [this.getFile(), id, attachment().get()]) === false) return this;
 							attachment().add(id);
-							t.triggerHandler('uploader.previewed',[this.getFile(), id]);
+							t.triggerHandler('uploader.previewed',[this.getFile(), id, attachment().get()]);
 							return this;
 						},
 						remove: function(){
 							var file = this.getFile();
-							if (t.triggerHandler('uploader.removing', [file, id]) === false) return this;
+							if (t.triggerHandler('uploader.removing', [file, id, attachment().get()]) === false) return this;
 							if (file) flex_uploader.uploader.removeFile(file, true);
 							attachment().remove(id);
 							$thumbnails[id].remove();
 							delete $thumbnails[id];
-							t.triggerHandler('uploader.removed',[file, id]);
+							t.triggerHandler('uploader.removed',[file, id, attachment().get()]);
 							return this;
 						},
 						setFile: function(file){
@@ -350,7 +350,7 @@
 					return true;
 				}
 				method.fileQueued = function(file) {
-					if (t.triggerHandler('uploader.uploading', [file]) === false) return false;
+					if (t.triggerHandler('uploader.uploading', [file, attachment().get()]) === false) return false;
 					progress(file).init().thumb();
 
 					//前台压缩图片，为避免产生BUG，不检查md5
@@ -375,7 +375,7 @@
 								progress(file).success().message('\u4e91\u7aef\u6587\u4ef6\u5df2\u5b58\u5728\uff0c\u6587\u4ef6\u79d2\u4f20\u6210\u529f!');
 								if (filelimit == 1) preview().removeAll();
 								preview(json.data.id, json.data.displayname, json.data.ext).build().setFile(file);
-								t.triggerHandler('uploader.uploaded',[file, json]);
+								t.triggerHandler('uploader.uploaded',[file, json, attachment().get()]);
 							} else {
 								flex_uploader.uploader.upload(file);
 							}
@@ -385,7 +385,7 @@
 				}
 				//上传过程中触发，携带上传进度。
 				method.uploadProgress = function(file, percentage) {
-					t.triggerHandler('uploader.progressing',[file, percentage]);
+					t.triggerHandler('uploader.progressing',[file, percentage, attachment().get()]);
 					progress(file).progressing(percentage);
 				}
 				//当文件上传成功时触发。
@@ -394,10 +394,10 @@
 						progress(file).success();
 						if (filelimit == 1) preview().removeAll();
 						preview(json.data.id, json.data.displayname, json.data.ext).build().setFile(file);
-						t.triggerHandler('uploader.uploaded',[file, json]);
+						t.triggerHandler('uploader.uploaded',[file, json, attachment().get()]);
 					} else {
 						progress(file).error("\u5931\u8d25:" + json.message.content.toHTML());
-						t.triggerHandler('uploader.error',[file, json.message.content]);
+						t.triggerHandler('uploader.error',[file, json.message.content, attachment().get()]);
 						//$.alert(json.message.content);
 					}
 				}
@@ -405,7 +405,7 @@
 				//当文件上传出错时触发。
 				method.uploadError = function(file, reason) {
 					progress(file).error("\u5931\u8d25:" + reason);
-					t.triggerHandler('uploader.error',[file, reason]);
+					t.triggerHandler('uploader.error',[file, reason, attachment().get()]);
 				}
 				//不管成功或者失败，文件上传完成时触发。
 				method.uploadComplete = function(file) {
@@ -443,6 +443,7 @@
 				flex_uploader.uploader.on('uploadComplete', method.uploadComplete)
 				flex_uploader.uploader.on('error', method.error)
 				//init
+				if(id) attachment().add(id);
 				preview().rebuildAll();
 				t.prop('flex_uploader', flex_uploader);
 			});

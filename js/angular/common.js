@@ -61,11 +61,44 @@ angular.module('untils', [])
 	return function (recordingUrl) {
 		return $sce.trustAsResourceUrl(recordingUrl);
 	};
-}]);
-var $app = angular.module('app', ['jquery.ajax', 'ui.bootstrap', 'untils']).run(function($http, $rootScope) {
-	//$http.defaults.headers.common.method = 'get';
-	$rootScope.load = function(page, filters, orders) {};
-	$rootScope.reload = function() {};
+}]).directive('uploader', function() {
+	return {
+		restrict: 'A',
+		require: ['?input'],
+		scope: {
+			maxWidth: '@',
+			maxHeight: '@',
+			filesize: '@',
+			filetype: '@',
+			filelimit: '@uploader',
+			value: '=ngModel',
+		},
+		link: function(scope, elem, attrs) {
+			var update = function(e, file, json, ids){
+				scope.value = elem.val();
+				scope.$apply();
+			};
+			elem.uploader(scope.maxWidth, scope.maxHeight, scope.filesize, scope.filetype, scope.filelimit, scope.value ? scope.value : elem.val()).on('uploader.uploaded', update).on('uploader.removed', update);
+		}
+	};
+});
+var $app = angular.module('app', ['jquery.ajax', 'ui.bootstrap', 'untils', 'ngInputModified'])
+.config(function(inputModifiedConfigProvider) {
+	inputModifiedConfigProvider.disableGlobally(); //默认关闭ngInputModified
+})
+.config(function($provide) {
+	$provide.decorator('$controller', function($delegate) {
+		return function(constructor, locals, later, indent) {
+			if (typeof constructor === 'string' && !locals.$scope.controllerName) {
+				locals.$scope.controllerName =  constructor;
+			}
+			return $delegate(constructor, locals, later, indent);
+		};
+	});
+})
+.run(function($rootScope) {
+	/*$rootScope.load = function(page, filters, orders) {};
+	$rootScope.reload = function() {};*/
 })
 //<a href="空/#" ng-click=""></a>
 .directive('a', function() {
@@ -82,13 +115,13 @@ var $app = angular.module('app', ['jquery.ajax', 'ui.bootstrap', 'untils']).run(
 //<a method></a> <form method></form>
 .controller('queryController',  function(){
 
-}).directive('method', function(){
+}).directive('query', function(){
 	return {
 		restrict: 'A',
-		require: '?a',
+		require: ['?a', '?form'],
 		scope: {
-			'done': '&ondone',
-			'fail': '&onfail'
+			'done': '&query',
+			'fail': '&fail'
 		},
 		controller: 'queryController',
 		link: function(scope, elem, attrs) {

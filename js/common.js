@@ -718,6 +718,7 @@ window.location.query = function(param) {
 	$.PATCH = function(url, data, callback, alert_it) {
 		return $.query.call(this, url, data, 'PATCH', callback, alert_it)
 	};
+
 	/**
 	 * [alert description]
 	 * @param  {String} msg              [description]
@@ -725,6 +726,7 @@ window.location.query = function(param) {
 	 * @return {[type]}                  [description]
 	 */
 	$.alert = function(msg, confirm_callback) {
+		var $dfd = jQuery.Deferred();
 		var setting = {
 			text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><div>'+ msg +'</div></div>',
 			type : 'success',
@@ -737,6 +739,7 @@ window.location.query = function(param) {
 						$noty.close();
 						if (confirm_callback && $.isFunction(confirm_callback))
 							confirm_callback.call(this);
+						$dfd.resolve();
 					}
 				}
 			] : false 
@@ -748,7 +751,10 @@ window.location.query = function(param) {
 			alert(msg);
 			if (confirm_callback && $.isFunction(confirm_callback))
 				confirm_callback.call(this);
+			$dfd.resolve();
+
 		}
+		return $dfd.promise();
 	};
 
 	$.tips = function(msg, timeout) {
@@ -763,6 +769,7 @@ window.location.query = function(param) {
 			alert(msg);
 	};
 	$.confirm = function(msg, confirm_callback, cancel_callback) {
+		var $dfd = jQuery.Deferred();
 		var setting = {
 			text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><div>'+ msg +'</div></div>',
 			type : 'warning',
@@ -774,6 +781,7 @@ window.location.query = function(param) {
 					onClick: function($noty) {
 						$noty.close();
 						if (confirm_callback && $.isFunction(confirm_callback)) confirm_callback.call(this);
+						$dfd.resolve();
 					}
 				},{
 					addClass: 'btn btn-danger',
@@ -781,6 +789,7 @@ window.location.query = function(param) {
 					onClick: function($noty) {
 						$noty.close();
 						if (cancel_callback && $.isFunction(confirm_callback)) cancel_callback.call(this);
+						$dfd.reject();
 					}
 				}
 			]
@@ -791,11 +800,15 @@ window.location.query = function(param) {
 		} else {
 			if (confirm(msg)) {
 				if (confirm_callback && $.isFunction(confirm_callback)) confirm_callback.call(this);
+				$dfd.resolve();
 			} else {
 				if (cancel_callback && $.isFunction(confirm_callback)) cancel_callback.call(this);
+				$dfd.reject();
 			}
 		}
+		return $dfd.promise();
 	};
+
 	$.fn.extend({checkAll : function($selector, callback) {
 		if(!$.isjQuery($selector)) $selector = $($selector);
 		var t = this;
@@ -858,6 +871,7 @@ window.location.query = function(param) {
 			if (validator) validator.settings.submitHandler = function(f,e) {};
 			$this.on(is_form ? 'submit': 'click', function(e){
 				var selector = $this.attr('selector');
+				if ($this.is('.disabled,[disabled]')) return false;
 				var $selector = is_form ? $this.add(selector) : $(selector);
 				if (validator && !$.isEmptyObject(validator.invalid)) //validator is invalid
 					return false;
@@ -867,33 +881,21 @@ window.location.query = function(param) {
 					$.tips(COMMON_LANGUAGE.unselected);
 					return false;
 				}
-				if (is_form)
-				{ //disabled the submit button
-					$(':submit,:image',$this).each(function(){
-						var $t = $(this);
-						if ($t.prop('disabled') || $t.hasClass('disabled')) return false;
-						$t.prop('disabled',true).attr('disabled','disabled');
-						var submit_val =  $t.is(':not([value])') ? $t.html() : $t.val();
-						if (submit_val) {
-							$t.filter('[value]').val(submit_val + '...');
-							$t.filter(':not([value])').html(submit_val + '...');
-						}
-						$t.delay(5000).queue(function(){
-							$t.prop('disabled',false).removeAttr('disabled');
-							if (submit_val) {
-								$t.filter('[value]').val(submit_val);
-								$t.filter(':not([value])').html(submit_val);
-							}
-							$t.dequeue();
-						});
-					});
-				}
-
+				
 				var url = $this.attr(is_form ? 'action' : 'href');
 				var method = $this.attr('method');
 				var msg = $this.attr('confirm');
 				var query = function(){
-					$.query.call($this, url, $selector.serializeArray(), method, callback, alert_it);
+					var $doms = is_form ? $(':submit,:image',$this).add($this) : $this;
+					$doms = $doms.filter(':not(.disabled,[disabled])');
+					$doms.prop('disabled',true).attr('disabled','disabled').each(function(){
+						var $t = $(this);var o = $t.offset();
+						$('<div style="position:absolute;left:'+(o.left + $t.width())+'px;top:'+(o.top - 16) +'px;height:16px;width:16px;display:block;z-index:99999" class="query-loading"><img src="data:image/gif;base64,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"</div>').appendTo('body');
+					}); //disabled the submit button
+					return $.query.call($this, url, $selector.serializeArray(), method, callback, alert_it).always(function(){
+						$('.query-loading').remove();
+						$doms.prop('disabled',false).removeAttr('disabled');
+					});
 				}
 				if (msg) {
 					msg = msg.replace('%L', $selector.serializeArray().length)
