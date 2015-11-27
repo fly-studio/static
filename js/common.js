@@ -664,7 +664,7 @@ window.location.query = function(param) {
 			headers: _headers,
 			timeout : 20000,
 			dataType : /[\?&](jsonp|callback)=\?/i.test(url) ? 'jsonp' : 'json',
-			success : function(json) {
+			success : function(json, textStatus, jqXHR) {
 				if (json) {
 					if (json.result && alert_it){
 						$.showtips(json, true, alert_it);
@@ -675,7 +675,7 @@ window.location.query = function(param) {
 					return _result;
 				}
 				if (callback && $.isFunction(callback))
-					callback.call(_this, json);
+					callback.call(_this, json, textStatus, jqXHR);
 			},
 			error : function(XMLHttpRequest, textStatus, errorThrown) {
 				if (alert_it)
