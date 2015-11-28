@@ -89,15 +89,19 @@ angular.module('untils', [])
 			maxHeight: '@',
 			filesize: '@',
 			filetype: '@',
-			filelimit: '@uploader',
-			value: '=ngModel',
+			filelimit: '@',
+			value: '=ngModel'
 		},
 		link: function(scope, elem, attrs) {
-			var update = function(e, file, json, ids){
-				scope.value = elem.val();
-				scope.$apply();
-			};
-			elem.uploader(scope.maxWidth, scope.maxHeight, scope.filesize, scope.filetype, scope.filelimit, scope.value ? scope.value : elem.val()).on('uploader.uploaded', update).on('uploader.removed', update);
+			scope.attachments = {};
+			elem.uploader(scope.maxWidth, scope.maxHeight, scope.filesize, scope.filetype, scope.filelimit, scope.value ? scope.value : elem.val())
+			.on('uploader.uploaded', function(e, file, json, ids){
+				scope.value = elem.val();scope.$apply();
+				scope.$emit('uploader.uploaded', scope, elem, file, json, ids);
+			}).on('uploader.removed', function(e, file, removeId, ids){
+				scope.value = elem.val();scope.$apply();
+				scope.$emit('uploader.removed', scope, elem, file, removeId, ids);
+			});
 		}
 	};
 });
@@ -139,14 +143,16 @@ var $app = angular.module('app', ['jquery', 'ui.bootstrap', 'untils', 'ngInputMo
 		restrict: 'A',
 		require: ['?a', '?form'],
 		scope: {
-			'done': '&query',
+			'done': '&done',
 			'fail': '&fail'
 		},
 		controller: 'queryController',
 		link: function(scope, elem, attrs) {
 			elem.query(function(json){
-				if (json.result == 'success')
-					scope.done.apply(scope, [json]);
+				scope.result = json;
+				scope.$apply(function(){
+					json.result == 'success' ? scope.done.apply(scope) : scope.fail.apply(scope);
+				});
 			}, !attrs.noAlert);
 		}
 	}
