@@ -1,4 +1,3 @@
-document.getElementsByTagName('html')[0].setAttribute('ng-app', 'app');
 //jquery ajax
 angular.module('jquery', [])
 .provider("$ajax", function(){
@@ -57,30 +56,29 @@ angular.module('jquery', [])
 	}];
 	//this.$get.$inject = ['$rootScope'];
 	//return this;
-});
-angular.module('untils', [])
-//nl2br
-.filter('nl2br', function($sce) {
-	return function(input) {
-		if (input !== void 0) {
-			return $sce.trustAsHtml(input.replace(/\n/g, '<br>'));
-		}
-	};
 })
-//byte2size
-.filter('byte2size', function() {
-	return function(input) {
-		if (input !== void 0) {
-			return bytesToSize(input);
+//<a method></a> <form method></form>
+.controller('queryController',  function(){
+
+}).directive('query', function(){
+	return {
+		restrict: 'A',
+		require: ['?a', '?form'],
+		scope: {
+			'done': '&done',
+			'fail': '&fail'
+		},
+		controller: 'queryController',
+		link: function(scope, elem, attrs) {
+			elem.query(function(json){
+				scope.result = json;
+				scope.$apply(function(){
+					json.result == 'success' ? scope.done.apply(scope) : scope.fail.apply(scope);
+				});
+			}, !attrs.noAlert);
 		}
-	};
-})
-//trustUrl for video/audio
-.filter("trustUrl", ['$sce', function ($sce) {
-	return function (recordingUrl) {
-		return $sce.trustAsResourceUrl(recordingUrl);
-	};
-}]).directive('uploader', function() {
+	}
+}).directive('uploader', function() {
 	return {
 		restrict: 'A',
 		require: ['?input'],
@@ -105,24 +103,7 @@ angular.module('untils', [])
 		}
 	};
 });
-var $app = angular.module('app', ['jquery', 'ui.bootstrap', 'untils', 'ngInputModified'])
-.config(function(inputModifiedConfigProvider) {
-	inputModifiedConfigProvider.disableGlobally(); //默认关闭ngInputModified
-})
-.config(function($provide) {
-	$provide.decorator('$controller', function($delegate) {
-		return function(constructor, locals, later, indent) {
-			if (typeof constructor === 'string' && !locals.$scope.controllerName) {
-				locals.$scope.controllerName =  constructor;
-			}
-			return $delegate(constructor, locals, later, indent);
-		};
-	});
-})
-.run(function($rootScope) {
-	/*$rootScope.load = function(page, filters, orders) {};
-	$rootScope.reload = function() {};*/
-})
+angular.module('untils', [])
 //<a href="空/#" ng-click=""></a>
 .directive('a', function() {
 	return {
@@ -135,25 +116,27 @@ var $app = angular.module('app', ['jquery', 'ui.bootstrap', 'untils', 'ngInputMo
 		}
 	};
 })
-//<a method></a> <form method></form>
-.controller('queryController',  function(){
-
-}).directive('query', function(){
-	return {
-		restrict: 'A',
-		require: ['?a', '?form'],
-		scope: {
-			'done': '&done',
-			'fail': '&fail'
-		},
-		controller: 'queryController',
-		link: function(scope, elem, attrs) {
-			elem.query(function(json){
-				scope.result = json;
-				scope.$apply(function(){
-					json.result == 'success' ? scope.done.apply(scope) : scope.fail.apply(scope);
-				});
-			}, !attrs.noAlert);
+//nl2br
+.filter('nl2br', function($sce) {
+	return function(input) {
+		if (input !== void 0) {
+			return $sce.trustAsHtml(input.replace(/\n/g, '<br>'));
 		}
-	}
-});
+	};
+})
+//byte2size
+.filter('byte2size', function() {
+	return function(input) {
+		if (input !== void 0) {
+			return bytesToSize(input);
+		}
+	};
+})
+//trustUrl for video/audio
+.filter("trustUrl", ['$sce', function ($sce) {
+	return function (recordingUrl) {
+		return $sce.trustAsResourceUrl(recordingUrl);
+	};
+}]);
+
+
