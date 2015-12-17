@@ -173,6 +173,7 @@
 						error: function(message) {
 							this.init();
 							this.initProgress();
+							file.setStatus('invalid');
 							$progresses[file.id].addClass("alert-danger");
 							$('.progress-bar', $progresses[file.id]).addClass("progress-bar-danger");
 							return this.message(message);
@@ -396,7 +397,7 @@
 						preview(json.data.id, json.data.displayname, json.data.ext).build().setFile(file);
 						t.triggerHandler('uploader.uploaded',[file, json, attachment().get()]);
 					} else {
-						progress(file).error("\u5931\u8d25:" + json.message.content.toHTML());
+						progress(file).error("\u5931\u8d25: " + json.message.content);
 						t.triggerHandler('uploader.error',[file, json.message.content, attachment().get()]);
 						//$.alert(json.message.content);
 					}
@@ -404,7 +405,7 @@
 				
 				//当文件上传出错时触发。
 				method.uploadError = function(file, reason) {
-					progress(file).error("\u5931\u8d25:" + reason);
+					progress(file).error("\u5931\u8d25: " + reason);
 					t.triggerHandler('uploader.error',[file, reason, attachment().get()]);
 				}
 				//不管成功或者失败，文件上传完成时触发。
