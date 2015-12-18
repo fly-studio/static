@@ -123,6 +123,13 @@ angular.module('untils', [])
 			return $sce.trustAsHtml(input.replace(/\n/g, '<br>'));
 		}
 	};
+})//count
+.filter('count', function() {
+	return function(input) {
+		if (input !== void 0) {
+			return count(input);
+		}
+	};
 })
 //byte2size
 .filter('byte2size', function() {
