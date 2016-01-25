@@ -45,6 +45,7 @@ angular.module('jquery', [])
 		angular.forEach(['get','post','head','patch','put','delete'], function(method){
 			query[method] = function(url, data, callback, alert_it)
 			{
+				alert_it = typeof alert_it == 'undefined' ? false : alert_it;
 				return query(url, data, method, callback, alert_it);
 			}
 		});
