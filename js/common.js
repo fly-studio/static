@@ -676,21 +676,27 @@ window.location.query = function(param) {
 		return callback === false ? _result : ajax;
 	};
 	$.GET = function(url, data, callback, alert_it) {
+		alert_it = typeof alert_it == 'undefined' ? false : alert_it;
 		return $.query.call(this, url, data, 'GET', callback, alert_it);
 	};
 	$.POST = function(url, data, callback, alert_it) {
+		alert_it = typeof alert_it == 'undefined' ? false : alert_it;
 		return $.query.call(this, url, data, 'POST', callback, alert_it)
 	};
 	$.PUT = function(url, data, callback, alert_it) {
+		alert_it = typeof alert_it == 'undefined' ? false : alert_it;
 		return $.query.call(this, url, data, 'PUT', callback, alert_it)
 	};
 	$.DELETE = function(url, data, callback, alert_it) {
+		alert_it = typeof alert_it == 'undefined' ? false : alert_it;
 		return $.query.call(this, url, data, 'DELETE', callback, alert_it)
 	};
 	$.HEAD = function(url, data, callback, alert_it) {
+		alert_it = typeof alert_it == 'undefined' ? false : alert_it;
 		return $.query.call(this, url, data, 'HEAD', callback, alert_it)
 	};
 	$.PATCH = function(url, data, callback, alert_it) {
+		alert_it = typeof alert_it == 'undefined' ? false : alert_it;
 		return $.query.call(this, url, data, 'PATCH', callback, alert_it)
 	};
 
