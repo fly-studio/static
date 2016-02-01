@@ -738,6 +738,53 @@ window.location.query = function(param) {
 		return $dfd.promise();
 	};
 
+	$.prompt = function(msg, confirm_callback, cancel_callback) {
+		var $dfd = jQuery.Deferred();
+		var _confirm = function(v){
+			if (!v) return _cancel();
+			if (confirm_callback && $.isFunction(confirm_callback)) confirm_callback.call(this,[v]);
+			$dfd.resolve([v]);
+		}
+		var _cancel = function(){
+			if (cancel_callback && $.isFunction(confirm_callback)) cancel_callback.call(this);
+			$dfd.reject();
+		}
+		var setting = {
+			text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><label>'+ msg +'<input type="text" class="form-control" name="prompt" placeholder="" autofocus="autofocus"></label></div>',
+			type : 'alert',
+			timeout :  false ,
+			buttons : [
+				{
+					addClass: 'btn btn-primary',
+					text: COMMON_LANGUAGE.ok,
+					onClick: function($noty) {
+						$noty.close();
+						var v = $('[name="prompt"]',$noty.$bar).val();
+						_confirm(v);
+					}
+				},{
+					addClass: 'btn btn-danger',
+					text: COMMON_LANGUAGE.cancel,
+					onClick: function($noty) {
+						$noty.close();
+						_cancel();
+					}
+				}
+			]
+		};
+		if ($.noty) {
+			var $noty = noty(setting);
+			$('[name="prompt"]',$noty.$bar).focus();
+		} else {
+			if (v = prompt(msg)) {
+				_confirm(v);
+			} else {
+				_cancel();
+			}
+		}
+		return $dfd.promise();
+	};
+
 	$.tips = function(msg, timeout) {
 		var setting = {
 			text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><div>'+ msg +'</div></div>',
