@@ -774,7 +774,14 @@ window.location.query = function(param) {
 		};
 		if ($.noty) {
 			var $noty = noty(setting);
-			$('[name="prompt"]',$noty.$bar).focus();
+			$('[name="prompt"]',$noty.$bar).focus().on('keypress', function(e){
+				if (e.keyCode==13)
+				{
+					$noty.close();
+					var v = $(this).val();
+					_confirm(v);
+				}
+			});
 		} else {
 			if (v = prompt(msg)) {
 				_confirm(v);
