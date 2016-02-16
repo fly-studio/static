@@ -296,7 +296,7 @@ Number.prototype.toTimeString = function(format_string) {
 };
 String.prototype.toCountDownString = function(format_string){
 	var count_down_ms = parseInt(this);
-	return isNaN(count_down_ms) ? this : count_down_ms.toCountDownString();
+	return isNaN(count_down_ms) ? this : count_down_ms.toCountDownString(format_string);
 };
 Number.prototype.toCountDownString = function(format_string){
 		var d,h,m,s,ms,minus=false;
@@ -575,7 +575,7 @@ window.location.query = function(param) {
 //		console.log(_tips);
 		if ($.noty) {
 			var setting = {
-				text : '<div style="text-align:left;"><h4>' + _tips.message.title + '</h4><div>'+ _tips.message.content +'</div></div>',
+				text : '<div style="text-align:left;"><h4>' + _tips.message.title + '</h4><div style="word-break:break-all;word-wrap:break-word;">'+ _tips.message.content +'</div></div>',
 				type : $.noty.tips_exchange[_tips.result] ? $.noty.tips_exchange[_tips.result] : 'alert',
 				timeout : _tips.url === false ? false : 1500,
 				buttons : _tips.url === false ? [
@@ -709,7 +709,7 @@ window.location.query = function(param) {
 	$.alert = function(msg, confirm_callback) {
 		var $dfd = jQuery.Deferred();
 		var setting = {
-			text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><div>'+ msg +'</div></div>',
+			text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><div style="word-break:break-all;word-wrap:break-word;">'+ msg +'</div></div>',
 			type : 'success',
 			timeout :  confirm_callback ? false : 1500 ,
 			buttons : confirm_callback ? [
@@ -750,7 +750,7 @@ window.location.query = function(param) {
 			$dfd.reject();
 		}
 		var setting = {
-			text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><label>'+ msg +'<input type="text" class="form-control" name="prompt" placeholder="" autofocus="autofocus"></label></div>',
+			text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><label style="word-break:break-all;word-wrap:break-word;">'+ msg +'<input type="text" class="form-control" name="prompt" placeholder="" autofocus="autofocus"></label></div>',
 			type : 'alert',
 			timeout :  false ,
 			buttons : [
@@ -794,7 +794,7 @@ window.location.query = function(param) {
 
 	$.tips = function(msg, timeout) {
 		var setting = {
-			text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><div>'+ msg +'</div></div>',
+			text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><div style="word-break:break-all;word-wrap:break-word;">'+ msg +'</div></div>',
 			type : 'warning',
 			timeout :  timeout ? timeout : 1500
 		};
@@ -806,7 +806,7 @@ window.location.query = function(param) {
 	$.confirm = function(msg, confirm_callback, cancel_callback) {
 		var $dfd = jQuery.Deferred();
 		var setting = {
-			text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><div>'+ msg +'</div></div>',
+			text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><div style="word-break:break-all;word-wrap:break-word;">'+ msg +'</div></div>',
 			type : 'warning',
 			timeout :  false ,
 			buttons : [
