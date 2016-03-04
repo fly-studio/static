@@ -24,20 +24,56 @@ cos(C) = (a² + b² - c²) / 2ab
 */
 
 if (!math) var math = {};
-//坐标2,与坐标1的x轴正方向的弧度(顺时针)
+//坐标2,与坐标1形成的斜率(坐标1的x轴正方向的夹角弧度（顺时针）)
 math.range = function(x1, y1, x2, y2)
 {
 	var angle = Math.atan2(y2 - y1, x2 - x1); //角度
 
 	if (angle < 0) angle = angle + Math.PI;
 	return angle;
-}
+};
 //两个坐标之间的距离(勾股定理，求斜边长)
 math.distance = function(x1, y1, x2, y2)
 {
-	var r = Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2),2));//两点距离
+	var r = Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));//两点距离
 	return r;
-}
+};
+/**
+ * 模仿Excel的列名，将数字转化为 A，AA，AZ等
+ * 
+ * @param  {Number} index 由0开始的数字
+ * @return {String}
+ */
+math.indexToColumn = function(index) {
+	var r = 26;
+	var str = '';
+	if (index == 0) return 'A';
+	while(index > 0) {
+		if (str.length > 0) --index;
+		var mr = index % r;
+		str = String.fromCharCode(mr + 65) + str; 
+		index = Math.floor((index - mr) / r);
+	}
+	return str;
+};
+/**
+ * 模仿Excel的列名，将A，AA，AZ等转化为数字 (从0开始)
+ * 
+ * @param  {String} no 列名
+ * @return {Number}
+ */
+math.columnToIndex = function(no) {
+	no = no.toUpperCase();
+	if (no == 'A') return 0;
+	var r = 26;
+	var index = 0;
+	var length = no.length;
+	for(var i = 0;i < length;++i) {
+		var ch = no.substr(i,1);
+		index += (String.charCodeAt(ch)  - 65 + 1) * Math.pow(r, length - i - 1);
+	}
+	return index - 1;
+};
 if (!color) var color = {};
 /**
  * 使用canvas的createLinearGradient 创建一个渐变色彩的圆形画笔
