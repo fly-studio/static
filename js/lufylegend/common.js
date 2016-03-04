@@ -71,3 +71,41 @@ bitmap.to = function(data, width, height, callback)
 	}	
 
 }
+/**
+ * 画一个矩形或者圆形的彩虹
+ * 如果定义r，并且 r = 宽或高 / 2 ，则会显示成圆，宽高相同会更好，
+ * 
+ * @param  {Number} width  图片宽
+ * @param  {Number} height 图片高，不定义则为宽，正方形
+ * @param  {Number} r      从中心点的放射半径，不设置会自动计算
+ * @return {CanvasElement} Canvas的一个彩虹图片
+ */
+bitmap.rainbow = function(width, height, r)
+{
+	var canvas = document.createElement("canvas");
+	var graphics = canvas.getContext("2d");
+	height = height || width;
+	canvas.width = width; canvas.height = height;
+	r = r || Math.sqrt(2 * Math.pow(Math.max(width, height) / 2, 2));
+	var cx = width / 2, cy = height / 2;
+	for (var i = 0; i < 360; i += 0.1) {
+		var rad = i * 0.0174532925;
+		var x = cx + r * Math.cos(rad); //圆的边沿坐标
+		var y = cy + r * Math.sin(rad);
+		//不能超出矩形
+		x = Math.min(width , Math.max(0, x));
+		y = Math.min(height , Math.max(0, y));
+		var grad = graphics.createLinearGradient(cx, cy, x, y);
+		grad.addColorStop(0, "white");
+		grad.addColorStop(0.01, "white");
+		grad.addColorStop(0.99, "hsla(" + i + ", 100%, 50%, 1.0)");
+		grad.addColorStop(1, "hsla(" + i + ", 100%, 50%, 1.0)");
+		graphics.strokeStyle = grad;
+		graphics.beginPath();
+		graphics.moveTo(cx, cy);
+		graphics.lineTo(x, y);
+		graphics.stroke();
+		delete grad;
+	}
+	return canvas;
+}
