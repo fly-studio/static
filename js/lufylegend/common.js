@@ -32,12 +32,6 @@ math.range = function(x1, y1, x2, y2)
 	if (angle < 0) angle = angle + Math.PI;
 	return angle;
 };
-//两个坐标之间的距离(勾股定理，求斜边长)
-math.distance = function(x1, y1, x2, y2)
-{
-	var r = Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));//两点距离
-	return r;
-};
 /**
  * 模仿Excel的列名，将数字转化为 A，AA，AZ等
  * 
