@@ -18,6 +18,31 @@ var COMMON_LANGUAGE = {
  * IE 6,7没有console，此处仅仅为了修复报错。
  */
 (function(){var e;var t=function(){};var n=["assert","clear","count","debug","dir","dirxml","error","exception","group","groupCollapsed","groupEnd","info","log","markTimeline","profile","profileEnd","table","time","timeEnd","timeStamp","trace","warn"];var r=n.length;var i=window.console=window.console||{};while(r--){e=n[r];if(!i[e]){i[e]=t}}})();
+// 解决浏览器无requestAnimationFrame的情况
+// http://paulirish.com/2011/requestanimationframe-for-smart-animating/
+// http://my.opera.com/emoller/blog/2011/12/20/requestanimationframe-for-smart-er-animating
+// requestAnimationFrame polyfill by Erik Möller. fixes from Paul Irish and Tino Zijdel
+// MIT license
+(function() {
+	var lastTime = 0;
+	var vendors = ['ms', 'moz', 'webkit', 'o'];
+	for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+		window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
+		window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame'] || window[vendors[x] + 'CancelRequestAnimationFrame'];
+	}
+	if (!window.requestAnimationFrame) window.requestAnimationFrame = function(callback, element) {
+		var currTime = new Date().getTime();
+		var timeToCall = Math.max(0, 16 - (currTime - lastTime));
+		var id = window.setTimeout(function() {
+			callback(currTime + timeToCall);
+		}, timeToCall);
+		lastTime = currTime + timeToCall;
+		return id;
+	};
+	if (!window.cancelAnimationFrame) window.cancelAnimationFrame = function(id) {
+		clearTimeout(id);
+	};
+}());
 /**
  * 模拟继承
  *
@@ -45,6 +70,7 @@ function base(derive, baseSprite, baseArgs){
 }
 /**
  * Clone 一个Object，类似PHP等语言的clone
+ * 类似于上例base
  * 
  * @param  {Object} obj 源
  * @return {Object}     

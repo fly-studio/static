@@ -1,13 +1,13 @@
 /* 
 ABC是三个角,abc分别是这三个角的对边  
-   C ___a___ B
-     |     /
-     |    /
-     b   c 
-     |  /
-     | /
-     |/
-     A
+	C ___a__ B
+	 |     /
+	 |    /
+	 b   c 
+	 |  /
+	 | /
+	 |/
+	 A
 
 直角三角形
 勾股  a² + b² = c²
@@ -25,12 +25,17 @@ cos(C) = (a² + b² - c²) / 2ab
 
 if (!math) var math = {};
 //坐标2,与坐标1形成的斜率(坐标1的x轴正方向的夹角弧度（顺时针）)
-math.range = function(x1, y1, x2, y2)
+math.slope = function(p1, p2)
 {
-	var angle = Math.atan2(y2 - y1, x2 - x1); //角度
-
-	if (angle < 0) angle = angle + Math.PI;
+	var angle = Math.atan2(p2[1] - p1[1], p2[0] - p1[0]); //角度
 	return angle;
+};
+math.d2r = function(d) {
+    return (d * Math.PI)/180;
+};
+// Convert Radian to Degree
+math.r2d = function(r) {
+    return (180 * r) / Math.PI;
 };
 /**
  * 模仿Excel的列名，将数字转化为 A，AA，AZ等
