@@ -243,3 +243,33 @@ bitmap.circleRainbow = function(r)
 {
 	return bitmap.rainbow(r * 2, r * 2 , r);
 }
+if (!sprite) var sprite = {};
+/**
+ * 
+ */
+sprite.modal = function(lSprite)
+{
+	var modal = new LSprite();
+	var alpha = new LSprite();
+	alpha.graphics.drawRect(0, '', [0, 0, LGlobal.width, LGlobal.height], true, '#000');
+	alpha.alpha = 0.8;
+	alpha.x = 0;alpha.y = 0;
+
+	var container = new LSprite();
+	container.x = (LGlobal.width - lSprite.getWidth()) / 2;container.y = (LGlobal.height - lSprite.getHeight()) / 2;
+	lSprite.visible = true;
+	container.addChild(lSprite);
+
+
+	modal.addChild(alpha);
+	modal.addChild(container);
+	addChild(modal);
+
+	modal.addEventListener(LMouseEvent.MOUSE_UP, function(e){
+		var sp = this.sp;
+		sp.removeAllEventListener();
+		sp.removeAllChild();
+		sp.remove();
+		sp.die();
+	});
+}
