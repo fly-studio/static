@@ -50,6 +50,11 @@ angular.module('jquery', [])
 			}
 		});
 		query.form = function($form, callback, alert_it) {
+			if (!$form || !$form.length) {
+				var $dfd = jQuery.Deferred();
+				$dfd.reject();
+				return $dfd.promise();
+			}
 			var method = ($form.attr('method') ? $form.attr('method') : 'POST').toLowerCase();
 			return query($form.attr('action'), $form.serialize(), method, callback, alert_it);
 		}
