@@ -37,42 +37,7 @@ math.d2r = function(d) {
 math.r2d = function(r) {
     return (180 * r) / Math.PI;
 };
-/**
- * 模仿Excel的列名，将数字转化为 A，AA，AZ等
- * 
- * @param  {Number} index 由0开始的数字
- * @return {String}
- */
-math.indexToColumn = function(index) {
-	var r = 26;
-	var str = '';
-	if (index == 0) return 'A';
-	while(index > 0) {
-		if (str.length > 0) --index;
-		var mr = index % r;
-		str = String.fromCharCode(mr + 65) + str; 
-		index = Math.floor((index - mr) / r);
-	}
-	return str;
-};
-/**
- * 模仿Excel的列名，将A，AA，AZ等转化为数字 (从0开始)
- * 
- * @param  {String} no 列名
- * @return {Number}
- */
-math.columnToIndex = function(no) {
-	no = no.toUpperCase();
-	if (no == 'A') return 0;
-	var r = 26;
-	var index = 0;
-	var length = no.length;
-	for(var i = 0;i < length;++i) {
-		var ch = no.substr(i,1);
-		index += (String.charCodeAt(ch)  - 65 + 1) * Math.pow(r, length - i - 1);
-	}
-	return index - 1;
-};
+
 if (!color) var color = {};
 /**
  * 使用canvas的createLinearGradient 创建一个渐变色彩的圆形画笔
@@ -247,8 +212,12 @@ if (!sprite) var sprite = {};
 /**
  * 
  */
-sprite.modal = function(lSprite)
+sprite.modal = function(lSprite, rect, showorhide_callback)
 {
+	if (typeof rect == 'undefined') rect = {};
+	rect.x = rect.x ? rect.x : 'center';
+	rect.y = rect.y ? rect.y : 'center';
+
 	var modal = new LSprite();
 	var alpha = new LSprite();
 	alpha.graphics.drawRect(0, '', [0, 0, LGlobal.width, LGlobal.height], true, '#000');
@@ -256,7 +225,8 @@ sprite.modal = function(lSprite)
 	alpha.x = 0;alpha.y = 0;
 
 	var container = new LSprite();
-	container.x = (LGlobal.width - lSprite.getWidth()) / 2;container.y = (LGlobal.height - lSprite.getHeight()) / 2;
+	container.x = rect.x == 'center' ? (LGlobal.width - lSprite.getWidth()) / 2 : rect.x;
+	container.y = rect.y == 'center' ? (LGlobal.height - lSprite.getHeight()) / 2 : rect.y;
 	lSprite.visible = true;
 	container.addChild(lSprite);
 
@@ -265,11 +235,79 @@ sprite.modal = function(lSprite)
 	modal.addChild(container);
 	addChild(modal);
 
+	if (showorhide_callback) showorhide_callback.call(lSprite, true);
+
 	modal.addEventListener(LMouseEvent.MOUSE_UP, function(e){
 		var sp = this.sp;
 		sp.removeAllEventListener();
 		sp.removeAllChild();
 		sp.remove();
 		sp.die();
+		if (showorhide_callback) showorhide_callback.call(lSprite, false);
 	});
+};
+math.toAbsolute = function(r)
+{
+	var s = this, sx = parseInt(LGlobal.canvasObj.style.width) / LGlobal.canvasObj.width, sy = parseInt(LGlobal.canvasObj.style.height) / LGlobal.canvasObj.height;
+	var rect = {x: 0, y: 0, width: 0, height: 0};
+	rect.x = (parseInt(LGlobal.canvasObj.style.marginLeft) + ((r.x * sx) >>> 0));
+	rect.y = (parseInt(LGlobal.canvasObj.style.marginTop) + ((r.y * sy) >>> 0));
+	rect.width = s.display.style.width = (r.width * sx >>> 0);
+	rect.height = s.display.style.height = (r.height * sy >>> 0);
 }
+var LStageImage = (function () {
+	function LStageImage () {
+		var s = this;
+		LExtends(s, LEventDispatcher, []);
+		s.display = document.createElement("div");
+		s.img = document.createElement("img");
+		s.display.style.position = "absolute";
+		s.display.style.marginTop = "0px";
+		s.display.style.marginLeft = "0px";
+		s.display.style.zIndex = LStageImage.START_INDEX++;
+		if(LGlobal.ios){
+			s.display.style.overflow = "auto";
+			s.display.style.webkitOverflowScrolling = "touch";
+		}
+		s.display.appendChild(s.img);
+		s.idAdded = false;
+	}
+	LStageImage.START_INDEX = 21;
+	var p = {
+		loadURL : function (u) {
+			var s = this;
+			s.img.src = u;
+			s.img.onload = function () {
+				s.dispatchEvent(LEvent.COMPLETE);
+			};
+		},
+		show : function () {
+			var s = this;
+			if (!s.idAdded) {
+				LGlobal.object.appendChild(s.display);
+				s.idAdded = true;
+			}
+			if (s.display.style.display == "none") {
+				s.display.style.display = "";
+			}
+		},
+		die : function () {
+			LGlobal.object.removeChild(this.display);
+			this.idAdded = false;
+		},
+		hide : function () {
+			this.display.style.display = "none";
+		},
+		setViewPort : function (r) {
+			var s = this, sx = parseInt(LGlobal.canvasObj.style.width) / LGlobal.canvasObj.width, sy = parseInt(LGlobal.canvasObj.style.height) / LGlobal.canvasObj.height;
+			s.display.style.marginTop = (parseInt(LGlobal.canvasObj.style.marginTop) + ((r.y * sy) >>> 0)) + "px";
+			s.display.style.marginLeft = (parseInt(LGlobal.canvasObj.style.marginLeft) + ((r.x * sx) >>> 0)) + "px";
+			s.img.style.width = s.display.style.width = (r.width * sx >>> 0) + "px";
+			s.img.style.height = s.display.style.height = (r.height * sy >>> 0) + "px";
+		}
+	};
+	for (var k in p) {
+		LStageImage.prototype[k] = p[k];
+	}
+	return LStageImage;
+})();
