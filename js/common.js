@@ -590,7 +590,8 @@ function rand(min, max) {
 function probability_rand(arr) { 
 	var result = false; 
 	//概率数组的总概率精度 
-	var sum = arr.sum(); 
+	var sum = 0;
+	for (var k in arr) sum += parseFloat(arr[k]);
 	//arsort($arr);
 	//概率数组循环 
 	for (var k in arr) { 
