@@ -309,8 +309,8 @@ var LStageImage = (function () {
 		},
 		setViewPort : function (r) {
 			var s = this, sx = parseInt(LGlobal.canvasObj.style.width) / LGlobal.canvasObj.width, sy = parseInt(LGlobal.canvasObj.style.height) / LGlobal.canvasObj.height;
-			s.display.style.left = (parseInt(LGlobal.canvasObj.style.marginTop) + ((r.y * sy) >>> 0)) + "px";
-			s.display.style.top = (parseInt(LGlobal.canvasObj.style.marginLeft) + ((r.x * sx) >>> 0)) + "px";
+			s.display.style.top = (parseInt(LGlobal.canvasObj.style.marginTop) + ((r.y * sy) >>> 0)) + "px";
+			s.display.style.left = (parseInt(LGlobal.canvasObj.style.marginLeft) + ((r.x * sx) >>> 0)) + "px";
 			s.img.style.width = s.display.style.width = (r.width * sx >>> 0) + "px";
 			s.img.style.height = s.display.style.height = (r.height * sy >>> 0) + "px";
 		},
