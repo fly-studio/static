@@ -280,6 +280,15 @@ var LStageImage = (function () {
 			s.img.onload = function () {
 				s.dispatchEvent(LEvent.COMPLETE);
 			};
+			/*s.img.onmousedown = function(e) {
+				s.dispatchEvent(LMouseEvent.MOUSE_DOWN);
+			}
+			s.img.onmouseup = function(e) {
+				s.dispatchEvent(LMouseEvent.MOUSE_UP);
+			}
+			s.img.onmousemove = function(e) {
+				s.dispatchEvent(LMouseEvent.MOUSE_MOUSE);
+			}*/
 		},
 		show : function () {
 			var s = this;
@@ -304,6 +313,24 @@ var LStageImage = (function () {
 			s.display.style.left = (parseInt(LGlobal.canvasObj.style.marginLeft) + ((r.x * sx) >>> 0)) + "px";
 			s.img.style.width = s.display.style.width = (r.width * sx >>> 0) + "px";
 			s.img.style.height = s.display.style.height = (r.height * sy >>> 0) + "px";
+		},
+		getX : function() {
+			return this.display.style.top;
+		},
+		getY : function() {
+			return this.display.style.left;
+		},
+		getWidth : function() {
+			return this.img.style.width;
+		},
+		getHeight : function() {
+			return this.img.style.height;
+		},
+		getContainer: function() {
+			return this.display;
+		},
+		getImage: function() {
+			return this.img;
 		}
 	};
 	for (var k in p) {
