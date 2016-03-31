@@ -265,10 +265,10 @@ var LStageImage = (function () {
 		s.display.style.top = "0px";
 		s.display.style.left = "0px";
 		s.display.style.zIndex = LStageImage.START_INDEX++;
-		/*if(LGlobal.ios){
+		if(LGlobal.ios){
 			s.display.style.overflow = "auto";
 			s.display.style.webkitOverflowScrolling = "touch";
-		}*/
+		}
 		s.display.appendChild(s.img);
 		s.idAdded = false;
 	}
@@ -309,22 +309,22 @@ var LStageImage = (function () {
 		},
 		setViewPort : function (r) {
 			var s = this, sx = parseInt(LGlobal.canvasObj.style.width) / LGlobal.canvasObj.width, sy = parseInt(LGlobal.canvasObj.style.height) / LGlobal.canvasObj.height;
-			s.display.style.top = (parseInt(LGlobal.canvasObj.style.marginTop) + ((r.y * sy) >>> 0)) + "px";
-			s.display.style.left = (parseInt(LGlobal.canvasObj.style.marginLeft) + ((r.x * sx) >>> 0)) + "px";
+			s.display.style.left = (parseInt(LGlobal.canvasObj.style.marginTop) + ((r.y * sy) >>> 0)) + "px";
+			s.display.style.top = (parseInt(LGlobal.canvasObj.style.marginLeft) + ((r.x * sx) >>> 0)) + "px";
 			s.img.style.width = s.display.style.width = (r.width * sx >>> 0) + "px";
 			s.img.style.height = s.display.style.height = (r.height * sy >>> 0) + "px";
 		},
 		getX : function() {
-			return this.display.style.top;
+			return parseFloat(this.display.style.top);
 		},
 		getY : function() {
-			return this.display.style.left;
+			return parseFloat(this.display.style.left);
 		},
 		getWidth : function() {
-			return this.img.style.width;
+			return parseFloat(this.img.style.width);
 		},
 		getHeight : function() {
-			return this.img.style.height;
+			return parseFloat(this.img.style.height);
 		},
 		getContainer: function() {
 			return this.display;
