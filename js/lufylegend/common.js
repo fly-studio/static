@@ -333,8 +333,96 @@ var LStageImage = (function () {
 			return this.img;
 		}
 	};
-	for (var k in p) {
+	for (var k in p)
 		LStageImage.prototype[k] = p[k];
-	}
 	return LStageImage;
+})();
+
+/**
+ * 地图类，地图的图片需要分割并处理大小，此处不支持图片的缩放，需要自己切好
+ * @param {Number} width 容器宽
+ * @param {Number} height 容器高
+ * @param {Array} imgList [[行1,图片,数组],[行2,图片,数组],[行3,图片,数组]] 比如三行的图片拼接
+ * 
+ * @return 
+ */
+var LMapSprite = (function(){
+	function LMapSprite (containerWidth, containerHeight, imgList) {
+		var s = this;
+		LExtends(s, LSprite, []);
+		s.posX = 0; s.posY = 0, s.width = 0, s.height = 0;
+		s.containerWidth = containerWidth;s.containerHeight = containerHeight;
+		s.imgList = imgList;
+		s.bitmaps = [];
+		s.cols = [];s.rows = [];
+		s.width = 0;s.height = 0;
+		for (var col = 0; col < imgList[0].length; col++)
+			s.rows.push(parseFloat(imgList[0][col].width));
+		s.width = s.rows.sum(); //第一行的宽度总数
+		for (var row = 0; row < imgList.length; row++)
+			s.cols.push(parseFloat(imgList[row][0].height));
+		s.height = s.cols.sum(); //第1列的高度总和
+	}
+	var p = {
+		setPos: function(x, y) {
+			var s = this;
+			s.posX = x;s.posY = y;
+		},
+		_ll_calc: function() {
+			var s = this;
+			for(var i in s.bitmaps)
+				delete s.bitmaps[i];
+			s.bitmaps = [];
+			s.removeAllChild();
+
+			//计算开始x,结束x
+			var startX,endX,startY,endY,startCube,endCube;
+			startX = Math.max(0, posX - s.containerWidth / 2);
+			endX = Math.min(startX + s.containerWidth, s.width);
+			startX = endX - s.containerWidth;
+
+			startY = Math.max(0, posX - s.containerHeight / 2);
+			endY = Math.min(startY + s.containerHeight, s.height);
+			startY = endY - s.containerHeight;
+
+			startCube = s._in_row_col(startX, startY);
+			endCube = s._in_row_col(endX, endY);
+
+			var x,y = startCube.top - startY;
+			//绘制bitmap到容器
+			for (var col = startCube.col; col <= endCube.col; col++) {
+				x = startCube.left - startX;
+				for (var row = startCube.row; row <= endCube.row; row++) {
+					var bmp = new LBitmap(new LBitmapData(s.imgList[row][col]));
+					s.bitmaps.push(bmp);
+					s.x = x; s.y = y;
+					s.addChild(bmp);
+					x += s.rows[row];
+				}
+				y += s.cols[col];
+			}
+
+		},
+		_in_row_col: function(x, y) {
+			var s = this;
+			var row = col = left = top = 0;
+			for (var i = 0, n = 0; i < s.cols.length; i++)
+				if (y >= (n += cols[i])) {col = i; left = n - cols[i];};
+			for (var i = 0, n = 0; i < s.rows.length; i++)
+				if (x >= (n += rows[i])) {row = i; top = n - rows[i];};
+			return {row: row, col: col, left: left, top: top};
+		},
+
+		_ll_show : function (c) {
+			var s = this;
+			s._ll_calc();
+			s.graphics.ll_show(c);
+			LGlobal.show(s.childList, c);
+			s._ll_debugShape(c);
+		},
+
+	};
+	for (var k in p)
+		LMapSprite.prototype[k] = p[k];
+	return LMapSprite;
 })();
