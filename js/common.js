@@ -789,8 +789,7 @@ window.location.query = function(param) {
 	$.showtips = function(tips, redirect, noty_config) {
 		var _tips = clone(tips);
 		var _redirect = $.isUndefined(redirect) ? true : redirect;
-//		console.log(_tips);
-		if (mui) {
+		if (typeof mui != 'undefined') {
 			mui.alert('<div style="word-break:break-all;word-wrap:break-word;text-align:left;">' + _tips.message.content + '</div>', _tips.message.title ? _tips.message.title : COMMON_LANGUAGE.tips, [
 				_tips.url === false ? COMMON_LANGUAGE.back : (_tips.url === true ? '('+COMMON_LANGUAGE.reload+'...)' : '('+COMMON_LANGUAGE.redirect+'...)' )
 			]);
@@ -930,7 +929,7 @@ window.location.query = function(param) {
 	$.alert = function(msg, confirm_callback) {
 		var $dfd = jQuery.Deferred();
 		
-		if (mui) {
+		if (typeof mui != 'undefined') {
 			mui.alert(msg, COMMON_LANGUAGE.tips, [COMMON_LANGUAGE.ok], function(){
 				if (confirm_callback && $.isFunction(confirm_callback))	confirm_callback.call(this);
 				$dfd.resolve();
@@ -975,7 +974,7 @@ window.location.query = function(param) {
 			$dfd.reject();
 		}
 		
-		if (mui) {
+		if (typeof mui != 'undefined') {
 			mui.prompt(msg, '', COMMON_LANGUAGE.tips, [COMMON_LANGUAGE.cancel, COMMON_LANGUAGE.ok], function(e){
 				if (e.index == 1)
 					_confirm(e.value);
@@ -1024,7 +1023,7 @@ window.location.query = function(param) {
 	};
 
 	$.tips = function(msg, timeout) {
-		if (mui) {
+		if (typeof mui != 'undefined') {
 			mui.toast(msg);
 		} else if ($.noty) {
 			var setting = {
@@ -1039,7 +1038,7 @@ window.location.query = function(param) {
 	};
 	$.confirm = function(msg, confirm_callback, cancel_callback) {
 		var $dfd = jQuery.Deferred();
-		if (mui) {
+		if (typeof mui != 'undefined') {
 			mui.prompt(msg, COMMON_LANGUAGE.tips, [COMMON_LANGUAGE.cancel, COMMON_LANGUAGE.ok], function(e){
 				if (e.index == 1) {
 					if (confirm_callback && $.isFunction(confirm_callback)) confirm_callback.call(this);
