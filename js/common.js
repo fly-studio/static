@@ -8,6 +8,8 @@ var COMMON_LANGUAGE = {
 	'ok' : '\u786e\u5b9a', //确定
 	'cancel' : '\u53d6\u6d88', //取消
 	'back' : '\u8fd4\u56de', //返回
+	'reload' : '\u91cd\u65b0\u8f7d\u5165', //重新载入
+	'redirect' : '\u9875\u9762\u8df3\u8f6c', //页面跳转
 	'unselected' : '\u8bf7\u81f3\u5c11\u9009\u62e9\u4e00\u9879\uff01', //请至少选择一项！
 	'network_timeout' : '\u7f51\u7edc\u6545\u969c\uff0c\u8bf7\u68c0\u67e5\u7f51\u7edc\u8fde\u63a5\u540e\u91cd\u8bd5\uff01', //网络故障，请检查网络连接后重试！
 	'parser_error' : '\u6570\u636e\u89e3\u6790\u5931\u8d25\uff0c\u5237\u65b0\u91cd\u8bd5\u4e0b\uff1f', //数据解析失败，刷新重试下？
@@ -788,7 +790,11 @@ window.location.query = function(param) {
 		var _tips = clone(tips);
 		var _redirect = $.isUndefined(redirect) ? true : redirect;
 //		console.log(_tips);
-		if ($.noty) {
+		if (mui) {
+			mui.alert('<div style="word-break:break-all;word-wrap:break-word;text-align:left;">' + _tips.message.content + '</div>', _tips.message.title ? _tips.message.title : COMMON_LANGUAGE.tips, [
+				_tips.url === false ? COMMON_LANGUAGE.back : (_tips.url === true ? '('+COMMON_LANGUAGE.reload+'...)' : '('+COMMON_LANGUAGE.redirect+'...)' )
+			]);
+		} else if ($.noty) {
 			var setting = {
 				text : '<div style="text-align:left;"><h4>' + _tips.message.title + '</h4><div style="word-break:break-all;word-wrap:break-word;">'+ _tips.message.content +'</div></div>',
 				type : $.noty.tips_exchange[_tips.result] ? $.noty.tips_exchange[_tips.result] : 'alert',
@@ -923,30 +929,34 @@ window.location.query = function(param) {
 	 */
 	$.alert = function(msg, confirm_callback) {
 		var $dfd = jQuery.Deferred();
-		var setting = {
-			text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><div style="word-break:break-all;word-wrap:break-word;">'+ msg +'</div></div>',
-			type : 'success',
-			timeout :  confirm_callback ? false : 1500 ,
-			buttons : confirm_callback ? [
-				{
-					addClass: 'btn btn-primary',
-					text: COMMON_LANGUAGE.ok,
-					onClick: function($noty) {
-						$noty.close();
-						if (confirm_callback && $.isFunction(confirm_callback))
-							confirm_callback.call(this);
-						$dfd.resolve();
+		
+		if (mui) {
+			mui.alert(msg, COMMON_LANGUAGE.tips, [COMMON_LANGUAGE.ok], function(){
+				if (confirm_callback && $.isFunction(confirm_callback))	confirm_callback.call(this);
+				$dfd.resolve();
+			});
+		} else if ($.noty) {
+			var setting = {
+				text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><div style="word-break:break-all;word-wrap:break-word;text-align:left;">'+ msg +'</div></div>',
+				type : 'success',
+				timeout :  confirm_callback ? false : 1500 ,
+				buttons : confirm_callback ? [
+					{
+						addClass: 'btn btn-primary',
+						text: COMMON_LANGUAGE.ok,
+						onClick: function($noty) {
+							$noty.close();
+							if (confirm_callback && $.isFunction(confirm_callback))	confirm_callback.call(this);
+							$dfd.resolve();
+						}
 					}
-				}
-			] : false 
-		};
-		if ($.noty) {
+				] : false
+			};
 			var $noty = noty(setting);
 			$('button:eq(0)',$noty.$buttons).focus();
 		} else {
 			alert(msg);
-			if (confirm_callback && $.isFunction(confirm_callback))
-				confirm_callback.call(this);
+			if (confirm_callback && $.isFunction(confirm_callback))	confirm_callback.call(this);
 			$dfd.resolve();
 
 		}
@@ -964,30 +974,36 @@ window.location.query = function(param) {
 			if (cancel_callback && $.isFunction(confirm_callback)) cancel_callback.call(this);
 			$dfd.reject();
 		}
-		var setting = {
-			text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><label style="word-break:break-all;word-wrap:break-word;">'+ msg +'<input type="text" class="form-control" name="prompt" placeholder="" autofocus="autofocus"></label></div>',
-			type : 'alert',
-			timeout :  false ,
-			buttons : [
-				{
-					addClass: 'btn btn-primary',
-					text: COMMON_LANGUAGE.ok,
-					onClick: function($noty) {
-						$noty.close();
-						var v = $('[name="prompt"]',$noty.$bar).val();
-						_confirm(v);
+		
+		if (mui) {
+			mui.prompt(msg, '', COMMON_LANGUAGE.tips, [COMMON_LANGUAGE.cancel, COMMON_LANGUAGE.ok], function(e){
+				if (e.index == 1)
+					_confirm(e.value);
+				else
+					_cancel();
+			});
+		} else if ($.noty) {
+			var setting = {
+				text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><label style="word-break:break-all;word-wrap:break-word;">'+ msg +'<input type="text" class="form-control" name="prompt" placeholder="" autofocus="autofocus"></label></div>',
+				type : 'alert',
+				timeout :  false ,
+				buttons : [
+					{
+						addClass: 'btn btn-primary',text: COMMON_LANGUAGE.ok,
+						onClick: function($noty) {
+							$noty.close();
+							var v = $('[name="prompt"]',$noty.$bar).val();
+							_confirm(v);
+						}
+					},{
+						addClass: 'btn btn-danger',text: COMMON_LANGUAGE.cancel,
+						onClick: function($noty) {
+							$noty.close();
+							_cancel();
+						}
 					}
-				},{
-					addClass: 'btn btn-danger',
-					text: COMMON_LANGUAGE.cancel,
-					onClick: function($noty) {
-						$noty.close();
-						_cancel();
-					}
-				}
-			]
-		};
-		if ($.noty) {
+				]
+			};
 			var $noty = noty(setting);
 			$('[name="prompt"]',$noty.$bar).focus().on('keypress', function(e){
 				if (e.keyCode==13)
@@ -1008,43 +1024,54 @@ window.location.query = function(param) {
 	};
 
 	$.tips = function(msg, timeout) {
-		var setting = {
-			text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><div style="word-break:break-all;word-wrap:break-word;">'+ msg +'</div></div>',
-			type : 'warning',
-			timeout :  timeout ? timeout : 1500
-		};
-		if ($.noty)
+		if (mui) {
+			mui.toast(msg);
+		} else if ($.noty) {
+			var setting = {
+				text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><div style="word-break:break-all;word-wrap:break-word;">'+ msg +'</div></div>',
+				type : 'warning',
+				timeout :  timeout ? timeout : 1500
+			};
 			noty(setting);
+		}
 		else
 			alert(msg);
 	};
 	$.confirm = function(msg, confirm_callback, cancel_callback) {
 		var $dfd = jQuery.Deferred();
-		var setting = {
-			text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><div style="word-break:break-all;word-wrap:break-word;">'+ msg +'</div></div>',
-			type : 'warning',
-			timeout :  false ,
-			buttons : [
-				{
-					addClass: 'btn btn-primary',
-					text: COMMON_LANGUAGE.ok,
-					onClick: function($noty) {
-						$noty.close();
-						if (confirm_callback && $.isFunction(confirm_callback)) confirm_callback.call(this);
-						$dfd.resolve();
-					}
-				},{
-					addClass: 'btn btn-danger',
-					text: COMMON_LANGUAGE.cancel,
-					onClick: function($noty) {
-						$noty.close();
-						if (cancel_callback && $.isFunction(confirm_callback)) cancel_callback.call(this);
-						$dfd.reject();
-					}
+		if (mui) {
+			mui.prompt(msg, COMMON_LANGUAGE.tips, [COMMON_LANGUAGE.cancel, COMMON_LANGUAGE.ok], function(e){
+				if (e.index == 1) {
+					if (confirm_callback && $.isFunction(confirm_callback)) confirm_callback.call(this);
+					$dfd.resolve();
+				} else {
+					if (cancel_callback && $.isFunction(confirm_callback)) cancel_callback.call(this);
+					$dfd.reject();
 				}
-			]
-		};
-		if ($.noty) {
+			});
+		} else if ($.noty) {
+			var setting = {
+				text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><div style="word-break:break-all;word-wrap:break-word;">'+ msg +'</div></div>',
+				type : 'warning',
+				timeout :  false ,
+				buttons : [
+					{
+						addClass: 'btn btn-primary',text: COMMON_LANGUAGE.ok,
+						onClick: function($noty) {
+							$noty.close();
+							if (confirm_callback && $.isFunction(confirm_callback)) confirm_callback.call(this);
+							$dfd.resolve();
+						}
+					},{
+						addClass: 'btn btn-danger',text: COMMON_LANGUAGE.cancel,
+						onClick: function($noty) {
+							$noty.close();
+							if (cancel_callback && $.isFunction(confirm_callback)) cancel_callback.call(this);
+							$dfd.reject();
+						}
+					}
+				]
+			};
 			var $noty = noty(setting);
 			$('button:eq(1)',$noty.$buttons).focus();
 		} else {
