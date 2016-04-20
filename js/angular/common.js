@@ -153,3 +153,18 @@ angular.module('untils', [])
 }]);
 
 
+document.getElementsByTagName('html')[0].setAttribute('ng-app', 'app');
+angular.module('app', [])
+.config(function($provide) {
+	$provide.decorator('$controller', function($delegate) {
+		return function(constructor, locals, later, indent) {
+			if (typeof constructor === 'string' && !locals.$scope.controllerName) {
+				locals.$scope.controllerName =  constructor;
+			}
+			return $delegate(constructor, locals, later, indent);
+		};
+	});
+})
+.run(function($rootScope) {
+
+});
