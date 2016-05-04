@@ -21,7 +21,7 @@ angular.module('jquery', [])
 				return ajax({url: url, data: data, type: method.toUpperCase(), success: callback});
 			}
 		});
-		return query;
+		return ajax;
 	}];
 })
 .provider("$query", function(){
@@ -109,7 +109,7 @@ angular.module('jquery', [])
 		}
 	};
 });
-angular.module('untils', [])
+angular.module('utils', [])
 //<a href="空/#" ng-click=""></a>
 .directive('a', function() {
 	return {
