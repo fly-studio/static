@@ -750,84 +750,7 @@ window.location.query = function(param) {
 	$.isjQuery = function(obj) {
 		return obj instanceof jQuery;
 	};
-	if ($.noty) {
-		$.noty.defaults = {
-			layout: 'center',
-			theme: 'defaultTheme',
-			type: 'alert',
-			text: '',
-			dismissQueue: true, // If you want to use queue feature set this true
-			template: '<div class="noty_message"><span class="noty_text"></span><div class="noty_close"></div></div>',
-			animation: {
-				open: {height: 'toggle'},
-				close: {height: 'toggle'},
-				easing: 'swing',
-				speed: $.OS.is_phone ? 0 : 500 // opening & closing animation speed
-			},
-			timeout: 2000, // delay for closing event. Set false for sticky notifications
-			force: false, // adds notification to the beginning of queue when set to true
-			modal: true,
-			maxVisible: 15, // you can set max visible notification for dismissQueue true option
-			closeWith: ['click'], // ['click', 'button', 'hover']
-			callback: {
-				onShow: function() {},
-				afterShow: function() {},
-				onClose: function() {},
-				afterClose: function() {}
-			},
-			buttons: false // an array of buttons
-		};
-		$.noty.tips_exchange = {
-			'success': 'success',
-			'failure': 'warning',
-			'warning': 'warning',
-			'error': 'error',
-			'notice': 'alert',
-			'information': 'information'
-		};
-	}
-	$.showtips = function(tips, redirect, noty_config) {
-		var _tips = clone(tips);
-		var _redirect = $.isUndefined(redirect) ? true : redirect;
-		if (typeof mui != 'undefined') {
-			mui.alert('<div style="word-break:break-all;word-wrap:break-word;text-align:left;">' + _tips.message.content + '</div>', _tips.message.title ? _tips.message.title : COMMON_LANGUAGE.tips, [
-				_tips.url === false ? COMMON_LANGUAGE.back : (_tips.url === true ? '('+COMMON_LANGUAGE.reload+'...)' : '('+COMMON_LANGUAGE.redirect+'...)' )
-			]);
-		} else if ($.noty) {
-			var setting = {
-				text : '<div style="text-align:left;"><h4>' + _tips.message.title + '</h4><div style="word-break:break-all;word-wrap:break-word;">'+ _tips.message.content +'</div></div>',
-				type : $.noty.tips_exchange[_tips.result] ? $.noty.tips_exchange[_tips.result] : 'alert',
-				timeout : _tips.url === false ? false : 1500,
-				buttons : _tips.url === false ? [
-				{
-					addClass: 'btn btn-warning',
-					text: COMMON_LANGUAGE.back,
-					onClick: function($noty) {
-						$noty.close();
-					}
-				}
-				] : false
-			};
-			if (typeof noty_config == 'object')
-				setting = $.extend(setting, noty_config);
 
-			var $noty = noty(setting);
-			$('button:eq(0)',$noty.$buttons).focus();
-		} else
-			alert(_tips.message.content.noHTML());
-
-		if (_redirect) {
-			if (_tips.url !== true && _tips.url !== false) {
-				setTimeout(function() {
-					self.location.href = _tips.url;
-				}, 1500);
-			} else if (_tips.url === true) {
-				setTimeout(function() {
-					self.location.reload();
-				}, 1500);
-			}
-		}
-	};
 	/**
 	 * post or get a url
 	 * @example post it when [data] isn't null
@@ -920,6 +843,26 @@ window.location.query = function(param) {
 		return $.query.call(this, url, data, 'PATCH', callback, alert_it)
 	};
 
+	$.showtips = function(tips, redirect, config) {
+		var _tips = clone(tips);
+		var _redirect = $.isUndefined(redirect) ? true : redirect;
+		if (typeof $.showtips_interface != 'undefined') {
+			$.showtips_interface(_tips, config);
+		} else
+			alert(_tips.message.content.noHTML());
+
+		if (_redirect) {
+			if (_tips.url !== true && _tips.url !== false) {
+				setTimeout(function() {
+					self.location.href = _tips.url;
+				}, 1500);
+			} else if (_tips.url === true) {
+				setTimeout(function() {
+					self.location.reload();
+				}, 1500);
+			}
+		}
+	};
 	/**
 	 * [alert description]
 	 * @param  {String} msg              [description]
@@ -928,36 +871,13 @@ window.location.query = function(param) {
 	 */
 	$.alert = function(msg, confirm_callback) {
 		var $dfd = jQuery.Deferred();
-		
-		if (typeof mui != 'undefined') {
-			mui.alert(msg, COMMON_LANGUAGE.tips, [COMMON_LANGUAGE.ok], function(){
-				if (confirm_callback && $.isFunction(confirm_callback))	confirm_callback.call(this);
-				$dfd.resolve();
-			});
-		} else if ($.noty) {
-			var setting = {
-				text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><div style="word-break:break-all;word-wrap:break-word;text-align:left;">'+ msg +'</div></div>',
-				type : 'success',
-				timeout :  confirm_callback ? false : 1500 ,
-				buttons : confirm_callback ? [
-					{
-						addClass: 'btn btn-primary',
-						text: COMMON_LANGUAGE.ok,
-						onClick: function($noty) {
-							$noty.close();
-							if (confirm_callback && $.isFunction(confirm_callback))	confirm_callback.call(this);
-							$dfd.resolve();
-						}
-					}
-				] : false
-			};
-			var $noty = noty(setting);
-			$('button:eq(0)',$noty.$buttons).focus();
-		} else {
+
+		if (typeof $.alert_interface != 'undefined')
+			$.alert_interface(msg, confirm_callback, $dfd);
+		else {
 			alert(msg);
 			if (confirm_callback && $.isFunction(confirm_callback))	confirm_callback.call(this);
 			$dfd.resolve();
-
 		}
 		return $dfd.promise();
 	};
@@ -970,110 +890,35 @@ window.location.query = function(param) {
 			$dfd.resolve([v]);
 		}
 		var _cancel = function(){
-			if (cancel_callback && $.isFunction(confirm_callback)) cancel_callback.call(this);
+			if (cancel_callback && $.isFunction(cancel_callback)) cancel_callback.call(this);
 			$dfd.reject();
 		}
 		
-		if (typeof mui != 'undefined') {
-			mui.prompt(msg, '', COMMON_LANGUAGE.tips, [COMMON_LANGUAGE.cancel, COMMON_LANGUAGE.ok], function(e){
-				if (e.index == 1)
-					_confirm(e.value);
-				else
-					_cancel();
-			});
-		} else if ($.noty) {
-			var setting = {
-				text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><label style="word-break:break-all;word-wrap:break-word;">'+ msg +'<input type="text" class="form-control" name="prompt" placeholder="" autofocus="autofocus"></label></div>',
-				type : 'alert',
-				timeout :  false ,
-				buttons : [
-					{
-						addClass: 'btn btn-primary',text: COMMON_LANGUAGE.ok,
-						onClick: function($noty) {
-							$noty.close();
-							var v = $('[name="prompt"]',$noty.$bar).val();
-							_confirm(v);
-						}
-					},{
-						addClass: 'btn btn-danger',text: COMMON_LANGUAGE.cancel,
-						onClick: function($noty) {
-							$noty.close();
-							_cancel();
-						}
-					}
-				]
-			};
-			var $noty = noty(setting);
-			$('[name="prompt"]',$noty.$bar).focus().on('keypress', function(e){
-				if (e.keyCode==13)
-				{
-					$noty.close();
-					var v = $(this).val();
-					_confirm(v);
-				}
-			});
-		} else {
-			if (v = prompt(msg)) {
+		if (typeof $.prompt_interface != 'undefined')
+			$.prompt_interface(msg, _confirm, _cancel, $dfd);
+		else {
+			if (v = prompt(msg))
 				_confirm(v);
-			} else {
+			else
 				_cancel();
-			}
 		}
 		return $dfd.promise();
 	};
-
 	$.tips = function(msg, timeout) {
-		if (typeof mui != 'undefined') {
-			mui.toast(msg);
-		} else if ($.noty) {
-			var setting = {
-				text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><div style="word-break:break-all;word-wrap:break-word;">'+ msg +'</div></div>',
-				type : 'warning',
-				timeout :  timeout ? timeout : 1500
-			};
-			noty(setting);
-		}
-		else
+		var $dfd = jQuery.Deferred();
+		if (typeof $.tips_interface != 'undefined')
+			$.tips_interface(msg, confirm_callback, cancel_callback, $dfd);
+		else {
 			alert(msg);
+			$dfd.resolve();
+		}
+		return $dfd.promise();
 	};
 	$.confirm = function(msg, confirm_callback, cancel_callback) {
 		var $dfd = jQuery.Deferred();
-		if (typeof mui != 'undefined') {
-			mui.prompt(msg, COMMON_LANGUAGE.tips, [COMMON_LANGUAGE.cancel, COMMON_LANGUAGE.ok], function(e){
-				if (e.index == 1) {
-					if (confirm_callback && $.isFunction(confirm_callback)) confirm_callback.call(this);
-					$dfd.resolve();
-				} else {
-					if (cancel_callback && $.isFunction(confirm_callback)) cancel_callback.call(this);
-					$dfd.reject();
-				}
-			});
-		} else if ($.noty) {
-			var setting = {
-				text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><div style="word-break:break-all;word-wrap:break-word;">'+ msg +'</div></div>',
-				type : 'warning',
-				timeout :  false ,
-				buttons : [
-					{
-						addClass: 'btn btn-primary',text: COMMON_LANGUAGE.ok,
-						onClick: function($noty) {
-							$noty.close();
-							if (confirm_callback && $.isFunction(confirm_callback)) confirm_callback.call(this);
-							$dfd.resolve();
-						}
-					},{
-						addClass: 'btn btn-danger',text: COMMON_LANGUAGE.cancel,
-						onClick: function($noty) {
-							$noty.close();
-							if (cancel_callback && $.isFunction(confirm_callback)) cancel_callback.call(this);
-							$dfd.reject();
-						}
-					}
-				]
-			};
-			var $noty = noty(setting);
-			$('button:eq(1)',$noty.$buttons).focus();
-		} else {
+		if (typeof $.confirm_interface != 'undefined')
+			$.confirm_interface(msg, confirm_callback, cancel_callback, $dfd);
+		else {
 			if (confirm(msg)) {
 				if (confirm_callback && $.isFunction(confirm_callback)) confirm_callback.call(this);
 				$dfd.resolve();
