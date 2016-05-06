@@ -907,7 +907,7 @@ window.location.query = function(param) {
 	$.tips = function(msg, timeout) {
 		var $dfd = jQuery.Deferred();
 		if (typeof $.tips_interface != 'undefined')
-			$.tips_interface(msg, confirm_callback, cancel_callback, $dfd);
+			$.tips_interface(msg, timeout, $dfd);
 		else {
 			alert(msg);
 			$dfd.resolve();

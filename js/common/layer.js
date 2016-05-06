@@ -18,7 +18,7 @@
 			$dfd.resolve();
 		});
 	};
-	$.tips_interface = function(msg, timeout) {
+	$.tips_interface = function(msg, timeout, $dfd) {
 		layer.msg(msg, {
 			time: timeout
 		}, function(){

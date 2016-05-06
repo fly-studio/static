@@ -80,7 +80,12 @@
 		var setting = {
 			text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><div style="word-break:break-all;word-wrap:break-word;">'+ msg +'</div></div>',
 			type : 'warning',
-			timeout :  timeout ? timeout : 1500
+			timeout :  timeout ? timeout : 1500,
+			callback: {
+				onClose: function() {
+					$dfd.resolve();
+				}
+			}
 		};
 		noty(setting);
 	};
