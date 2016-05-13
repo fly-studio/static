@@ -1,0 +1,33 @@
+{
+	"name": "egret",
+	"version": "3.0.8",
+	"modules": [
+		{
+			"name": "loading",
+			"description": "loading UI",
+			"files": [
+				"loading.d.ts",
+				"loading.js"
+			],
+			"root": ""
+		},
+		{
+			"name": "bitmap",
+			"description": "bitmap functions",
+			"files": [
+				"bitmap.d.ts",
+				"bitmap.js"
+			],
+			"root": ""
+		},
+		{
+			"name": "sharp",
+			"description": "sharp functions",
+			"files": [
+				"sharp.d.ts",
+				"sharp.js"
+			],
+			"root": ""
+		}
+	]
+}

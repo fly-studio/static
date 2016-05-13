@@ -124,7 +124,7 @@ declare module Sharp {
 	 * @param  {egret.Point} linePos2 线结束点
 	 * @return {egret.Point/boolean}
 	 */
-	function pointLineClosest(p:egret.Point, linePos1:egret.Point, linePos2:egret.Point):any;
+	function pointLineClosest(p:egret.Point, linePos1:egret.Point, linePos2:egret.Point):egret.Point|boolean;
 	/**
 	 * 测试「线」与「圆」是否相交
 	 * @param  {egret.Point} linePos1  线起始点
@@ -151,7 +151,7 @@ declare module Sharp {
 	 * @param  {egret.Point} line2Pos2 线2结束点
 	 * @return {egret.Point/boolean}
 	 */
-	function lineLineIntersect(line1Pos1:egret.Point, line1Pos2:egret.Point, line2Pos1:egret.Point, line2Pos2:egret.Point):any;
+	function lineLineIntersect(line1Pos1:egret.Point, line1Pos2:egret.Point, line2Pos1:egret.Point, line2Pos2:egret.Point):egret.Point|boolean;
 	/**
 	 * 测试两「线」是否相交
 	 * @param  {egret.Point} line1Pos1 线1起始点
