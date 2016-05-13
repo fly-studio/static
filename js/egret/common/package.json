@@ -28,6 +28,15 @@
 				"sharp.js"
 			],
 			"root": ""
+		},
+		{
+			"name": "box2d",
+			"description": "box2d",
+			"files": [
+				"box2dweb.d.ts",
+				"../../Box2dWeb-2.1.a.3.min.js"
+			],
+			"root": ""
 		}
 	]
 }
