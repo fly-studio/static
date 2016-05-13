@@ -1,3 +1,28 @@
+var UPLOADER_LANGUAGE = {
+	'close' : '\u5173\u95ed',
+	'drop_container' : '\u62d6\u5230\u6587\u4ef6\u5230\u8fd9\u91cc',
+	'drop_tips' : '\u652f\u6301\u4eceWindows\u4e2d\u62d6\u52a8\u6587\u4ef6\u5230\u8fd9\u91cc\u4e0a\u4f20\uff08\u9700\u73b0\u4ee3\u6d4f\u89c8\u5668\uff09',
+	'drop_button' : '\u62d6\u653e\u6587\u4ef6',
+	'select_file' : '\u9009\u62e9\u6587\u4ef6',
+	'ctrl_v_tips' : '\u53ef\u4ee5\u4f7f\u7528Ctrl+V\u76f4\u63a5\u7c98\u8d34\u622a\u56fe\uff08\u9700\u73b0\u4ee3\u6d4f\u89c8\u5668\uff09',
+	'ctrl_v_button' : 'Ctrl+V \u622a\u56fe',
+	'resize' : '\u56fe\u7247\u4f1a\u81ea\u52a8\u7b49\u6bd4\u7f29\u653e\u81f3\uff1a{0}',
+	'uploading' : '\u6b63\u5728\u4e0a\u4f20\u6587\u4ef6...',
+	'success' : '\u4e0a\u4f20\u6210\u529f!',
+	'rotate_right' : '\u5411\u53f3\u65cb\u8f6c',
+	'rotate_left' : '\u5411\u5de6\u65cb\u8f6c',
+	'loading' : '\u6b63\u5728\u8f7d\u5165...',
+	'reading' : '\u6587\u4ef6\u8bfb\u53d6\u4e2d...',
+	'filetype' : '\u8bf7\u4e0a\u4f20{0}\u6587\u4ef6!',
+	'filenum_limite' : '\u53ea\u5141\u8bb8\u4e0a\u4f20{0}\u4e2a\u6587\u4ef6\uff0c\u8bf7\u5220\u51cf\u540e\u91cd\u8bd5!',
+	'hashing' : '\u6b63\u5728\u6548\u9a8c\u6587\u4ef6...',
+	'hash_success' : '\u4e91\u7aef\u6587\u4ef6\u5df2\u5b58\u5728\uff0c\u6587\u4ef6\u79d2\u4f20\u6210\u529f!',
+	'error' : '\u5931\u8d25',
+	'num_limit' : '\u53ea\u80fd\u4e0a\u4f20{0}\u4e2a\u6587\u4ef6!',
+	'allsize_limit' : '\u6587\u4ef6\u603b\u5927\u5c0f\u8d85\u51fa!',
+	'filesize_limite'  : '\u6587\u4ef6\u5927\u5c0f\u8d85\u51fa {0}!',
+	'duplicate' : '\u4e0a\u4f20\u961f\u5217\u4e2d\u6709\u91cd\u590d\u6587\u4ef6!',
+};
 (function($){
 	if(typeof COMMON_LANGUAGE == 'undefined')
 		throw('this javascript file need behind \'common.js\'');
@@ -34,11 +59,11 @@
 				var uploader_id = 'uploader-id-' + nonce(), pick_id = 'pick-id-' + nonce();
 				var progresses_id = uploader_id + '-progresses',thumbnails_id = uploader_id + '-thumbnails', input_id = uploader_id + '-input';
 				//添加容器到input下
-				flex_uploader.$container = $('<div class="uploader-container" id="'+uploader_id+'"><div class="drop-tips text-info"><h2>\u62d6\u5230\u6587\u4ef6\u5230\u8fd9\u91cc</h2><br /><br /><div class="btn btn-info" onclick="javascript:jQuery(this).parent().hide().parent(\'.uploader-container\').removeClass(\'webuploader-dnd-over\');"><i class="glyphicon glyphicon-remove"></i> \u5173;\u95ed;</div></div>\
-					<div class="pull-left"><span id="'+pick_id+'">\u9009\u62e9\u6587\u4ef6(\u2264 '+bytesToSize(filesize)+')</span></div>'
+				flex_uploader.$container = $('<div class="uploader-container" id="'+uploader_id+'"><div class="drop-tips text-info"><h2>'+UPLOADER_LANGUAGE.drop_container+'</h2><br /><br /><div class="btn btn-info" onclick="javascript:jQuery(this).parent().hide().parent(\'.uploader-container\').removeClass(\'webuploader-dnd-over\');"><i class="glyphicon glyphicon-remove"></i> '+UPLOADER_LANGUAGE.close+'</div></div>\
+					<div class="pull-left"><span id="'+pick_id+'">'+UPLOADER_LANGUAGE.select_file+'(\u2264 '+bytesToSize(filesize)+')</span></div>'
 					+ '<div class="pull-left tags">&nbsp;<span class="label label-success">.' + filetype.replace(/,/g,'</span>&nbsp;<span class="label label-success">.') + '</span>'
-					+ '&nbsp;<span class="label label-warning enable-tooltip" data-placement="top" title="\u53ef\u4ee5\u4f7f\u7528Ctrl+V\u76f4\u63a5\u7c98\u8d34\u622a\u56fe\uff08\u9700\u73b0\u4ee3\u6d4f\u89c8\u5668\uff09"><small class="glyphicon glyphicon-info-sign"></small> Ctrl+V \u622a\u56fe</span>&nbsp;<span class="label label-warning enable-tooltip" data-placement="top" title="\u652f\u6301\u4eceWindows\u4e2d\u62d6\u52a8\u6587\u4ef6\u5230\u8fd9\u91cc\u4e0a\u4f20\uff08\u9700\u73b0\u4ee3\u6d4f\u89c8\u5668\uff09"><small class="glyphicon glyphicon-info-sign"></small> \u62d6\u653e\u6587\u4ef6</span>'
-					+ (max_width > 0 && max_height > 0 ? '<br /><small>&nbsp;\u56fe\u7247\u4f1a\u81ea\u52a8\u7b49\u6bd4\u7f29\u653e\u81f3\uff1a' + max_width.toString().toHTML() + 'x' + max_height.toString().toHTML() + '</small>': '')
+					+ '&nbsp;<span class="label label-warning enable-tooltip" data-placement="top" title="'+UPLOADER_LANGUAGE.ctrl_v_tips+'"><small class="glyphicon glyphicon-info-sign"></small> '+UPLOADER_LANGUAGE.ctrl_v_button+'</span>&nbsp;<span class="label label-warning enable-tooltip" data-placement="top" title="'+UPLOADER_LANGUAGE.drop_container+'"><small class="glyphicon glyphicon-info-sign"></small> '+UPLOADER_LANGUAGE.drop_button+'</span>'
+					+ (max_width > 0 && max_height > 0 ? '<br /><small>&nbsp;'+UPLOADER_LANGUAGE.resize.replace('{0}', max_width.toString().toHTML() + 'x' + max_height.toString().toHTML()) + '</small>' : '')
 					+ '</div><div class="clearfix"></div>\
 					<div id="'+progresses_id+'" class="progresses"></div><div class="clearfix"></div>\
 					<div id="'+thumbnails_id+'" class="thumbnails row"></div><div class="clearfix"></div></div>').insertAfter(t);
@@ -71,7 +96,7 @@
 					duplicate: false,
 					// 文件选择筛选。
 					accept: {
-						title: '\u9009\u62e9\u6587\u4ef6',
+						title: UPLOADER_LANGUAGE.select_file,
 						extensions: filetype,
 						mimeTypes: typeof mimeType != 'undefined' ? filetype.split(',').map(function(v){return mimeType.lookup('name.'+v)}).join(',') : '*/*'
 					},
@@ -191,7 +216,7 @@
 							else
 								$bar.addClass('progress-bar-success');
 							if (percentage < 100) $bar.addClass('active'); else $bar.removeClass('active');
-							return this.message('\u6b63\u5728\u4e0a\u4f20\u6587\u4ef6...');
+							return this.message(UPLOADER_LANGUAGE.uploading);
 						},
 						success: function() {
 							this.progressing(100);
@@ -201,7 +226,7 @@
 							$progresses[file.id].delay(1500).queue(function(){
 								$(this).alert('close').dequeue();
 							});
-							return this.message('\u4e0a\u4f20\u6210\u529f!');
+							return this.message(UPLOADER_LANGUAGE.success);
 						},
 						cancel: function() {
 							flex_uploader.uploader.cancelFile(file);
@@ -220,8 +245,8 @@
 					if (!!id && !$thumbnails[id])
 					{
 						$thumbnails[id] = $('<div class="col-xs-6 col-md-4 alert"><div class="thumbnail">\
-							<div class="file-panel"><span class="cancel" data-dismiss="alert" aria-label="Close">\u5220\u9664</span><span class="rotateRight">\u5411\u53f3\u65cb\u8f6c</span><span class="rotateLeft">\u5411\u5de6\u65cb\u8f6c</span></div>\
-							<a href="'+$.baseuri+'attachment?id='+id+'"  target="_blank"><img src="'+$.baseuri+'placeholder?size=300x200&text='+encodeURIComponent('\u6b63\u5728\u8f7d\u5165...')+'" alt="" class="img-responsive center-block"  onerror="this.src=\''+ $.baseuri +'placeholder?size=300x200&text=\'+encodeURIComponent(\'\u6587\u4ef6\u8bfb\u53d6\u4e2d...\');"></a>\
+							<div class="file-panel"><span class="cancel" data-dismiss="alert" aria-label="Close">'+UPLOADER_LANGUAGE.close+'</span><span class="rotateRight">'+UPLOADER_LANGUAGE.rotate_right+'</span><span class="rotateLeft">'+UPLOADER_LANGUAGE.rotate_left+'</span></div>\
+							<a href="'+$.baseuri+'attachment?id='+id+'"  target="_blank"><img src="'+$.baseuri+'placeholder?size=300x200&text='+encodeURIComponent(UPLOADER_LANGUAGE.loading)+'" alt="" class="img-responsive center-block"  onerror="this.src=\''+ $.baseuri +'placeholder?size=300x200&text=\'+encodeURIComponent(\''+UPLOADER_LANGUAGE.reading+'\');"></a>\
 							<div class="caption">\
         					<h4><span class="title">'+(filename ? filename.toHTML() : '')+'</span><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></h4>\
 							</div><div class="clearfix"></div>\
@@ -341,11 +366,11 @@
 				//---------------------------------------
 				method.beforeFileQueued = function(file) {
 					if (filetype.split(',').indexOf(file.ext.toLowerCase()) == -1){
-						$.alert('\u8bf7\u4e0a\u4f20' + filetype + '\u6587\u4ef6!');
+						$.alert(UPLOADER_LANGUAGE.filetype.replace('{0}', filetype));
 						return false;
 					}
 					if (filelimit > 1 &&  attachment().get().length >= filelimit) {
-						$.alert('\u53ea\u5141\u8bb8\u4e0a\u4f20' + filelimit + '\u4e2a\u6587\u4ef6\uff0c\u8bf7\u5220\u51cf\u540e\u91cd\u8bd5!');
+						$.alert(UPLOADER_LANGUAGE.filenum_limite.replace('{0}', filelimit));
 						return false;
 					}
 					return true;
@@ -362,7 +387,7 @@
 					}
 
 					this.md5File( file ).progress(function(percentage) {
-						progress(file).progressing(percentage).message('\u6b63\u5728\u6548\u9a8c\u6587\u4ef6...');
+						progress(file).progressing(percentage).message(UPLOADER_LANGUAGE.hashing);
 					}).then(function(val) {
 						$.POST($.baseuri + 'attachment/hash_query', {
 							hash: val,
@@ -373,7 +398,7 @@
 						}, function(json){
 							if (json && json.result == 'success'){
 								flex_uploader.uploader.skipFile(file);
-								progress(file).success().message('\u4e91\u7aef\u6587\u4ef6\u5df2\u5b58\u5728\uff0c\u6587\u4ef6\u79d2\u4f20\u6210\u529f!');
+								progress(file).success().message(UPLOADER_LANGUAGE.hash_success);
 								if (filelimit == 1) preview().removeAll();
 								preview(json.data.id, json.data.displayname, json.data.ext).build().setFile(file);
 								t.triggerHandler('uploader.uploaded',[file, json, attachment().get()]);
@@ -397,7 +422,7 @@
 						preview(json.data.id, json.data.displayname, json.data.ext).build().setFile(file);
 						t.triggerHandler('uploader.uploaded',[file, json, attachment().get()]);
 					} else {
-						progress(file).error("\u5931\u8d25: " + json.message.content);
+						progress(file).error(UPLOADER_LANGUAGE.error+': ' + json.message.content);
 						t.triggerHandler('uploader.error',[file, json.message.content, attachment().get()]);
 						//$.alert(json.message.content);
 					}
@@ -405,7 +430,7 @@
 				
 				//当文件上传出错时触发。
 				method.uploadError = function(file, reason) {
-					progress(file).error("\u5931\u8d25: " + reason);
+					progress(file).error(UPLOADER_LANGUAGE.error+': ' + reason);
 					t.triggerHandler('uploader.error',[file, reason, attachment().get()]);
 				}
 				//不管成功或者失败，文件上传完成时触发。
@@ -416,19 +441,19 @@
 					switch(code)
 					{
 						case 'Q_EXCEED_NUM_LIMIT':
-							$.alert('\u53ea\u80fd\u4e0a\u4f20' + max + '\u4e2a\u6587\u4ef6!');
+							$.alert(UPLOADER_LANGUAGE.num_limit.replace('{0}', max));
 							break;
 						case 'Q_EXCEED_SIZE_LIMIT':
-							$.alert('\u6587\u4ef6\u603b\u5927\u5c0f\u8d85\u51fa!');
+							$.alert(UPLOADER_LANGUAGE.allsize_limit);
 							break;
 						case 'F_EXCEED_SIZE':
-							$.alert('\u6587\u4ef6\u5927\u5c0f\u8d85\u51fa'+bytesToSize(filesize)+'!');
+							$.alert(UPLOADER_LANGUAGE.filesize_limite.replace('{0}', bytesToSize(filesize)));
 							break;
 						case 'F_DUPLICATE':
-							$.alert('\u4e0a\u4f20\u961f\u5217\u4e2d\u6709\u91cd\u590d\u6587\u4ef6!');
+							$.alert(UPLOADER_LANGUAGE.duplicate);
 							break;
 						case 'Q_TYPE_DENIED':
-							$.alert('\u4e0a\u4f20\u7684\u6587\u4ef6\u53ea\u80fd\u4e3a' + filetype);
+							$.alert(UPLOADER_LANGUAGE.filetype.replace('{0}', filetype));
 							break;
 						default:
 							$.alert(code);
