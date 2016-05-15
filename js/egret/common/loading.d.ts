@@ -1,6 +1,6 @@
 declare class LoadingUI extends egret.Sprite {
 
-	loadConfig(resourceFiles:Array<string>, onComplete?:Function): void;
-	loadGroup(name:string, onComplete?:Function): void;
+	loadConfig(resourceFiles:Array<string>, onComplete?:Function, thisObject?:any): void;
+	loadGroup(name:string, onComplete?:Function, thisObject?:any): void;
 
 }
