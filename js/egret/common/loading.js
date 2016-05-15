@@ -3,23 +3,23 @@ var LoadingUI = (function (_super) {
 	function LoadingUI() {
 		_super.call(this);
 
-		this.groupName = null;
-		
-		this.createView();
+		this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
 	}
 	var d = __define,c=LoadingUI,p=c.prototype;
 
-	p.createView = function () {
+	p.onAddToStage = function (e) {
 		this.textField = new egret.TextField();
 		this.addChild(this.textField);
-		this.textField.y = 300;
-		this.textField.width = 480;
+		this.textField.y = (this.stage.stageHeight - 100) / 2;
+		this.textField.width = this.stage.stageWidth;
 		this.textField.height = 100;
 		this.textField.textAlign = "center";
 	};
 
 	p.setProgress = function (current, total) {
-		this.textField.text = "Loading..." + current + "/" + total;
+		var percent = total > 0 ? current / total * 100 : 0;
+		if (percent > 100) percent = 100;
+		this.textField.text = "Loading..." + parseInt(percent) + '%';
 	};
 
 	p.loadConfig = function(resourceFiles, onComplete, thisObject) {
