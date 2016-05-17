@@ -49,13 +49,7 @@
 		{
 			"name": "jquery.common",
 			"files": [
-				"../../common.d.ts"
-			],
-			"root": ""
-		},
-		{
-			"name": "jquery.cookie",
-			"files": [
+				"../../common.d.ts",
 				"../../jquery.cookie.d.ts",
 				"../../common.js"
 			],

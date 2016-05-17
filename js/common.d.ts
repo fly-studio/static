@@ -1,7 +1,10 @@
 ///<reference path="../jquery/jquery.d.ts" />
-
+interface BBQStatic {
+	querystring(str:string):any;
+}
 interface JQueryStatic {
 	baseuri:string;
+	deparam: BBQStatic;
 	showtips(tips:any, redirect?:boolean, config?:any):void;
 	GET(url:string, data?:any, callback?:Function, alert_it?:boolean):any;
 	POST(url:string, data?:any, callback?:Function, alert_it?:boolean):any;

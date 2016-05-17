@@ -706,7 +706,7 @@ window.location.query = function(param) {
 	};
 	var scripts = document.getElementsByTagName("script");
 	var thiscript = scripts[ scripts.length - 1 ];
-	$.baseuri = thiscript.src.toString().match(/[^\/:](\/.*)static\/js\/common\.js/i)[1];
+	$.baseuri = thiscript.src.toString().match(/[^\/:](\/.*)static\/js\/common\.js/i) ? thiscript.src.toString().match(/[^\/:](\/.*)static\/js\/common\.js/i)[1] : thiscript.src.toString().replace(/\\/g, '/').replace(/\/[^\/]*\/?$/, '') + '/';
 	if (!$.baseuri) $.baseuri = '/';
 	//init csrf
 	$.csrf = $('meta[name="csrf-token"]').attr('content');
