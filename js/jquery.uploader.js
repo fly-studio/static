@@ -21,7 +21,7 @@ var UPLOADER_LANGUAGE = {
 	'num_limit' : '\u53ea\u80fd\u4e0a\u4f20{0}\u4e2a\u6587\u4ef6!',
 	'allsize_limit' : '\u6587\u4ef6\u603b\u5927\u5c0f\u8d85\u51fa!',
 	'filesize_limite'  : '\u6587\u4ef6\u5927\u5c0f\u8d85\u51fa {0}!',
-	'duplicate' : '\u4e0a\u4f20\u961f\u5217\u4e2d\u6709\u91cd\u590d\u6587\u4ef6!',
+	'duplicate' : '\u4e0a\u4f20\u961f\u5217\u4e2d\u6709\u91cd\u590d\u6587\u4ef6!'
 };
 (function($){
 	if(typeof COMMON_LANGUAGE == 'undefined')
