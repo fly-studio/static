@@ -33,8 +33,31 @@
 			"name": "box2d",
 			"description": "box2d",
 			"files": [
-				"box2dweb.d.ts",
+				"../../box2dweb.d.ts",
 				"../../Box2dWeb-2.1.a.3.min.js"
+			],
+			"root": ""
+		},
+		{
+			"name": "jquery",
+			"files": [
+				"../../jquery.d.ts",
+				"../../jquery-2.1.4.min.js"
+			],
+			"root": ""
+		},
+		{
+			"name": "jquery.common",
+			"files": [
+				"../../common.d.ts"
+			],
+			"root": ""
+		},
+		{
+			"name": "jquery.cookie",
+			"files": [
+				"../../jquery.cookie.d.ts",
+				"../../common.js"
 			],
 			"root": ""
 		}
