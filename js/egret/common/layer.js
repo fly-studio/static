@@ -67,6 +67,7 @@ var layer;
 
 	method.tips = function(options, thisObj) {
 		thisObj = thisObj ? thisObj : this;
+		var stage = typeof thisObj.stage != 'undefined' ? thisObj.stage : egret.MainContext.instance.stage;
 		var _options = {
 			textColor: options.color || 0x0,
 			fontFamily: options.fontFamily || 'Microsoft Yahei',
@@ -75,19 +76,19 @@ var layer;
 			content: options.content || '',
 			timeout: !options.buttons && typeof options.timeout == 'undefined' ? 1500 : 0,
 			buttons: options.buttons || [],
-			width: options.width || thisObj.stage.stageWidth * 0.75,
-			height: options.height || thisObj.stage.stageHeight * 0.3
+			width: options.width || stage.stageWidth * 0.75,
+			height: options.height || stage.stageHeight * 0.3
 		};
 		
 		if (_options.width > 500) _options.width = 500;
 		
 		var mask = new egret.Sprite;
 		mask.graphics.beginFill(0x0, 0.25);
-		mask.graphics.drawRect(0, 0, thisObj.stage.stageWidth, thisObj.stage.stageHeight);
+		mask.graphics.drawRect(0, 0, stage.stageWidth, stage.stageHeight);
 		mask.graphics.endFill();
-		thisObj.stage.addChild(mask);
+		stage.addChild(mask);
 		
-		var titleHeight = 70, buttonHeight = _options.buttons.length > 0 ? 75 : 0, contentHeight = thisObj.stage.stageHeight * .9 - titleHeight - buttonHeight;
+		var titleHeight = 70, buttonHeight = _options.buttons.length > 0 ? 75 : 0, contentHeight = stage.stageHeight * .9 - titleHeight - buttonHeight;
 		
 		var content = new egret.TextField;content.name = 'content';
 		content.textColor = _options.textColor;content.fontFamily = _options.fontFamily;
@@ -107,9 +108,9 @@ var layer;
 		tips.graphics.beginFill(_options.backgoundColor, 0.95);
 		tips.graphics.drawRoundRect(0, 0, _options.width, _options.height, 50);
 		tips.graphics.endFill();
-		tips.x = (thisObj.stage.stageWidth - _options.width) / 2;
-		tips.y = (thisObj.stage.stageHeight - _options.height) / 2;
-		thisObj.stage.addChild(tips);
+		tips.x = (stage.stageWidth - _options.width) / 2;
+		tips.y = (stage.stageHeight - _options.height) / 2;
+		stage.addChild(tips);
 
 		
 		tips.addChild(content);
@@ -204,15 +205,16 @@ var layer;
 	
 	method.loading = function(thisObj) {
 		thisObj = thisObj ? thisObj : this;
-		var width = thisObj.stage.stageWidth * 0.65; //正方形
+		var stage = typeof thisObj.stage != 'undefined' ? thisObj.stage : egret.MainContext.instance.stage;
+		var width = stage.stageWidth * 0.65; //正方形
 		if (width > 500) width = 500;
 		
 		var loading = new egret.Sprite;
 		loading.graphics.beginFill(0x0, 0.8);
 		loading.graphics.drawRoundRect(0, 0, width, width, 50);
 		loading.graphics.endFill();
-		loading.x = (thisObj.stage.stageWidth - loading.width) / 2;	
-		loading.y = (thisObj.stage.stageHeight - loading.height) / 2;
+		loading.x = (stage.stageWidth - loading.width) / 2;	
+		loading.y = (stage.stageHeight - loading.height) / 2;
 		
 		var circle = new egret.Sprite;
 
@@ -236,7 +238,7 @@ var layer;
 		subText.text = '';
 		loading.addChild(subText);
 		
-		thisObj.stage.addChild(loading);
+		stage.addChild(loading);
 		loading.touchEnabled = true;
 		loading.addEventListener(egret.TouchEvent.TOUCH_TAP, function(e){
 		}, thisObj, true, 10);

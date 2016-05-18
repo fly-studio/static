@@ -17,7 +17,10 @@ declare module url {
 
 	function upload(options: AjaxSettings, thisObj?: any): egret.HttpRequest;
 	function upload(url:string, options: AjaxSettings, thisObj?: any): egret.HttpRequest;
-	
+
 	function get(url: string, data?: any, onSuccess?: Function, thisObj?:any): egret.HttpRequest;
 	function post(url: string, data?: any, onSuccess?: Function, thisObj?:any): egret.HttpRequest;
 }
+
+
+declare function isEmpty(obj: any): boolean;
