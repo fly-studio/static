@@ -10,19 +10,22 @@ var layer;
 	};
 
 	method.autoTips = function(json, thisObj){
+		var noHTML = function(str) {
+			return str.replace(/<script[^>]*?>.*?<\/script>/ig, '').replace(/<[\/\!]*?[^<>]*?>/g, '').replace(/<style[^>]*?>.*?<\/style>/ig, '').replace(/<![\s\S]*?--[ \t\n\r]*>/, '').replace(/([\r\n])[\s]+/,'').replace(/&(quot|#34|amp|#38|lt|#60|gt|#62|nbsp|#160)/i,'');
+		}
 		var btns = [];
 		thisObj = thisObj ? thisObj : this;
 		if (json.url == false) 
-			btns = [{text: '\u8fd4\u56de', onClick: function(sprite){
+			btns = [{text: '\u8fd4\u56de', onClick: function(e, sprite){
 				if (sprite.parent) sprite.parent.removeChild(sprite);
 			}}];
 		else if (json.url !== true)
-			btns = [{text: '(\u8df3\u8f6c\u94fe\u63a5)', onClick: function(sprite){
+			btns = [{text: '(\u8df3\u8f6c\u94fe\u63a5)', onClick: function(e, sprite){
 				location.href = json.url;
 			}}];
 		return method.tips.call(thisObj, {
-			title: json.message.title,
-			content: json.message.content,
+			title: noHTML(json.message.title),
+			content: noHTML(json.message.content),
 			buttons: btns,
 			timeout: json.url === true ? 1500 : 0
 		});
