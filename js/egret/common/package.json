@@ -12,15 +12,6 @@
 			"root": ""
 		},
 		{
-			"name": "bitmap",
-			"description": "bitmap functions",
-			"files": [
-				"bitmap.d.ts",
-				"bitmap.js"
-			],
-			"root": ""
-		},
-		{
 			"name": "sharp",
 			"description": "sharp functions",
 			"files": [
@@ -39,19 +30,29 @@
 			"root": ""
 		},
 		{
-			"name": "jquery",
+			"name": "ajax",
 			"files": [
-				"../../jquery.d.ts",
-				"../../jquery-2.1.4.min.js"
+				"ajax.d.ts",
+				"ajax.js"
 			],
 			"root": ""
 		},
 		{
-			"name": "jquery.common",
+			"name": "jquery.network",
 			"files": [
-				"../../common.d.ts",
+				"../../jquery.d.ts",
 				"../../jquery.cookie.d.ts",
-				"../../common.js"
+				"jquery.network.d.ts",
+				"jquery.network.js"
+			],
+			"root": ""
+		},
+		{
+			"name": "layer",
+			"description": "layer functions",
+			"files": [
+				"layer.d.ts",
+				"layer.js"
 			],
 			"root": ""
 		}
