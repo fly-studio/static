@@ -119,14 +119,25 @@ var url;
 			options = thisObj || {};
 			thisObj = param3;
 		}
-		var request = new egret.HttpRequest();
-		request.responseType = options.dataType || egret.HttpResponseType.TEXT;
-		request.open(options.url, options.method || egret.HttpMethod.GET);
-		for (var key in (options.headers || {}))
-			request.setRequestHeader(key, options.header[key]);
-		if (options.method == egret.HttpMethod.POST) request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+		
 		var data = options.data || {};
 		if (typeof data != 'string') data = url.http_build_query(data);
+		var _method = typeof options.method != 'undefined' ? options.method : egret.HttpMethod.GET;
+
+		var request = new egret.HttpRequest();
+
+		if (_method == egret.HttpMethod.POST)
+			request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+		else if (_method == egret.HttpMethod.GET)
+		{
+			if (data) options.url += (options.url.indexOf('?') >= 0 ? '&' : '?') + data;
+			data = null;
+		}
+
+		request.responseType = options.dataType || egret.HttpResponseType.TEXT;
+		for (var key in (options.headers || {}))
+			request.setRequestHeader(key, options.headers[key]);
+		request.open(options.url, _method);
 		request.send(data);
 		
 		return method._httpRequest(request, options, thisObj);
