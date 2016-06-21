@@ -26,7 +26,7 @@ var GPS = {
 			return {'lat': wgsLat, 'lon': wgsLon};
 
 		var d = this.delta(wgsLat, wgsLon);
-		return {'lat' : wgsLat + d.lat,'lon' : wgsLon + d.lon};
+		return {'lat' : parseFloat(wgsLat) + parseFloat(d.lat),'lon' : parseFloat(wgsLon) + parseFloat(d.lon)};
 	},
 	//GCJ-02 to WGS-84
 	gcj_decrypt : function (gcjLat, gcjLon) {
