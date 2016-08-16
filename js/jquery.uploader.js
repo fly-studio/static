@@ -105,7 +105,7 @@ var UPLOADER_LANGUAGE = {
 					//分多大一片？ 默认大小为5M.
 					chunkSize: 5242880,
 					//分片允许自动重传多少次
-					chunkRetry: 2,
+					chunkRetry: 5,
 					//是否分片上传。
 					chunked: true,
 					//同时上传并发数
@@ -203,10 +203,11 @@ var UPLOADER_LANGUAGE = {
 							$('.progress-bar', $progresses[file.id]).addClass("progress-bar-danger");
 							return this.message(message);
 						},
-						progressing: function (percentage) {
+						progressing: function (percentage, is_hashing) {
 							this.init();
 							this.initProgress();
 							$progresses[file.id].addClass("alert-info");
+							percentage = percentage.toFixed(2);
 							var $bar = $('.progress-bar', $progresses[file.id]).width(percentage + "%");
 							$('.progress-bar span', $progresses[file.id]).text(percentage + "%");
 							if (percentage < 20)
@@ -272,7 +273,7 @@ var UPLOADER_LANGUAGE = {
 									$('.title', $thumbnails[id]).text(json.data.displayname);
 									$('img', $thumbnails[id]).attr('src',pic);
 								}
-							},false);
+							});
 						}
 						else
 						{
@@ -387,7 +388,7 @@ var UPLOADER_LANGUAGE = {
 					}
 
 					this.md5File( file ).progress(function(percentage) {
-						progress(file).progressing(percentage).message(UPLOADER_LANGUAGE.hashing);
+						progress(file).progressing(0).message(UPLOADER_LANGUAGE.hashing + ' ' + (percentage * 100).toFixed(2) + '%');
 					}).then(function(val) {
 						$.POST($.baseuri + 'attachment/hash_query', {
 							hash: val,
@@ -403,11 +404,25 @@ var UPLOADER_LANGUAGE = {
 								preview(json.data.id, json.data.displayname, json.data.ext).build().setFile(file);
 								t.triggerHandler('uploader.uploaded',[file, json, attachment().get()]);
 							} else {
+								file.md5 = val;
 								flex_uploader.uploader.upload(file);
 							}
 						},false);
 					});
 					return true;
+				}
+				method.uploadBeforeSend = function(obj, data, headers) {
+					//console.log(obj);
+					data['uuid'] = obj['blob']['ruid'];
+					data['start'] = obj['start'];
+					data['end'] = obj['end'];
+					data['chunks'] = obj['chunks'];
+					data['chunk'] = obj['chunk'];
+					//data['size'] = obj['file']['size'];
+					data['hash'] = obj['file']['md5'];
+				}
+				method.uploadStart = function(file) {
+					
 				}
 				//上传过程中触发，携带上传进度。
 				method.uploadProgress = function(file, percentage) {
@@ -463,6 +478,8 @@ var UPLOADER_LANGUAGE = {
 
 				flex_uploader.uploader.on('beforeFileQueued', method.beforeFileQueued)
 				flex_uploader.uploader.on('fileQueued', method.fileQueued)
+				flex_uploader.uploader.on('uploadBeforeSend', method.uploadBeforeSend)
+				flex_uploader.uploader.on('uploadStart', method.uploadStart)
 				flex_uploader.uploader.on('uploadProgress', method.uploadProgress)
 				flex_uploader.uploader.on('uploadSuccess', method.uploadSuccess)
 				flex_uploader.uploader.on('uploadError', method.uploadError)
