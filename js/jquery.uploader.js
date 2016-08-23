@@ -413,12 +413,12 @@ var UPLOADER_LANGUAGE = {
 				}
 				method.uploadBeforeSend = function(obj, data, headers) {
 					//console.log(obj);
-					data['uuid'] = obj['blob']['ruid'];
+					data['uuid'] = obj['blob']['ruid'] + obj['file']['id'] + obj['file']['size'];
 					data['start'] = obj['start'];
 					data['end'] = obj['end'];
 					data['chunks'] = obj['chunks'];
 					data['chunk'] = obj['chunk'];
-					//data['size'] = obj['file']['size'];
+					data['total'] = obj['file']['size'];
 					data['hash'] = obj['file']['md5'];
 				}
 				method.uploadStart = function(file) {
