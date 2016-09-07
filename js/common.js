@@ -844,6 +844,8 @@ window.location.query = function(param) {
 	};
 
 	$.showtips = function(tips, redirect, config) {
+		if (tips.result == 'api') return; //API
+
 		var _tips = clone(tips);
 		var _redirect = $.isUndefined(redirect) ? true : redirect;
 		if (typeof $.showtips_interface != 'undefined') {
@@ -851,8 +853,8 @@ window.location.query = function(param) {
 		} else
 			alert(_tips.message.content.noHTML());
 
-		if (_redirect) {
-			if (_tips.url !== true && _tips.url !== false) {
+		if (_redirect && typeof _tips['url'] != 'undefined') {
+			if (_tips.url !== true && _tips.url !== false ) {
 				setTimeout(function() {
 					self.location.href = _tips.url;
 				}, 1500);
