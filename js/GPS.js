@@ -1,6 +1,7 @@
 var GPS = {
 	PI : 3.14159265358979324,
 	x_pi : 3.14159265358979324 * 3000.0 / 180.0,
+	
 	delta : function (lat, lon) {
 		// Krasovsky 1940
 		//
@@ -22,7 +23,8 @@ var GPS = {
 	
 	//WGS-84 to GCJ-02
 	gcj_encrypt : function (wgsLat, wgsLon) {
-		if (this.outOfChina(wgsLat, wgsLon))
+		//if (this.outOfChina(wgsLat, wgsLon))
+		if (!this.isInChina(wgsLat, wgsLon))
 			return {'lat': wgsLat, 'lon': wgsLon};
 
 		var d = this.delta(wgsLat, wgsLon);
@@ -30,7 +32,8 @@ var GPS = {
 	},
 	//GCJ-02 to WGS-84
 	gcj_decrypt : function (gcjLat, gcjLon) {
-		if (this.outOfChina(gcjLat, gcjLon))
+		if (!this.isInChina(wgsLat, wgsLon))
+		//if (this.outOfChina(gcjLat, gcjLon))
 			return {'lat': gcjLat, 'lon': gcjLon};
 		
 		var d = this.delta(gcjLat, gcjLon);
@@ -105,8 +108,8 @@ var GPS = {
 		/*
 		if (Math.abs(mercatorLon) < 180 && Math.abs(mercatorLat) < 90)
 			return null;
-    	if ((Math.abs(mercatorLon) > 20037508.3427892) || (Math.abs(mercatorLat) > 20037508.3427892))
-        	return null;
+		if ((Math.abs(mercatorLon) > 20037508.3427892) || (Math.abs(mercatorLat) > 20037508.3427892))
+			return null;
 		var a = mercatorLon / 6378137.0 * 57.295779513082323;
 		var x = a - (Math.floor(((a + 180.0) / 360.0)) * 360.0);
 		var y = (1.5707963267948966 - (2.0 * Math.atan(Math.exp((-1.0 * mercatorLat) / 6378137.0)))) * 57.295779513082323;
@@ -124,6 +127,48 @@ var GPS = {
 		var alpha = Math.acos(s);
 		var distance = alpha * earthR;
 		return distance;
+	},
+	rectangle: function(lng1, lat1, lng2, lat2) {
+		return {
+			west : Math.min(lng1, lng2),
+			north : Math.max(lat1, lat2),
+			east : Math.max(lng1, lng2),
+			south : Math.min(lat1, lat2)
+		};
+	},
+	isInRect: function(rect, lon, lat) {
+		return rect.west <= lon && rect.east >= lon && rect.north >= lat && rect.south <= lat;
+	},
+	isInChina:function(lat, lon) {
+		//China region - raw data
+		//http://www.cnblogs.com/Aimeast/archive/2012/08/09/2629614.html
+		var region = [
+			this.rectangle(79.446200, 49.220400, 96.330000,42.889900),
+			this.rectangle(109.687200, 54.141500, 135.000200, 39.374200),
+			this.rectangle(73.124600, 42.889900, 124.143255, 29.529700),
+			this.rectangle(82.968400, 29.529700, 97.035200, 26.718600),
+			this.rectangle(97.025300, 29.529700, 124.367395, 20.414096),
+			this.rectangle(107.975793, 20.414096, 111.744104, 17.871542)
+		];
+
+		//China excluded region - raw data
+		var exclude = [
+			this.rectangle(119.921265, 25.398623, 122.497559, 21.785006),
+			this.rectangle(101.865200, 22.284000, 106.665000, 20.098800),
+			this.rectangle(106.452500, 21.542200, 108.051000, 20.487800),
+			this.rectangle(109.032300, 55.817500, 119.127000, 50.325700),
+			this.rectangle(127.456800, 55.817500, 137.022700, 49.557400),
+			this.rectangle(131.266200, 44.892200, 137.022700, 42.569200)
+		];
+		for (var i = 0; i < region.length; i++)
+			if (this.isInRect(region[i], lon, lat))
+			{
+				for (var j = 0; j < exclude.length; j++)
+					if (this.isInRect(exclude[j], lon, lat))
+						return false;
+				return true;
+			}
+		return false;
 	},
 	outOfChina : function (lat, lon) {
 		if (lon < 72.004 || lon > 137.8347)
