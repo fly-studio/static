@@ -1,4 +1,10 @@
 (function($){
+	var TIPS_LANGUAGE = {
+		'tips' : '\u63d0\u793a', //提示
+		'ok' : '\u786e\u5b9a', //确定
+		'cancel' : '\u53d6\u6d88', //取消
+		'back' : '\u8fd4\u56de' //返回
+	}
 	$.noty.defaults = {
 		layout: 'center',
 		theme: 'defaultTheme',
@@ -42,7 +48,7 @@
 			buttons : json.url === false ? [
 			{
 				addClass: 'btn btn-warning',
-				text: COMMON_LANGUAGE.back,
+				text: TIPS_LANGUAGE.back,
 				onClick: function($noty) {
 					$noty.close();
 				}
@@ -57,13 +63,13 @@
 	}
 	$.alert_interface = function(msg, confirm_callback, $dfd) {
 		var setting = {
-			text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><div style="word-break:break-all;word-wrap:break-word;text-align:left;">'+ msg +'</div></div>',
+			text : '<div style="text-align:left;"><h4>' + TIPS_LANGUAGE.tips + '</h4><div style="word-break:break-all;word-wrap:break-word;text-align:left;">'+ msg +'</div></div>',
 			type : 'success',
 			timeout :  confirm_callback ? false : 1500 ,
 			buttons : confirm_callback ? [
 				{
 					addClass: 'btn btn-primary',
-					text: COMMON_LANGUAGE.ok,
+					text: TIPS_LANGUAGE.ok,
 					onClick: function($noty) {
 						$noty.close();
 						if (confirm_callback && $.isFunction(confirm_callback))	confirm_callback.call(this);
@@ -78,7 +84,7 @@
 	$.tips_interface = function(msg, timeout, $dfd)
 	{
 		var setting = {
-			text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><div style="word-break:break-all;word-wrap:break-word;">'+ msg +'</div></div>',
+			text : '<div style="text-align:left;"><h4>' + TIPS_LANGUAGE.tips + '</h4><div style="word-break:break-all;word-wrap:break-word;">'+ msg +'</div></div>',
 			type : 'warning',
 			timeout :  timeout ? timeout : 1500,
 			callback: {
@@ -91,19 +97,19 @@
 	};
 	$.confirm_interface = function(msg, confirm_callback, cancel_callback, $dfd) {
 		var setting = {
-			text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><div style="word-break:break-all;word-wrap:break-word;">'+ msg +'</div></div>',
+			text : '<div style="text-align:left;"><h4>' + TIPS_LANGUAGE.tips + '</h4><div style="word-break:break-all;word-wrap:break-word;">'+ msg +'</div></div>',
 			type : 'warning',
 			timeout :  false ,
 			buttons : [
 				{
-					addClass: 'btn btn-primary',text: COMMON_LANGUAGE.ok,
+					addClass: 'btn btn-primary',text: TIPS_LANGUAGE.ok,
 					onClick: function($noty) {
 						$noty.close();
 						if (confirm_callback && $.isFunction(confirm_callback)) confirm_callback.call(this);
 						$dfd.resolve();
 					}
 				},{
-					addClass: 'btn btn-danger',text: COMMON_LANGUAGE.cancel,
+					addClass: 'btn btn-danger',text: TIPS_LANGUAGE.cancel,
 					onClick: function($noty) {
 						$noty.close();
 						if (cancel_callback && $.isFunction(confirm_callback)) cancel_callback.call(this);
@@ -117,19 +123,19 @@
 	};
 	$.prompt_interface = function(msg, confirm_callback, cancel_callback, $dfd) {
 		var setting = {
-			text : '<div style="text-align:left;"><h4>' + COMMON_LANGUAGE.tips + '</h4><label style="word-break:break-all;word-wrap:break-word;">'+ msg +'<input type="text" class="form-control" name="prompt" placeholder="" autofocus="autofocus"></label></div>',
+			text : '<div style="text-align:left;"><h4>' + TIPS_LANGUAGE.tips + '</h4><label style="word-break:break-all;word-wrap:break-word;">'+ msg +'<input type="text" class="form-control" name="prompt" placeholder="" autofocus="autofocus"></label></div>',
 			type : 'alert',
 			timeout :  false ,
 			buttons : [
 				{
-					addClass: 'btn btn-primary',text: COMMON_LANGUAGE.ok,
+					addClass: 'btn btn-primary',text: TIPS_LANGUAGE.ok,
 					onClick: function($noty) {
 						$noty.close();
 						var v = $('[name="prompt"]',$noty.$bar).val();
 						confirm_callback.call(this, [v]);
 					}
 				},{
-					addClass: 'btn btn-danger',text: COMMON_LANGUAGE.cancel,
+					addClass: 'btn btn-danger',text: TIPS_LANGUAGE.cancel,
 					onClick: function($noty) {
 						$noty.close();
 						cancel_callback.call(this);

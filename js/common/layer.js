@@ -1,10 +1,16 @@
 (function($){
+	var TIPS_LANGUAGE = {
+		'tips' : '\u63d0\u793a', //提示
+		'ok' : '\u786e\u5b9a', //确定
+		'cancel' : '\u53d6\u6d88', //取消
+		'back' : '\u8fd4\u56de' //返回
+	}
 	$.showtips_interface = function(json, config) {
 		var _config = {
 			content: '<div style="word-break:break-all;word-wrap:break-word;text-align:left;">' + json.message.content + '</div>',
-			title: json.message.title ? json.message.title : COMMON_LANGUAGE.tips,
+			title: json.message.title ? json.message.title : TIPS_LANGUAGE.tips,
 			time: json.url === false ? false : 1500,
-			btn: json.url === false ? [COMMON_LANGUAGE.back] : false,
+			btn: json.url === false ? [TIPS_LANGUAGE.back] : false,
 			yes: function (index, layero) {
 				layer.close(index);
 			}
