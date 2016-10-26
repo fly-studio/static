@@ -18,8 +18,8 @@
 		});
 	}
 	//
-	if (cryptico) {
-
+	if (typeof cryptico != 'undefined') {
+		
 	}
 	/**
 	 * post or get a url
@@ -141,7 +141,7 @@
 		return this.each(function() {
 			var $this = $(this);
 			var is_form = $this.is('form');
-			show_loading = show_loading !== undefined ? show_loading : true;
+			show_loading = typeof show_loading != 'undefined' ? show_loading : true;
 			var validator = is_form ? $this.data('validator') : null;
 			if (validator) validator.settings.submitHandler = function(f,e) {};
 			$this.on(is_form ? 'submit': 'click', function(e){
