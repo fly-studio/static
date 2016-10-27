@@ -95,10 +95,6 @@
 					if (json.result && alert_it){
 						$.showtips(json, true, alert_it);
 					}
-					if (json.encrypt && $.ssl) {
-						var key = $.ssl.decrypt(json.key);
-						console.log(key);return;
-					}
 				}
 				if (callback === false)	{
 					_result = json;
