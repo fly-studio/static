@@ -1,12 +1,15 @@
 
 (function($){
 	var QUERY_LANGUAGE = {
-		'reload' : '\u91cd\u65b0\u8f7d\u5165', //重新载入
-		'redirect' : '\u9875\u9762\u8df3\u8f6c', //页面跳转
-		'unselected' : '\u8bf7\u81f3\u5c11\u9009\u62e9\u4e00\u9879\uff01', //请至少选择一项！
-		'network_timeout' : '\u7f51\u7edc\u6545\u969c\uff0c\u8bf7\u68c0\u67e5\u7f51\u7edc\u8fde\u63a5\u540e\u91cd\u8bd5\uff01', //网络故障，请检查网络连接后重试！
-		'parser_error' : '\u6570\u636e\u89e3\u6790\u5931\u8d25\uff0c\u5237\u65b0\u91cd\u8bd5\u4e0b\uff1f', //数据解析失败，刷新重试下？
-		'server_error' : '\u670d\u52a1\u5668\u53ef\u80fd\u51fa\u73b0\u4e86\u70b9\u95ee\u9898\uff0c\u5237\u65b0\u9875\u9762\u91cd\u8bd5\u4e0b\uff1f' //服务器可能出现了点问题，刷新页面重试下？
+		'error' : '错误',
+		'reload' : '重新载入',
+		'redirect' : '页面跳转',
+		'unselected' : '请至少选择一项！',
+		'network_timeout' : '网络故障，请检查网络连接后重试！',
+		'parser_error' : '数据解析失败，刷新重试下？',
+		'server_error' : '服务器可能出现了点问题，刷新页面重试下？',
+		'encrypt_key' : '数据已经加密，但未正确传递公钥。',
+		'encrypt_js' : '数据已经加密，但页面未加载解密JS。'
 	}
 	//init csrf
 	$.csrf = $('meta[name="csrf-token"]').attr('content');
@@ -16,7 +19,44 @@
 	if ($.ssl)
 		headers['X-RSA'] = encodeURIComponent($.ssl.rsa.public);
 
-	$.ajaxSetup({headers:headers});
+
+	$.ajaxSetup({headers:headers, dataFilter: function(data, type){
+		var callback = ''; 
+		if (type == 'jsonp')
+			callback = '';
+		if (type == 'json') {
+			var json = $.parseJSON(data);
+			if (typeof json != 'undefined' && typeof json.result != 'undefined' && json.result == 'api' && typeof json.encrypt != 'undefined' && json.encrypt === true)
+			{
+				 if (typeof json.key != 'undefined' && typeof $.ssl != 'undefined') {
+					var key = $.ssl.decrypt(json.key);
+					var encrypted = json.data;
+					var encrypted_json = JSON.parse(aesjs.util.convertBytesToString(base64js.toByteArray(encrypted))); //json_decode()
+					//base64 decode
+					key = base64js.toByteArray(key);
+					iv = base64js.toByteArray(encrypted_json.iv);
+					value = base64js.toByteArray(encrypted_json.value);
+					//aes cbc
+					var aesCbc = new aesjs.ModeOfOperation.cbc(key, iv);
+					var decryptedBytes = aesCbc.decrypt(value);
+					var decypted = aesjs.util.convertBytesToString(decryptedBytes);
+					//unserialize
+					json.data = unserialize(decypted);
+				} else if (!json.key)
+				{
+					json.result = 'error';
+					json.message = {title: QUERY_LANGUAGE.error, content: QUERY_LANGUAGE.encrypt_key};
+				} else {
+					json.result = 'error';
+					json.message = {title: QUERY_LANGUAGE.error, content: QUERY_LANGUAGE.encrypt_js};
+				}
+			}
+			data = JSON.stringify(json);
+		}
+
+		return data;
+	}}); 
+
 	//init ssl
 
 	/**
