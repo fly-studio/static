@@ -10,17 +10,15 @@
 	}
 	//init csrf
 	$.csrf = $('meta[name="csrf-token"]').attr('content');
-	if ($.csrf) {
-		$.ajaxSetup({
-			headers: {
-				'X-CSRF-TOKEN': $.csrf
-			}
-		});
-	}
-	//
-	if (typeof cryptico != 'undefined') {
-		
-	}
+	var headers = {};
+	if ($.csrf)
+		headers['X-CSRF-TOKEN'] = $.csrf
+	if ($.ssl)
+		headers['X-RSA'] = encodeURIComponent($.ssl.rsa.public);
+
+	$.ajaxSetup({headers:headers});
+	//init ssl
+
 	/**
 	 * post or get a url
 	 * @example post it when [data] isn't null
@@ -56,6 +54,10 @@
 				if (json) {
 					if (json.result && alert_it){
 						$.showtips(json, true, alert_it);
+					}
+					if (json.encrypt && $.ssl) {
+						var key = $.ssl.decrypt(json.key);
+						console.log(key);return;
 					}
 				}
 				if (callback === false)	{

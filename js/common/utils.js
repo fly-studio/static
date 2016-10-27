@@ -48,7 +48,42 @@
 			};
 	};
 })();
+(function(){
+	//ssl
+	if (typeof JSEncrypt != 'undefined' && window.sessionStorage) {
+		function getRSAKey() {
+			var rsa = window.sessionStorage.getItem('l+rsa');
+			if (rsa) rsa = JSON.parse(rsa);
+			if (!rsa)
+			{
+				var crypt = new JSEncrypt({default_key_size:1024});
+				var key = crypt.getKey();
 
+				rsa = {
+					private: key.getPrivateKey(),
+					public: key.getPublicKey(),
+				}
+				window.sessionStorage.setItem('l+rsa',JSON.stringify(rsa));
+			}
+			return rsa;
+		}
+		window.ssl = (new function()
+		{
+			this.rsa = getRSAKey();
+			this.encrypt = function(text) {
+				var crypt = new JSEncrypt();
+				crypt.setKey(this.rsa.public);
+				return crypt.encrypt(text);
+			}
+			this.decrypt = function(text) {
+				var crypt = new JSEncrypt();
+				crypt.setKey(this.rsa.private);
+				return crypt.decrypt(text);
+			}
+		});
+		if (jQuery) jQuery.ssl = window.ssl;
+	}
+})();
 
 /**
  * 此函数主要是为了计算概率，用于出奖

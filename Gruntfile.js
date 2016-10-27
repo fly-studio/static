@@ -11,7 +11,7 @@ module.exports = function (grunt) {
                     sourceMap: true,
                     ASCIIOnly:true
                 },
-                files: { 'js/common.js' : ['js/common/common.js','js/common/polyfill.js','js/common/query.js']},  // source files mask
+                files: { 'js/common.js' : ['js/common/utils.js','js/common/polyfill.js','js/common/query.js']},  // source files mask
                 flatten: true,   // remove all unnecessary nesting
                 
             }
