@@ -8,8 +8,10 @@
 		'network_timeout' : '网络故障，请检查网络连接后重试！',
 		'parser_error' : '数据解析失败，刷新重试下？',
 		'server_error' : '服务器可能出现了点问题，刷新页面重试下？',
-		'encrypt_key' : '数据已经加密，但未正确传递公钥。',
-		'encrypt_js' : '数据已经加密，但页面未加载解密JS。'
+		'encrypt_key' : '数据已经加密，但未传递正确的公钥。',
+		'encrypt_js' : '数据已经加密，但页面未加载解密JS。',
+		'encrypt_string' : '数据已经加密，但密文解密失败，请联系管理员。',
+		'encrypt_unserialize' : '数据已经加密，但密文解开失败，请联系管理员。',
 	}
 	//init csrf
 	$.csrf = $('meta[name="csrf-token"]').attr('content');
@@ -22,36 +24,52 @@
 
 	$.ajaxSetup({headers:headers, dataFilter: function(data, type){
 		var callback = ''; 
+		var jsonError = function(content) {
+			json.result = 'error';
+			json.message = {title: QUERY_LANGUAGE.error, content: content};
+			return JSON.stringify(data);
+		}
 		if (type == 'jsonp')
 			callback = '';
 		if (type == 'json') {
 			var json = $.parseJSON(data);
 			if (typeof json != 'undefined' && typeof json.result != 'undefined' && json.result == 'api' && typeof json.encrypt != 'undefined' && json.encrypt === true)
 			{
-				 if (typeof json.key != 'undefined' && typeof $.ssl != 'undefined') {
-					var key = $.ssl.decrypt(json.key);
+				 if (typeof json.key != 'undefined' && typeof $.ssl != 'undefined' && !!json.key) {
+				 	try{
+						var key = $.ssl.decrypt(json.key);
+					} catch (e) {
+						return jsonError(QUERY_LANGUAGE.encrypt_key + e.message);
+					}
 					var encrypted = json.data;
-					var encrypted_json = JSON.parse(aesjs.util.convertBytesToString(base64js.toByteArray(encrypted))); //json_decode()
-					//base64 decode
-					key = base64js.toByteArray(key);
-					iv = base64js.toByteArray(encrypted_json.iv);
-					value = base64js.toByteArray(encrypted_json.value);
-					//aes cbc
-					var aesCbc = new aesjs.ModeOfOperation.cbc(key, iv);
-					var decryptedBytes = aesCbc.decrypt(value);
-					var decypted = aesjs.util.convertBytesToString(decryptedBytes);
-					//unserialize
-					json.data = unserialize(decypted);
+					try{
+						var encrypted_json = JSON.parse(aesjs.util.convertBytesToString(base64js.toByteArray(encrypted))); //json_decode()
+					} catch (e) {
+						return jsonError(QUERY_LANGUAGE.encrypt_string + e.message);
+					}
+					try{
+						//base64 decode
+						var keyBytes = base64js.toByteArray(key),
+						ivBytes = base64js.toByteArray(encrypted_json.iv),
+						valueBytes = base64js.toByteArray(encrypted_json.value);
+						//aes cbc
+						var aesCbc = new aesjs.ModeOfOperation.cbc(keyBytes, ivBytes);
+						var decryptedBytes = aesCbc.decrypt(valueBytes);
+						var decypted = aesjs.util.convertBytesToString(decryptedBytes);
+						//unserialize
+						json.data = unserialize(decypted);
+					} catch(e) {
+						return jsonError(QUERY_LANGUAGE.encrypt_unserialize + e.message);
+					}
+
 				} else if (!json.key)
-				{
-					json.result = 'error';
-					json.message = {title: QUERY_LANGUAGE.error, content: QUERY_LANGUAGE.encrypt_key};
-				} else {
-					json.result = 'error';
-					json.message = {title: QUERY_LANGUAGE.error, content: QUERY_LANGUAGE.encrypt_js};
-				}
+					return jsonError(QUERY_LANGUAGE.encrypt_key);
+				else 
+					return jsonError(QUERY_LANGUAGE.encrypt_js);
 			}
 			data = JSON.stringify(json);
+			if (typeof json.debug != 'undefined' && !!json.debug) console.log(json);
+			delete json;
 		}
 
 		return data;
