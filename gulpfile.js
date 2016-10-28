@@ -7,6 +7,11 @@ var header = require('gulp-header');
 var rename = require('gulp-rename');
 var jshint = require('gulp-jshint');
 var data = require('gulp-data');
+var stripDebug = require('gulp-strip-debug');
+var vinylPaths = require('vinyl-paths');
+var minifyCss = require('gulp-minify-css');
+var del = require('del');
+//var vinylPaths = require('vinyl-paths');
 // 编译Sass
 gulp.task('sass', function() {
     gulp.src('./scss/*.scss')
@@ -17,8 +22,8 @@ gulp.task('sass', function() {
 // 合并，压缩common
 gulp.task('common-scripts', function() {
     gulp.src(['js/common/utils.js','js/common/polyfill.js','js/common/query.js'])
-    	.pipe(jshint())
         .pipe(sourcemaps.init({loadMaps: true}))
+        .pipe(jshint())
         .pipe(concat('common.js'))
         //.pipe(gulp.dest('js/'))
         .pipe(uglify({output: {ascii_only:true}}))
@@ -27,23 +32,48 @@ gulp.task('common-scripts', function() {
         .pipe(gulp.dest('js/'));
 });
 // 分散压缩
-gulp.task('scripts', function() {
-    gulp.src(['js/GPS.js', 'js/htmldiff.js'])
-        .pipe(data(function (file) {
-            return {
-                filename: path.basename(file.path),
-                dir: path.dirname(file.path)
-            };
-        }))
-        .pipe(uglify({output: {ascii_only:true}}))
-        .pipe(header('/*! ${filename} ${date}*/\n', { date : (new Date).toLocaleString()} ))
-        .pipe(rename({suffix:'.min'}))
-        .pipe(gulp.dest('js/'));
-
-});
 gulp.task('watch', function() {
     gulp.watch(['js/common/utils.js','js/common/polyfill.js','js/common/query.js'], ['common-scripts']);
-    gulp.watch(['js/GPS.js', 'js/htmldiff.js'], ['scripts']);
+    gulp.watch(['js/GPS.js', 'js/htmldiff.js', 'js/jquery.uploader.js', 'js/jquery.validate.addons.js', 'css/uploader.css'], function(e){
+        var ext = path.extname(e.path);
+        var dir = path.dirname(e.path);
+        if (e.type == 'deleted')
+        {
+          var filename = path.basename(e.path, ext);
+          del.sync(path.join(dir,filename+'.min'+ext));
+        }
+        else
+        {   switch (ext.toLowerCase())
+            {
+                case '.js':
+                    gulp.src(e.path)
+                    .pipe(data(function (file) {
+                        return {
+                            filename: path.basename(file.path),
+                            dir: path.dirname(file.path)
+                        };
+                    }))
+                    .pipe(uglify({output: {ascii_only:true}}))
+                    .pipe(header('/*! ${filename} ${date}*/\n', { date : (new Date).toLocaleString()} ))
+                    .pipe(rename({suffix:'.min'}))
+                    .pipe(gulp.dest(dir));
+                    break;
+                case '.css':
+                    gulp.src(e.path)
+                    .pipe(data(function (file) {
+                        return {
+                            filename: path.basename(file.path),
+                            dir: path.dirname(file.path)
+                        };
+                    }))
+                    .pipe(minifyCss())
+                    .pipe(header('/*! ${filename} ${date}*/\n', { date : (new Date).toLocaleString()} ))
+                    .pipe(rename({suffix:'.min'}))
+                    .pipe(gulp.dest(dir));
+                    break;
+            }
+        }
+    });
 });
 // 默认任务
 gulp.task('default', ['watch']);

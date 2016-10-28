@@ -1,6 +1,6 @@
 
 (function($){
-	var QUERY_LANGUAGE = {
+	$.QUERY_LANGUAGE = {
 		'error' : '错误',
 		'reload' : '重新载入',
 		'redirect' : '页面跳转',
@@ -26,7 +26,7 @@
 		var callback = ''; 
 		var jsonError = function(content) {
 			json.result = 'error';
-			json.message = {title: QUERY_LANGUAGE.error, content: content};
+			json.message = {title: $.QUERY_LANGUAGE.error, content: content};
 			return JSON.stringify(data);
 		}
 		if (type == 'jsonp')
@@ -39,13 +39,13 @@
 				 	try{
 						var key = $.ssl.decrypt(json.key);
 					} catch (e) {
-						return jsonError(QUERY_LANGUAGE.encrypt_key + e.message);
+						return jsonError($.QUERY_LANGUAGE.encrypt_key + e.message);
 					}
 					var encrypted = json.data;
 					try{
 						var encrypted_json = JSON.parse(aesjs.util.convertBytesToString(base64js.toByteArray(encrypted))); //json_decode()
 					} catch (e) {
-						return jsonError(QUERY_LANGUAGE.encrypt_string + e.message);
+						return jsonError($.QUERY_LANGUAGE.encrypt_string + e.message);
 					}
 					try{
 						//base64 decode
@@ -59,13 +59,13 @@
 						//unserialize
 						json.data = unserialize(decypted);
 					} catch(e) {
-						return jsonError(QUERY_LANGUAGE.encrypt_unserialize + e.message);
+						return jsonError($.QUERY_LANGUAGE.encrypt_unserialize + e.message);
 					}
 
 				} else if (!json.key)
-					return jsonError(QUERY_LANGUAGE.encrypt_key);
+					return jsonError($.QUERY_LANGUAGE.encrypt_key);
 				else 
-					return jsonError(QUERY_LANGUAGE.encrypt_js);
+					return jsonError($.QUERY_LANGUAGE.encrypt_js);
 			}
 			data = JSON.stringify(json);
 			if (typeof json.debug != 'undefined' && !!json.debug) console.log(json);
@@ -126,17 +126,17 @@
 				{
 					switch(textStatus) {
 						case 'timeout':
-							$.tips(QUERY_LANGUAGE.network_timeout);
+							$.tips($.QUERY_LANGUAGE.network_timeout);
 							break;
 						case 'error':
 							break;
 						case 'notmodified':
 							break;
 						case 'parsererror':
-							$.tips(QUERY_LANGUAGE.parser_error);
+							$.tips($.QUERY_LANGUAGE.parser_error);
 							break;
 						default:
-							$.tips(QUERY_LANGUAGE.server_error);
+							$.tips($.QUERY_LANGUAGE.server_error);
 							break;
 					}
 				}
@@ -209,7 +209,7 @@
 				
 				if((selector || is_form) && $selector.serializeArray().length <= 0) //selector is set,but nothing to query
 				{
-					$.tips(QUERY_LANGUAGE.unselected);
+					$.tips($.QUERY_LANGUAGE.unselected);
 					return false;
 				}
 				
