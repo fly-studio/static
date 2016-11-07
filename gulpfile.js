@@ -43,10 +43,30 @@ gulp.task('watch', function() {
           del.sync(path.join(dir,filename+'.min'+ext));
         }
         else
-        {   switch (ext.toLowerCase())
+        {
+            switch (ext.toLowerCase())
             {
                 case '.js':
                     gulp.src(e.path)
+                    .pipe(jshint({loopfunc:true}))
+                    .pipe(map(function (file, cb) {
+                        if (file.jshint.success) {
+                            util.log('0 error. JSHINT success!');
+                            return cb(null, file);
+                        }
+                        util.log('JSHINT fail in', file.path);
+                        let i = 0;
+                        file.jshint.results.forEach(function (result) {
+                            if (!result.error)
+                                return;
+                            i++;
+                            const err = result.error
+                            util.log(`  line ${err.line}, col ${err.character}, code ${err.code}, ${err.reason}`);
+                        });
+                        util.log(i + ' errors.');
+                        
+                        //return cb();
+                    }))
                     .pipe(data(function (file) {
                         return {
                             filename: path.basename(file.path),
@@ -56,10 +76,16 @@ gulp.task('watch', function() {
                     .pipe(uglify({output: {ascii_only:true}}))
                     .pipe(header('/*! ${filename} ${date}*/\n', { date : (new Date).toLocaleString()} ))
                     .pipe(rename({suffix:'.min'}))
-                    .pipe(gulp.dest(dir));
+                    .pipe(gulp.dest(dir))
+                    .pipe(map(function(file, cb){
+                        util.log('created ', file.path);
+                        return cb(null, file);
+                    }));
                     break;
                 case '.css':
                     gulp.src(e.path)
+                    .pipe(csslint())
+                    .pipe(csslint.formatter())
                     .pipe(data(function (file) {
                         return {
                             filename: path.basename(file.path),
@@ -69,7 +95,11 @@ gulp.task('watch', function() {
                     .pipe(minifyCss())
                     .pipe(header('/*! ${filename} ${date}*/\n', { date : (new Date).toLocaleString()} ))
                     .pipe(rename({suffix:'.min'}))
-                    .pipe(gulp.dest(dir));
+                    .pipe(gulp.dest(dir))
+                    .pipe(map(function(file, cb){
+                        util.log('created ', file.path);
+                        return cb(null, file);
+                    }));
                     break;
             }
         }
