@@ -32,7 +32,7 @@ angular.module('jquery', [])
 			jQuery.query(url, data, method, callback, alert_it).done(function(data, textStatus, jqXHR){
 				var args = arguments;
 				$rootScope.$apply(function() {
-					data && data.result == 'success' ? $dfd.resolve.apply($dfd, args) : $dfd.reject.apply($dfd, args)
+					data && (data.result == 'success' || data.result == 'api') ? $dfd.resolve.apply($dfd, args) : $dfd.reject.apply($dfd, args)
 				});
 			}).fail(function() {
 				var args = arguments;
@@ -79,7 +79,7 @@ angular.module('jquery', [])
 			elem.query(function(json){
 				scope.result = json;
 				scope.$apply(function(){
-					json.result == 'success' ? scope.done.apply(scope) : scope.fail.apply(scope);
+					json.result == 'success' || json.result == 'api' ? scope.done.apply(scope) : scope.fail.apply(scope);
 				});
 			}, !attrs.noAlert);
 		}
