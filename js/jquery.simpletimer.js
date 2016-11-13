@@ -29,7 +29,14 @@
  */
 /**
  * <div data-target="02/28/2020 00:00:00" id="dom"></div>
+ * @example start count down (auto stop)
  * $('#dom').simpleCountdown('%D days %H hours %M minutes %S seconds');
+ * @example stop count down
+ * $('#dom').simpleCountdown(true);
+ * 
+ * @param format (string): ['%H:%M:%S'] see $.simpletimer.toLimitString
+ * @param millisec (integer,ms): [500], how long updating the countdown once
+ * @param autoStop (boolean): [true], auto stop when countdown < 0
  */
 (function($){
 	var array_weeks = [
@@ -133,27 +140,25 @@
 		},
 		setDeltaSSI: function(datestr){
 			/*<!--#config timefmt="%m/%d/%Y %H:%M:%S" -->*/
-			var now = new Date();
 			var ssi = this.getDate(datestr);
-			var delta = ssi.getTime() - now.getTime();
+			var delta = ssi.getTime() - (new Date()).getTime();
 			this.serverClientDelta = delta;
 			return delta;
 		}
 	};
-	$.fn.extend({simpleCountdown: function(format, allow_overflow){
+	$.fn.extend({simpleCountdown: function(format, millisec, autoStop){
 		if (typeof format == 'undefined') format = '%H:%M:%S';
-		if (typeof allow_overflow == 'undefined') allow_overflow = false;
+		if (typeof autoStop == 'undefined') autoStop = true;
+		if (typeof millisec == 'undefined') millisec = 500;
 
 		return this.each(function(){
 			var t = $(this);
-			var method = {interval: null};
-			method.target = t.data('target');
-			method.target = $.simpletimer.getDate(method.target);
+			var method = {};
 			method.countdown = function(){
 				if ($.simpletimer.getDelta() === false)
-					return t.html('waiting server\'s time sync.');
-				var ms = $.simpletimer.getCountdown($.simpletimer.getDelta(), method.target);
-				if (ms < 0 && !allow_overflow) {
+					return t.html('Synchronizing server\'s time.');
+				var ms = $.simpletimer.getCountdown($.simpletimer.getDelta(), t.data('target'));
+				if (ms < 0 && autoStop) {
 					t.triggerHandler('simple.timer.overflow');
 					return method.stopCountDown();
 				};
@@ -162,7 +167,7 @@
 			}
 			method.startCountDown = function(){
 				method.stopCountDown();
-				t.data({simpleCountdown: setInterval(method.countdown, 500)});
+				t.data({simpleCountdown: setInterval(method.countdown, millisec)});
 				t.triggerHandler('simple.timer.started');
 			}
 			method.stopCountDown = function(){
@@ -171,8 +176,8 @@
 					clearInterval(interval);
 				t.triggerHandler('simple.timer.stoped');
 			}
-			method.startCountDown();
-		});		
+			if (format === true) method.stopCountDown(); else method.startCountDown();
+		});
 	}
 	});
 	function XMLHttpRequest2Delta(XMLHttpRequest){
