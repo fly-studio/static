@@ -28,15 +28,15 @@
 		throw('this javascript file need behind \'common.js\'');
 	var scripts = document.getElementsByTagName("script");
 	var querys = $.deparam.querystring((scripts[ scripts.length - 1 ]).src);
-	$.session_id = querys['session_id'];
+	$.session_id = querys.session_id;
 	
 	$.fn.extend({
 		uploader : function(max_width, max_height, filesize, filetype, filelimit, id) {
 			if (max_width !== true)
-				max_width = $.isUndefined(max_width) ? 0 : parseFloat(max_width);
-			max_height = $.isUndefined(max_height) ? 0 : parseFloat(max_height);
-			filesize = $.isUndefined(filesize) ? 2 * 1024 * 1024 : filesize; //2 MB
-			filetype = $.isUndefined(filetype) ? 'jpg,jpeg,png,bmp,gif,webp,svg' : filetype.toLowerCase();
+				max_width = typeof max_widt == 'undefined' ? 0 : parseFloat(max_width);
+			max_height = typeof max_heigh == 'undefined' ? 0 : parseFloat(max_height);
+			filesize = typeof filesiz == 'undefined' ? 2 * 1024 * 1024 : filesize; //2 MB
+			filetype = typeof filetyp == 'undefined' ? 'jpg,jpeg,png,bmp,gif,webp,svg' : filetype.toLowerCase();
 			filelimit = isNaN(filelimit) ? 1 : parseInt(filelimit);
 			var img_types = ['jpg','jpeg','png','bmp','gif','webp','svg'];
 			return this.each(function(){
@@ -47,7 +47,7 @@
 				{ //删除原有的控件
 					delete flex_uploader.uploader;
 					flex_uploader.$container.remove();
-					t.prop('flex_uploader', {});
+					t.removeProp('flex_uploader');
 				}
 				//删除该控件，下面的不用执行
 				if (max_width === true) return;
@@ -57,117 +57,35 @@
 					return rand(10000,99999);
 				};
 				var uploader_id = 'uploader-id-' + nonce(), pick_id = 'pick-id-' + nonce();
-				var progresses_id = uploader_id + '-progresses',thumbnails_id = uploader_id + '-thumbnails', input_id = uploader_id + '-input';
+				var progresses_id = uploader_id + '-progresses', thumbnails_id = uploader_id + '-thumbnails', input_id = uploader_id + '-input';
 				//添加容器到input下
-				flex_uploader.$container = $('<div class="uploader-container" id="'+uploader_id+'"><div class="drop-tips text-info"><h2>'+$.UPLOADER_LANGUAGE.drop_container+'</h2><br /><br /><div class="btn btn-info" onclick="javascript:jQuery(this).parent().hide().parent(\'.uploader-container\').removeClass(\'webuploader-dnd-over\');"><i class="glyphicon glyphicon-remove"></i> '+$.UPLOADER_LANGUAGE.close+'</div></div>\
-					<div class="pull-left"><span id="'+pick_id+'">'+$.UPLOADER_LANGUAGE.select_file+'(\u2264 '+bytesToSize(filesize)+')</span></div>'
-					+ '<div class="pull-left tags">&nbsp;<span class="label label-success">.' + filetype.replace(/,/g,'</span>&nbsp;<span class="label label-success">.') + '</span>'
-					+ '&nbsp;<span class="label label-warning enable-tooltip" data-placement="top" title="'+$.UPLOADER_LANGUAGE.ctrl_v_tips+'"><small class="glyphicon glyphicon-info-sign"></small> '+$.UPLOADER_LANGUAGE.ctrl_v_button+'</span>&nbsp;<span class="label label-warning enable-tooltip" data-placement="top" title="'+$.UPLOADER_LANGUAGE.drop_container+'"><small class="glyphicon glyphicon-info-sign"></small> '+$.UPLOADER_LANGUAGE.drop_button+'</span>'
-					+ (max_width > 0 && max_height > 0 ? '<br /><small>&nbsp;'+$.UPLOADER_LANGUAGE.resize.replace('{0}', max_width.toString().toHTML() + 'x' + max_height.toString().toHTML()) + '</small>' : '')
-					+ '</div><div class="clearfix"></div>\
-					<div id="'+progresses_id+'" class="progresses"></div><div class="clearfix"></div>\
-					<div id="'+thumbnails_id+'" class="thumbnails row"></div><div class="clearfix"></div></div>').insertAfter(t);
-				if ($.fn.tooltip) $('.enable-tooltip', flex_uploader.$container).tooltip();
-				flex_uploader.uploader = WebUploader.create({
-					// swf文件路径
-					swf: $.baseuri + "static/js/webuploader/Uploader.swf",
-					// 文件接收服务端。
-					server: $.baseuri + "attachment/uploader_query?of=json",
-					// 选择文件的按钮。可选。内部根据当前运行是创建，可能是input元素，也可能是flash
-					pick: {
-						id: '#' + pick_id,
-						multiple: true
-					},
-					//表单附加数据
-					formData: $.extend($.session_id ? {"PHPSESSIONID": $.session_id} : {}, $.csrf ? {'_token': $.csrf} : {}, {}),
-					//文件表单name
-					fileVal: 'Filedata',
-					//METHOD
-					method: 'POST',
-					//二进制上传，php://input都为文件内容，其他参数在$_GET中
-					sendAsBinary: false,
-					//可提交文件数量限制
-					fileNumLimit: 0,
-					//总文件大小限制
-					//fileSizeLimit: 1024 * 1024 * 1024, //1G
-					//单文件大小限制
-					fileSingleSizeLimit: filesize,
-					//是否去重
-					duplicate: false,
-					// 文件选择筛选。
-					accept: {
-						title: $.UPLOADER_LANGUAGE.select_file,
-						extensions: filetype,
-						mimeTypes: typeof mimeType != 'undefined' ? filetype.split(',').map(function(v){return mimeType.lookup('name.'+v)}).join(',') : '*/*'
-					},
-					//是否允许在文件传输时提前把下一个文件的分片,MD5准备好
-					prepareNextFile: true,
-					//分多大一片？ 默认大小为5M.
-					chunkSize: 5242880,
-					//分片允许自动重传多少次
-					chunkRetry: 5,
-					//是否分片上传。
-					chunked: true,
-					//同时上传并发数
-					threads: 3,
-					//指定拖拽的容器
-					dnd: '#' + uploader_id,
-					//全局禁用拉拽，防止默认打开文件
-					disableGlobalDnd: true,
-					//可以粘贴的容器
-					paste: document.body,
-					thumb: {// 缩略图
-						width: 75,
-						height: 75,
-						// 图片质量，只有type为`image/jpeg`的时候才有效。
-						quality: 70,
-						// 是否允许放大，如果想要生成小图的时候不失真，此选项应该设置为false.
-						allowMagnify: false,
-						// 是否允许裁剪。
-						crop: true,
-						// 为空的话则保留原有图片格式。
-						// 否则强制转换成指定的类型。
-						//type: 'image/jpeg'
-					},
-					// 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！
-					resize: false,
-					compress: null
-				});
-				// 修改后图片上传前，尝试将图片压缩到max_width * max_height
-				if (max_width > 0 && max_height > 0)
-					flex_uploader.uploader.option( 'compress', {
-						width: max_width,
-						height: max_height,
-						// 图片质量，只有type为`image/jpeg`的时候才有效。
-						quality: 100,
-						// 是否允许放大，如果想要生成小图的时候不失真，此选项应该设置为false.
-						allowMagnify: false,
-						// 是否允许裁剪。
-						crop: false,
-						// 是否保留头部meta信息。
-						preserveHeaders: true,
-						// 如果发现压缩后文件大小比原来还大，则使用原来图片。此属性可能会影响图片自动纠正功能
-						noCompressIfLarger: true,
-						// 单位字节，如果图片大小小于此值，不会采用压缩。
-						compressSize: 0
-					});
-
+				flex_uploader.$container = $('<div class="uploader-container" id="'+ uploader_id +'">'+
+					'<div class="drop-tips text-info"><h2>'+ $.UPLOADER_LANGUAGE.drop_container +'</h2><br /><br /><div class="btn btn-info" onclick="javascript:jQuery(this).parent().hide().parent(\'.uploader-container\').removeClass(\'webuploader-dnd-over\');"><i class="glyphicon glyphicon-remove"></i> '+$.UPLOADER_LANGUAGE.close+'</div></div>' +
+					'<div class="pull-left"><span id="'+ pick_id +'">'+ $.UPLOADER_LANGUAGE.select_file +'(≤ '+ bytesToSize(filesize) +')</span></div>' +
+					'<div class="pull-left tags">&nbsp;<span class="label label-success">.' + filetype.replace(/,/g,'</span>&nbsp;<span class="label label-success">.') + '</span>' +
+					'&nbsp;<span class="label label-warning enable-tooltip" data-placement="top" title="'+ $.UPLOADER_LANGUAGE.ctrl_v_tips +'"><small class="glyphicon glyphicon-info-sign"></small> '+ $.UPLOADER_LANGUAGE.ctrl_v_button +'</span>&nbsp;<span class="label label-warning enable-tooltip" data-placement="top" title="'+ $.UPLOADER_LANGUAGE.drop_container +'"><small class="glyphicon glyphicon-info-sign"></small> '+ $.UPLOADER_LANGUAGE.drop_button +'</span>' +
+					(max_width > 0 && max_height > 0 ? '<br /><small>&nbsp;'+ $.UPLOADER_LANGUAGE.resize.replace('{0}', max_width.toString().toHTML() + 'x' + max_height.toString().toHTML()) + '</small>' : '') +
+					'</div><div class="clearfix"></div>' +
+					'<div id="' + progresses_id + '" class="progresses"></div><div class="clearfix"></div>' +
+					'<div id="' + thumbnails_id + '" class="thumbnails row"></div><div class="clearfix"></div>' +
+					'</div>').insertAfter(t);
 				
+				if (typeof $.fn.tooltip != 'undefined') $('.enable-tooltip', flex_uploader.$container).tooltip();
 
 				var $progresses = {};
 				var progress = function(file){
 					if (!$progresses[file.id])
-						$progresses[file.id] = $('<div class="media alert alert-warning fade in"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>\
-							<div class="media-left media-middle"><img class="media-object" src="" alt=""></div>\
-							<div class="media-body"><h4 class="media-heading">'+file.name.toHTML()+'('+bytesToSize(file.size)+')</h4>\
-							<div class="media-message"></div>\
-							<div class="progress">\
-								<div class="progress-bar progress-bar-warning progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">\
-									<span class=""></span>\
-								</div>\
-							</div>\
-							</div>\
-						</div>').appendTo('#'+progresses_id).on('closed.bs.alert', function(){
+						$progresses[file.id] = $('<div class="media alert alert-warning fade in"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>' +
+							'<div class="media-left media-middle"><img class="media-object" src="" alt=""></div>' +
+							'<div class="media-body"><h4 class="media-heading">'+file.name.toHTML()+'('+bytesToSize(file.size)+')</h4>' +
+							'<div class="media-message"></div>' +
+							'<div class="progress">' +
+								'<div class="progress-bar progress-bar-warning progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">' +
+									'<span class=""></span>' +
+								'</div>' +
+							'</div>' +
+							'</div>' +
+						'</div>').appendTo('#'+progresses_id).on('closed.bs.alert', function(){
 							if (file.getStatus() == 'complete')
 								progress(file).remove();
 							else
@@ -239,19 +157,19 @@
 							return this;
 						}
 					};
-				}
+				};
 				var $thumbnails = {};
 				var preview = function(id, filename, fileext)
 				{
-					if (!!id && !$thumbnails[id])
+					if (typeof id != 'undefined' && typeof $thumbnails[id] == 'undefined')
 					{
-						$thumbnails[id] = $('<div class="col-xs-6 col-md-4 alert"><div class="thumbnail">\
-							<div class="file-panel"><span class="cancel" data-dismiss="alert" aria-label="Close">'+$.UPLOADER_LANGUAGE.close+'</span><span class="rotateRight">'+$.UPLOADER_LANGUAGE.rotate_right+'</span><span class="rotateLeft">'+$.UPLOADER_LANGUAGE.rotate_left+'</span></div>\
-							<a href="'+$.baseuri+'attachment?id='+id+'"  target="_blank"><img src="'+$.baseuri+'placeholder?size=300x200&text='+encodeURIComponent($.UPLOADER_LANGUAGE.loading)+'" alt="" class="img-responsive center-block"  onerror="this.src=\''+ $.baseuri +'placeholder?size=300x200&text=\'+encodeURIComponent(\''+$.UPLOADER_LANGUAGE.reading+'\');"></a>\
-							<div class="caption">\
-        					<h4><span class="title">'+(filename ? filename.toHTML() : '')+'</span><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></h4>\
-							</div><div class="clearfix"></div>\
-							</div><div class="clearfix"></div></div>').appendTo('#' + thumbnails_id).on('closed.bs.alert', function(){
+						$thumbnails[id] = $('<div class="col-xs-6 col-md-4 alert"><div class="thumbnail">' +
+							'<div class="file-panel"><span class="cancel" data-dismiss="alert" aria-label="Close">'+$.UPLOADER_LANGUAGE.close+'</span><span class="rotateRight">'+$.UPLOADER_LANGUAGE.rotate_right+'</span><span class="rotateLeft">'+$.UPLOADER_LANGUAGE.rotate_left+'</span></div>' +
+							'<a href="'+$.baseuri+'attachment?id='+id+'"  target="_blank"><img src="'+$.baseuri+'placeholder?size=300x200&text='+encodeURIComponent($.UPLOADER_LANGUAGE.loading)+'" alt="" class="img-responsive center-block"  onerror="this.src=\''+ $.baseuri +'placeholder?size=300x200&text=\'+encodeURIComponent(\''+$.UPLOADER_LANGUAGE.reading+'\');"></a>' +
+							'<div class="caption">' +
+        					'<h4><span class="title">'+(filename ? filename.toHTML() : '')+'</span><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></h4>' +
+							'</div><div class="clearfix"></div>' +
+							'</div><div class="clearfix"></div></div>').appendTo('#' + thumbnails_id).on('closed.bs.alert', function(){
 								preview(id).remove();
 							});
 							$('.rotateLeft,.rotateRight', $thumbnails[id]).on('click', function(){
@@ -266,10 +184,10 @@
 							});
 						if (!fileext) 
 						{
-							$.GET($.baseuri + 'attachment/info?id='+id, null, function(json){
-								if (json.result == 'success' && json.data.ext)
+							$.GET($.baseuri + 'attachment/info?id='+ id, null, function(json){
+								if (typeof json != 'undefined' && (json.result == 'success' || json.result == 'api') && typeof json.data.ext != 'undefined')
 								{
-									var pic = img_types.indexOf(json.data.ext.toLowerCase()) > -1 ? $.baseuri+'attachment/preview?id='+id : $.baseuri+'placeholder?size=300x200&text='+encodeURIComponent(json.data.ext);
+									var pic = img_types.indexOf(json.data.ext.toLowerCase()) > -1 ? $.baseuri + 'attachment/preview?id='+ id : $.baseuri + 'placeholder?size=300x200&text='+encodeURIComponent(json.data.ext);
 									$('.title', $thumbnails[id]).text(json.data.displayname);
 									$('img', $thumbnails[id]).attr('src',pic);
 								}
@@ -277,7 +195,7 @@
 						}
 						else
 						{
-							var pic = img_types.indexOf(fileext.toLowerCase()) > -1 ? $.baseuri+'attachment/preview?id='+id: $.baseuri+'placeholder?size=300x200&text='+encodeURIComponent(fileext);
+							var pic = img_types.indexOf(fileext.toLowerCase()) > -1 ? $.baseuri + 'attachment/preview?id='+ id: $.baseuri + 'placeholder?size=300x200&text='+ encodeURIComponent(fileext);
 							$('img', $thumbnails[id]).attr('src',pic);
 						}
 					}
@@ -309,7 +227,7 @@
 						removeAll: function(){
 							for (var id in $thumbnails) {
 								preview(id).remove();
-							};
+							}
 						},
 						rebuildAll: function() {
 							//remove all files
@@ -320,13 +238,13 @@
 							this.removeAll();
 							//build
 							var aids = attachment().get();
-							for (var i = 0; i < aids.length; i++) {
+							for (i = 0; i < aids.length; i++) {
 								preview(aids[i]).build();
-							};
+							}
 							return this;
 						}
 					};
-				}
+				};
 				var attachment = function() {
 					var aid = t.val();
 					if (aid == '0') aid = '';
@@ -361,7 +279,7 @@
 							return aids;
 						}
 					};
-				}
+				};
 
 
 				//---------------------------------------
@@ -375,7 +293,7 @@
 						return false;
 					}
 					return true;
-				}
+				};
 				method.fileQueued = function(file) {
 					if (t.triggerHandler('uploader.uploading', [file, attachment().get()]) === false) return false;
 					progress(file).init().thumb();
@@ -397,7 +315,7 @@
 							ext: file.ext,
 							size: file.size
 						}, function(json){
-							if (json && json.result == 'success'){
+							if (typeof json != 'undefined' && (json.result == 'success' || json.result == 'api')){
 								flex_uploader.uploader.skipFile(file);
 								progress(file).success().message($.UPLOADER_LANGUAGE.hash_success);
 								if (filelimit == 1) preview().removeAll();
@@ -410,28 +328,28 @@
 						},false);
 					});
 					return true;
-				}
+				};
 				method.uploadBeforeSend = function(obj, data, headers) {
 					//console.log(obj);
-					data['uuid'] = obj['blob']['ruid'] + obj['file']['id'] + obj['file']['size'];
-					data['start'] = obj['start'];
-					data['end'] = obj['end'];
-					data['chunks'] = obj['chunks'];
-					data['chunk'] = obj['chunk'];
-					data['total'] = obj['file']['size'];
-					data['hash'] = obj['file']['md5'];
-				}
+					data.uuid = obj.blob.ruid + obj.file.id + obj.file.size;
+					data.start = obj.start;
+					data.end = obj.end;
+					data.chunks = obj.chunks;
+					data.chunk = obj.chunk;
+					data.total = obj.file.size;
+					data.hash = obj.file.md5;
+				};
 				method.uploadStart = function(file) {
 					
-				}
+				};
 				//上传过程中触发，携带上传进度。
 				method.uploadProgress = function(file, percentage) {
 					t.triggerHandler('uploader.progressing',[file, percentage, attachment().get()]);
 					progress(file).progressing(percentage);
-				}
+				};
 				//当文件上传成功时触发。
 				method.uploadSuccess = function(file, json) {
-					if (json && json.result == 'success') {
+					if (json && (json.result == 'success' || json.result == 'api')) {
 						progress(file).success();
 						if (filelimit == 1) preview().removeAll();
 						preview(json.data.id, json.data.displayname, json.data.ext).build().setFile(file);
@@ -441,17 +359,17 @@
 						t.triggerHandler('uploader.error',[file, json.message.content, attachment().get()]);
 						//$.alert(json.message.content);
 					}
-				}
+				};
 				
 				//当文件上传出错时触发。
 				method.uploadError = function(file, reason) {
 					progress(file).error($.UPLOADER_LANGUAGE.error+': ' + reason);
 					t.triggerHandler('uploader.error',[file, reason, attachment().get()]);
-				}
+				};
 				//不管成功或者失败，文件上传完成时触发。
 				method.uploadComplete = function(file) {
 					
-				}
+				};
 				method.error = function(code, max, file) {
 					switch(code)
 					{
@@ -474,21 +392,124 @@
 							$.alert(code);
 							break;
 					}
+				};
+
+				method.create = function()
+				{
+					if (flex_uploader.uploader || typeof t.prop('flex_uploader') == 'undefined') return;
+					flex_uploader.uploader = WebUploader.create({
+						// swf文件路径
+						swf: $.baseuri + "static/js/webuploader/Uploader.swf",
+						// 文件接收服务端。
+						server: $.baseuri + "attachment/uploader_query?of=json",
+						// 选择文件的按钮。可选。内部根据当前运行是创建，可能是input元素，也可能是flash
+						pick: {
+							id: '#' + pick_id,
+							multiple: true
+						},
+						//表单附加数据
+						formData: $.extend($.session_id ? {"PHPSESSIONID": $.session_id} : {}, $.csrf ? {'_token': $.csrf} : {}, {}),
+						//文件表单name
+						fileVal: 'Filedata',
+						//METHOD
+						method: 'POST',
+						//二进制上传，php://input都为文件内容，其他参数在$_GET中
+						sendAsBinary: false,
+						//可提交文件数量限制
+						fileNumLimit: 0,
+						//总文件大小限制
+						//fileSizeLimit: 1024 * 1024 * 1024, //1G
+						//单文件大小限制
+						fileSingleSizeLimit: filesize,
+						//是否去重
+						duplicate: false,
+						// 文件选择筛选。
+						accept: {
+							title: $.UPLOADER_LANGUAGE.select_file,
+							extensions: filetype,
+							mimeTypes: typeof mimeType != 'undefined' ? filetype.split(',').map(function(v){return mimeType.lookup('name.' + v);}).join(',') : '*/*'
+						},
+						//是否允许在文件传输时提前把下一个文件的分片,MD5准备好
+						prepareNextFile: true,
+						//分多大一片？ 默认大小为5M.
+						chunkSize: 5242880,
+						//分片允许自动重传多少次
+						chunkRetry: 5,
+						//是否分片上传。
+						chunked: true,
+						//同时上传并发数
+						threads: 3,
+						//指定拖拽的容器
+						dnd: '#' + uploader_id,
+						//全局禁用拉拽，防止默认打开文件
+						disableGlobalDnd: true,
+						//可以粘贴的容器
+						paste: document.body,
+						thumb: {// 缩略图
+							width: 75,
+							height: 75,
+							// 图片质量，只有type为`image/jpeg`的时候才有效。
+							quality: 70,
+							// 是否允许放大，如果想要生成小图的时候不失真，此选项应该设置为false.
+							allowMagnify: false,
+							// 是否允许裁剪。
+							crop: true,
+							// 为空的话则保留原有图片格式。
+							// 否则强制转换成指定的类型。
+							//type: 'image/jpeg'
+						},
+						// 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！
+						resize: false,
+						compress: null
+					});
+					// 修改后图片上传前，尝试将图片压缩到max_width * max_height
+					if (max_width > 0 && max_height > 0)
+						flex_uploader.uploader.option( 'compress', {
+							width: max_width,
+							height: max_height,
+							// 图片质量，只有type为`image/jpeg`的时候才有效。
+							quality: 100,
+							// 是否允许放大，如果想要生成小图的时候不失真，此选项应该设置为false.
+							allowMagnify: false,
+							// 是否允许裁剪。
+							crop: false,
+							// 是否保留头部meta信息。
+							preserveHeaders: true,
+							// 如果发现压缩后文件大小比原来还大，则使用原来图片。此属性可能会影响图片自动纠正功能
+							noCompressIfLarger: true,
+							// 单位字节，如果图片大小小于此值，不会采用压缩。
+							compressSize: 0
+						});
+					flex_uploader.uploader.on('beforeFileQueued', method.beforeFileQueued);
+					flex_uploader.uploader.on('fileQueued', method.fileQueued);
+					flex_uploader.uploader.on('uploadBeforeSend', method.uploadBeforeSend);
+					flex_uploader.uploader.on('uploadStart', method.uploadStart);
+					flex_uploader.uploader.on('uploadProgress', method.uploadProgress);
+					flex_uploader.uploader.on('uploadSuccess', method.uploadSuccess);
+					flex_uploader.uploader.on('uploadError', method.uploadError);
+					flex_uploader.uploader.on('uploadComplete', method.uploadComplete);
+					flex_uploader.uploader.on('error', method.error);
+
+					//init
+					if(id) attachment().add(id);
+					preview().rebuildAll();
+				};
+
+				t.prop('flex_uploader', flex_uploader);
+
+				if (!flex_uploader.$container.is(':visible')/* flex_uploader.$container[0].offsetParent === null*/) { //默认没有显示出来，需要特殊处理
+					method.interval = setInterval(function(){
+						if (flex_uploader.$container.is(':visible'))
+						{
+							clearInterval(method.interval);
+							method.create();
+						}
+					}, 1000); //还能有更好的方法吗? MutationObserver?
+
+				} else {
+					method.create();
 				}
 
-				flex_uploader.uploader.on('beforeFileQueued', method.beforeFileQueued)
-				flex_uploader.uploader.on('fileQueued', method.fileQueued)
-				flex_uploader.uploader.on('uploadBeforeSend', method.uploadBeforeSend)
-				flex_uploader.uploader.on('uploadStart', method.uploadStart)
-				flex_uploader.uploader.on('uploadProgress', method.uploadProgress)
-				flex_uploader.uploader.on('uploadSuccess', method.uploadSuccess)
-				flex_uploader.uploader.on('uploadError', method.uploadError)
-				flex_uploader.uploader.on('uploadComplete', method.uploadComplete)
-				flex_uploader.uploader.on('error', method.error)
-				//init
-				if(id) attachment().add(id);
-				preview().rebuildAll();
-				t.prop('flex_uploader', flex_uploader);
 			});
 			
 		}

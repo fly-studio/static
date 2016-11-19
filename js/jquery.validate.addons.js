@@ -93,7 +93,7 @@ $.extend(jQuery.validator.messages, {
 $.fn.extend({validate_addons: function(validate, callback){
 	for(var n in validate.rules)
 		if (validate.rules[n].ansi) $('[name="'+ n +'"]', this).data({ansi: validate.rules[n].ansi});
-	this.validate({'ignore': [], 'rules': validate.rules, 'messages': validate.messages, 'submitHandler': function(form, event){
+	this.validate({'ignore': '.ignore', 'rules': validate.rules, 'messages': validate.messages, 'submitHandler': function(form, event){
 		if (callback && $.isFunction(callback) && !callback.call(this, form, event))
 			return false;
 		form.submit();
