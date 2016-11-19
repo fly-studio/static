@@ -1,5 +1,6 @@
 var gulp = require('gulp');
 var path = require('path');
+var util = require("gulp-util");
 var uglify = require('gulp-uglify');
 var concat = require('gulp-concat');
 var sourcemaps = require('gulp-sourcemaps');
@@ -11,6 +12,8 @@ var stripDebug = require('gulp-strip-debug');
 var vinylPaths = require('vinyl-paths');
 var minifyCss = require('gulp-minify-css');
 var del = require('del');
+var map = require('map-stream');
+var stylish = require('jshint-stylish');
 //var vinylPaths = require('vinyl-paths');
 // 编译Sass
 gulp.task('sass', function() {
@@ -23,13 +26,24 @@ gulp.task('sass', function() {
 gulp.task('common-scripts', function() {
     gulp.src(['js/common/utils.js','js/common/polyfill.js','js/common/query.js'])
         .pipe(sourcemaps.init({loadMaps: true}))
-        .pipe(jshint())
+        .pipe(jshint({loopfunc:true, maxerr: 50}))
+        .pipe(jshint.reporter(stylish))
+        .pipe(map(function(file, cb){
+            if (file.jshint.success) {
+                util.log('0 error. JSHINT success!');
+                return cb(null, file);
+            }
+        }))
         .pipe(concat('common.js'))
         //.pipe(gulp.dest('js/'))
         .pipe(uglify({output: {ascii_only:true}}))
         .pipe(header('/*! ${name} ${date}*/\n', { name : 'common', date : (new Date).toLocaleString()} ))
         .pipe(sourcemaps.write('./common'))
-        .pipe(gulp.dest('js/'));
+        .pipe(gulp.dest('js/'))
+        .pipe(map(function(file, cb){
+            util.log('created ', file.path);
+            return cb(null, file);
+        }));
 });
 // 分散压缩
 gulp.task('watch', function() {
@@ -48,25 +62,15 @@ gulp.task('watch', function() {
             {
                 case '.js':
                     gulp.src(e.path)
-                    .pipe(jshint({loopfunc:true}))
-                    .pipe(map(function (file, cb) {
+                    .pipe(jshint({loopfunc:true, maxerr: 50}))
+                    .pipe(jshint.reporter(stylish))
+                    .pipe(map(function(file, cb){
                         if (file.jshint.success) {
                             util.log('0 error. JSHINT success!');
                             return cb(null, file);
                         }
-                        util.log('JSHINT fail in', file.path);
-                        let i = 0;
-                        file.jshint.results.forEach(function (result) {
-                            if (!result.error)
-                                return;
-                            i++;
-                            const err = result.error
-                            util.log(`  line ${err.line}, col ${err.character}, code ${err.code}, ${err.reason}`);
-                        });
-                        util.log(i + ' errors.');
-                        
-                        //return cb();
                     }))
+                    .pipe(sourcemaps.init({loadMaps: true}))
                     .pipe(data(function (file) {
                         return {
                             filename: path.basename(file.path),
@@ -76,6 +80,7 @@ gulp.task('watch', function() {
                     .pipe(uglify({output: {ascii_only:true}}))
                     .pipe(header('/*! ${filename} ${date}*/\n', { date : (new Date).toLocaleString()} ))
                     .pipe(rename({suffix:'.min'}))
+                    .pipe(sourcemaps.write('./'))
                     .pipe(gulp.dest(dir))
                     .pipe(map(function(file, cb){
                         util.log('created ', file.path);

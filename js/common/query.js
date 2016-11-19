@@ -29,9 +29,9 @@
 			json.message = {title: $.QUERY_LANGUAGE.error, content: content};
 			return JSON.stringify(data);
 		}
-		if (type == 'jsonp')
+		if (type.toLowerCase() == 'jsonp')
 			callback = '';
-		if (type == 'json') {
+		if (type.toLowerCase() == 'json') {
 			var json = $.parseJSON(data);
 			if (typeof json != 'undefined' && typeof json.result != 'undefined' && json.result == 'api' && typeof json.encrypt != 'undefined' && json.encrypt === true)
 			{
