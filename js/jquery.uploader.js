@@ -32,12 +32,25 @@
 	
 	$.fn.extend({
 		uploader : function(max_width, max_height, filesize, filetype, filelimit, id) {
-			if (max_width !== true)
-				max_width = typeof max_width == 'undefined' ? 0 : parseFloat(max_width);
-			max_height = typeof max_height == 'undefined' ? 0 : parseFloat(max_height);
-			filesize = typeof filesize == 'undefined' ? 2 * 1024 * 1024 : filesize; //2 MB
-			filetype = typeof filetype == 'undefined' ? 'jpg,jpeg,png,bmp,gif,webp,svg' : filetype.toLowerCase();
-			filelimit = isNaN(filelimit) ? 1 : parseInt(filelimit);
+			var options = {
+				max_width: 0,
+				max_height: 0,
+				filesize: 2 * 1024 * 1024,
+				filetype: 'jpg,jpeg,png,bmp,gif,webp,svg',
+				filelimit: 1,
+				id: null,
+			};
+			if (typeof max_width == 'object' && max_width !== null) // it's options
+				options = $.extend({}, options, max_width);
+			else if (max_width !== true)
+			{
+				if (typeof max_width != 'undefined') options.max_width = parseFloat(max_width);
+				if (typeof max_height != 'undefined') options.max_height = parseFloat(max_height);
+				if (typeof filesize != 'undefined') options.filesize = parseFloat(filesize);
+				if (typeof filetype != 'undefined') options.filetype = filetype.toLowerCase();
+				if (typeof filelimit != 'undefined') options.filelimit = parseInt(filelimit);
+				if (typeof id != 'undefined') options.id = id;
+			}
 			var img_types = ['jpg','jpeg','png','bmp','gif','webp','svg'];
 			return this.each(function(){
 				var t = $(this);
@@ -61,10 +74,10 @@
 				//添加容器到input下
 				flex_uploader.$container = $('<div class="uploader-container" id="'+ uploader_id +'">'+
 					'<div class="drop-tips text-info"><h2>'+ $.UPLOADER_LANGUAGE.drop_container +'</h2><br /><br /><div class="btn btn-info" onclick="javascript:jQuery(this).parent().hide().parent(\'.uploader-container\').removeClass(\'webuploader-dnd-over\');"><i class="glyphicon glyphicon-remove"></i> '+$.UPLOADER_LANGUAGE.close+'</div></div>' +
-					'<div class="pull-left"><span id="'+ pick_id +'">'+ $.UPLOADER_LANGUAGE.select_file +'(≤ '+ bytesToSize(filesize) +')</span></div>' +
-					'<div class="pull-left tags">&nbsp;<span class="label label-success">.' + filetype.replace(/,/g,'</span>&nbsp;<span class="label label-success">.') + '</span>' +
+					'<div class="pull-left"><span id="'+ pick_id +'">'+ $.UPLOADER_LANGUAGE.select_file +'(≤ '+ bytesToSize(options.filesize) +')</span></div>' +
+					'<div class="pull-left tags">&nbsp;<span class="label label-success">.' + options.filetype.replace(/,/g,'</span>&nbsp;<span class="label label-success">.') + '</span>' +
 					'&nbsp;<!--<span class="label label-warning enable-tooltip" data-placement="top" title="'+ $.UPLOADER_LANGUAGE.ctrl_v_tips +'"><small class="glyphicon glyphicon-info-sign"></small> '+ $.UPLOADER_LANGUAGE.ctrl_v_button +'</span>&nbsp;--><span class="label label-warning enable-tooltip" data-placement="top" title="'+ $.UPLOADER_LANGUAGE.drop_container +'"><small class="glyphicon glyphicon-info-sign"></small> '+ $.UPLOADER_LANGUAGE.drop_button +'</span>' +
-					(max_width > 0 && max_height > 0 ? '<br /><small>&nbsp;'+ $.UPLOADER_LANGUAGE.resize.replace('{0}', max_width.toString().toHTML() + 'x' + max_height.toString().toHTML()) + '</small>' : '') +
+					(options.max_width > 0 && options.max_height > 0 ? '<br /><small>&nbsp;'+ $.UPLOADER_LANGUAGE.resize.replace('{0}', options.max_width.toString().toHTML() + 'x' + options.max_height.toString().toHTML()) + '</small>' : '') +
 					'</div><div class="clearfix"></div>' +
 					'<div id="' + progresses_id + '" class="progresses"></div><div class="clearfix"></div>' +
 					'<div id="' + thumbnails_id + '" class="thumbnails row"></div><div class="clearfix"></div>' +
@@ -261,7 +274,7 @@
 							return this;
 						},
 						add: function(id) {
-							if (filelimit == 1) aids = [id.toString()];
+							if (options.filelimit == 1) aids = [id.toString()];
 							var i = aids.indexOf(id.toString());
 							if (i == -1) aids.push(id.toString());
 							return this.write();
@@ -284,12 +297,12 @@
 
 				//---------------------------------------
 				method.beforeFileQueued = function(file) {
-					if (filetype.split(',').indexOf(file.ext.toLowerCase()) == -1){
-						$.alert($.UPLOADER_LANGUAGE.filetype.replace('{0}', filetype));
+					if (options.filetype.split(',').indexOf(file.ext.toLowerCase()) == -1){
+						$.alert($.UPLOADER_LANGUAGE.filetype.replace('{0}', options.filetype));
 						return false;
 					}
-					if (filelimit > 1 &&  attachment().get().length >= filelimit) {
-						$.alert($.UPLOADER_LANGUAGE.filenum_limite.replace('{0}', filelimit));
+					if (options.filelimit > 1 &&  attachment().get().length >= options.filelimit) {
+						$.alert($.UPLOADER_LANGUAGE.filenum_limite.replace('{0}', options.filelimit));
 						return false;
 					}
 					return true;
@@ -298,8 +311,8 @@
 					if (t.triggerHandler('uploader.uploading', [file, attachment().get()]) === false) return false;
 					progress(file).init().thumb();
 
-					//前台压缩图片，为避免产生BUG，不检查md5
-					if (max_width > 0 && max_height > 0 && (file.ext == 'jpg' || file.ext == 'jpeg'))
+					//前台压缩图片，检查的是源文件的MD5，而非压缩之后的，所以直接上传。另外：压缩之后的图片暂时无法检查BUG
+					if (options.max_width > 0 && options.max_height > 0 && (file.ext == 'jpg' || file.ext == 'jpeg'))
 					{
 						flex_uploader.uploader.upload(file);
 						return true;
@@ -318,7 +331,7 @@
 							if (typeof json != 'undefined' && (json.result == 'success' || json.result == 'api')){
 								flex_uploader.uploader.skipFile(file);
 								progress(file).success().message($.UPLOADER_LANGUAGE.hash_success);
-								if (filelimit == 1) preview().removeAll();
+								if (options.filelimit == 1) preview().removeAll();
 								preview(json.data.id, json.data.displayname, json.data.ext).build().setFile(file);
 								t.triggerHandler('uploader.uploaded',[file, json, attachment().get()]);
 							} else {
@@ -351,7 +364,7 @@
 				method.uploadSuccess = function(file, json) {
 					if (json && (json.result == 'success' || json.result == 'api')) {
 						progress(file).success();
-						if (filelimit == 1) preview().removeAll();
+						if (options.filelimit == 1) preview().removeAll();
 						preview(json.data.id, json.data.displayname, json.data.ext).build().setFile(file);
 						t.triggerHandler('uploader.uploaded',[file, json, attachment().get()]);
 					} else {
@@ -380,13 +393,13 @@
 							$.alert($.UPLOADER_LANGUAGE.allsize_limit);
 							break;
 						case 'F_EXCEED_SIZE':
-							$.alert($.UPLOADER_LANGUAGE.filesize_limite.replace('{0}', bytesToSize(filesize)));
+							$.alert($.UPLOADER_LANGUAGE.filesize_limite.replace('{0}', bytesToSize(options.filesize)));
 							break;
 						case 'F_DUPLICATE':
 							$.alert($.UPLOADER_LANGUAGE.duplicate);
 							break;
 						case 'Q_TYPE_DENIED':
-							$.alert($.UPLOADER_LANGUAGE.filetype.replace('{0}', filetype));
+							$.alert($.UPLOADER_LANGUAGE.filetype.replace('{0}', options.filetype));
 							break;
 						default:
 							$.alert(code);
@@ -420,14 +433,14 @@
 						//总文件大小限制
 						//fileSizeLimit: 1024 * 1024 * 1024, //1G
 						//单文件大小限制
-						fileSingleSizeLimit: filesize,
+						fileSingleSizeLimit: options.filesize,
 						//是否去重
 						duplicate: false,
 						// 文件选择筛选。
 						accept: {
 							title: $.UPLOADER_LANGUAGE.select_file,
-							extensions: filetype,
-							mimeTypes: typeof mimeType != 'undefined' ? filetype.split(',').map(function(v){return mimeType.lookup('name.' + v);}).join(',') : '*/*'
+							extensions: options.filetype,
+							mimeTypes: typeof mimeType != 'undefined' ? options.filetype.split(',').map(function(v){return mimeType.lookup('name.' + v);}).join(',') : '*/*'
 						},
 						//是否允许在文件传输时提前把下一个文件的分片,MD5准备好
 						prepareNextFile: true,
@@ -463,10 +476,10 @@
 						compress: null
 					});
 					// 修改后图片上传前，尝试将图片压缩到max_width * max_height
-					if (max_width > 0 && max_height > 0)
+					if (options.max_width > 0 && options.max_height > 0)
 						flex_uploader.uploader.option( 'compress', {
-							width: max_width,
-							height: max_height,
+							width: options.max_width,
+							height: options.max_height,
 							// 图片质量，只有type为`image/jpeg`的时候才有效。
 							quality: 100,
 							// 是否允许放大，如果想要生成小图的时候不失真，此选项应该设置为false.
@@ -492,7 +505,7 @@
 
 					t.prop('flex_uploader', flex_uploader);
 					//init
-					if(id) attachment().add(id);
+					if(options.id) attachment().add(options.id);
 					preview().rebuildAll();
 				};
 
