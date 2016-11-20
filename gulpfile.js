@@ -48,7 +48,7 @@ gulp.task('common-scripts', function() {
 // 分散压缩
 gulp.task('watch', function() {
     gulp.watch(['js/common/utils.js','js/common/polyfill.js','js/common/query.js'], ['common-scripts']);
-    gulp.watch(['js/GPS.js', 'js/htmldiff.js', 'js/jquery.uploader.js', 'js/jquery.validate.addons.js', 'css/uploader.css'], function(e){
+    gulp.watch(['js/GPS.js', 'js/mimetype.js', 'js/moment.js', 'js/htmldiff.js', 'js/jquery.uploader.js', 'js/jquery.validate.addons.js', 'css/uploader.css'], function(e){
         var ext = path.extname(e.path);
         var dir = path.dirname(e.path);
         if (e.type == 'deleted')

@@ -33,10 +33,10 @@
 	$.fn.extend({
 		uploader : function(max_width, max_height, filesize, filetype, filelimit, id) {
 			if (max_width !== true)
-				max_width = typeof max_widt == 'undefined' ? 0 : parseFloat(max_width);
-			max_height = typeof max_heigh == 'undefined' ? 0 : parseFloat(max_height);
-			filesize = typeof filesiz == 'undefined' ? 2 * 1024 * 1024 : filesize; //2 MB
-			filetype = typeof filetyp == 'undefined' ? 'jpg,jpeg,png,bmp,gif,webp,svg' : filetype.toLowerCase();
+				max_width = typeof max_width == 'undefined' ? 0 : parseFloat(max_width);
+			max_height = typeof max_height == 'undefined' ? 0 : parseFloat(max_height);
+			filesize = typeof filesize == 'undefined' ? 2 * 1024 * 1024 : filesize; //2 MB
+			filetype = typeof filetype == 'undefined' ? 'jpg,jpeg,png,bmp,gif,webp,svg' : filetype.toLowerCase();
 			filelimit = isNaN(filelimit) ? 1 : parseInt(filelimit);
 			var img_types = ['jpg','jpeg','png','bmp','gif','webp','svg'];
 			return this.each(function(){
@@ -52,7 +52,7 @@
 				//删除该控件，下面的不用执行
 				if (max_width === true) return;
 
-				var method = {};
+				var method = {interval: null};
 				var nonce = function(){
 					return rand(10000,99999);
 				};
@@ -63,7 +63,7 @@
 					'<div class="drop-tips text-info"><h2>'+ $.UPLOADER_LANGUAGE.drop_container +'</h2><br /><br /><div class="btn btn-info" onclick="javascript:jQuery(this).parent().hide().parent(\'.uploader-container\').removeClass(\'webuploader-dnd-over\');"><i class="glyphicon glyphicon-remove"></i> '+$.UPLOADER_LANGUAGE.close+'</div></div>' +
 					'<div class="pull-left"><span id="'+ pick_id +'">'+ $.UPLOADER_LANGUAGE.select_file +'(≤ '+ bytesToSize(filesize) +')</span></div>' +
 					'<div class="pull-left tags">&nbsp;<span class="label label-success">.' + filetype.replace(/,/g,'</span>&nbsp;<span class="label label-success">.') + '</span>' +
-					'&nbsp;<span class="label label-warning enable-tooltip" data-placement="top" title="'+ $.UPLOADER_LANGUAGE.ctrl_v_tips +'"><small class="glyphicon glyphicon-info-sign"></small> '+ $.UPLOADER_LANGUAGE.ctrl_v_button +'</span>&nbsp;<span class="label label-warning enable-tooltip" data-placement="top" title="'+ $.UPLOADER_LANGUAGE.drop_container +'"><small class="glyphicon glyphicon-info-sign"></small> '+ $.UPLOADER_LANGUAGE.drop_button +'</span>' +
+					'&nbsp;<!--<span class="label label-warning enable-tooltip" data-placement="top" title="'+ $.UPLOADER_LANGUAGE.ctrl_v_tips +'"><small class="glyphicon glyphicon-info-sign"></small> '+ $.UPLOADER_LANGUAGE.ctrl_v_button +'</span>&nbsp;--><span class="label label-warning enable-tooltip" data-placement="top" title="'+ $.UPLOADER_LANGUAGE.drop_container +'"><small class="glyphicon glyphicon-info-sign"></small> '+ $.UPLOADER_LANGUAGE.drop_button +'</span>' +
 					(max_width > 0 && max_height > 0 ? '<br /><small>&nbsp;'+ $.UPLOADER_LANGUAGE.resize.replace('{0}', max_width.toString().toHTML() + 'x' + max_height.toString().toHTML()) + '</small>' : '') +
 					'</div><div class="clearfix"></div>' +
 					'<div id="' + progresses_id + '" class="progresses"></div><div class="clearfix"></div>' +
@@ -396,7 +396,7 @@
 
 				method.create = function()
 				{
-					if (flex_uploader.uploader || typeof t.prop('flex_uploader') == 'undefined') return;
+					if (flex_uploader.uploader || typeof t.prop('flex_uploader') == 'undefined' || typeof t.prop('flex_uploader').uploader != 'undefined') return;
 					flex_uploader.uploader = WebUploader.create({
 						// swf文件路径
 						swf: $.baseuri + "static/js/webuploader/Uploader.swf",
@@ -404,7 +404,7 @@
 						server: $.baseuri + "attachment/uploader_query?of=json",
 						// 选择文件的按钮。可选。内部根据当前运行是创建，可能是input元素，也可能是flash
 						pick: {
-							id: '#' + pick_id,
+							id: document.getElementById(pick_id),
 							multiple: true
 						},
 						//表单附加数据
@@ -440,11 +440,11 @@
 						//同时上传并发数
 						threads: 3,
 						//指定拖拽的容器
-						dnd: '#' + uploader_id,
+						dnd: document.getElementById(uploader_id),
 						//全局禁用拉拽，防止默认打开文件
 						disableGlobalDnd: true,
 						//可以粘贴的容器
-						paste: document.body,
+						//paste: document.getElementById(uploader_id),
 						thumb: {// 缩略图
 							width: 75,
 							height: 75,
@@ -490,6 +490,7 @@
 					flex_uploader.uploader.on('uploadComplete', method.uploadComplete);
 					flex_uploader.uploader.on('error', method.error);
 
+					t.prop('flex_uploader', flex_uploader);
 					//init
 					if(id) attachment().add(id);
 					preview().rebuildAll();
@@ -504,7 +505,7 @@
 							clearInterval(method.interval);
 							method.create();
 						}
-					}, 1000); //还能有更好的方法吗? MutationObserver?
+					}, 500); //还能有更好的方法吗? MutationObserver?
 
 				} else {
 					method.create();
