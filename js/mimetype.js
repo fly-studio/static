@@ -191,6 +191,7 @@
 	MimeType.set(".acc", "application/vnd.americandynamics.acc");
 	MimeType.set(".ami", "application/vnd.amiga.ami");
 	MimeType.set(".apk", "application/vnd.android.package-archive");
+	MimeType.set(".ipa", "application/iphone");
 	MimeType.set(".cii", "application/vnd.anser-web-certificate-issue-initiation");
 	MimeType.set(".fti", "application/vnd.anser-web-funds-transfer-initiation");
 	MimeType.set(".atx", "application/vnd.antix.game-component");
