@@ -12,12 +12,12 @@
 		'encrypt_js' : '数据已经加密，但页面未加载解密JS。',
 		'encrypt_string' : '数据已经加密，但密文解密失败，请联系管理员。',
 		'encrypt_unserialize' : '数据已经加密，但密文解开失败，请联系管理员。',
-	}
+	};
 	//init csrf
 	$.csrf = $('meta[name="csrf-token"]').attr('content');
 	var headers = {};
 	if ($.csrf)
-		headers['X-CSRF-TOKEN'] = $.csrf
+		headers['X-CSRF-TOKEN'] = $.csrf;
 	if ($.ssl)
 		headers['X-RSA'] = encodeURIComponent($.ssl.rsa.public);
 
@@ -25,26 +25,31 @@
 	$.ajaxSetup({headers:headers, dataFilter: function(data, type){
 		var callback = ''; 
 		var jsonError = function(content) {
-			json.result = 'error';
-			json.message = {title: $.QUERY_LANGUAGE.error, content: content};
+			var data = {};
+			data.result = 'error';
+			data.message = {title: $.QUERY_LANGUAGE.error, content: content};
 			return JSON.stringify(data);
-		}
+		};
 		if (type.toLowerCase() == 'jsonp')
 			callback = '';
 		if (type.toLowerCase() == 'json') {
 			var json = $.parseJSON(data);
 			if (typeof json != 'undefined' && typeof json.result != 'undefined' && json.result == 'api' && typeof json.encrypt != 'undefined' && json.encrypt === true)
 			{
-				 if (typeof json.key != 'undefined' && typeof $.ssl != 'undefined' && !!json.key) {
+				var key,encrypt,encrypted_json;
+				if (typeof json.key != 'undefined' && typeof $.ssl != 'undefined' && !!json.key) {
 				 	try{
-						var key = $.ssl.decrypt(json.key);
+						key = $.ssl.decrypt(json.key);
 					} catch (e) {
+						console.log(e.stack);
 						return jsonError($.QUERY_LANGUAGE.encrypt_key + e.message);
 					}
-					var encrypted = json.data;
+					encrypted = json.data;
 					try{
-						var encrypted_json = JSON.parse(aesjs.util.convertBytesToString(base64js.toByteArray(encrypted))); //json_decode()
+						var s = base64js.toByteArray(encrypted);
+						encrypted_json = JSON.parse(aesjs.util.convertBytesToString(s)); //json_decode()
 					} catch (e) {
+						console.log(e.stack);
 						return jsonError($.QUERY_LANGUAGE.encrypt_string + e.message);
 					}
 					try{
@@ -59,6 +64,7 @@
 						//unserialize
 						json.data = unserialize(decypted);
 					} catch(e) {
+						console.log(e.stack);
 						return jsonError($.QUERY_LANGUAGE.encrypt_unserialize + e.message);
 					}
 
@@ -69,7 +75,7 @@
 			}
 			data = JSON.stringify(json);
 			if (typeof json.debug != 'undefined' && !!json.debug) console.log(json);
-			delete json;
+			//delete json;
 		}
 
 		return data;
@@ -93,12 +99,12 @@
 		if (typeof method == 'undefined') method = data ? 'POST' : 'GET';
 		var _this = this, _result = null, _headers = {}, _data = data;
 		if (data && data instanceof String) _data = $.deparam(data);
-		if (_data && _data['_method']) {
-			method = _data['_method'];
+		if (_data && _data._method) {
+			method = _data._method;
 			_headers['X-HTTP-Method-Override'] = method;
-		};
-		if (_data && _data['_token']) //add csrf
-			_headers['X-CSRF-TOKEN'] = _data['_token'];
+		}
+		if (_data && _data._token) //add csrf
+			_headers['X-CSRF-TOKEN'] = _data._token;
 		var ajax = $.ajax({
 			url : url,
 			data : _data ? _data : null,
@@ -150,23 +156,23 @@
 	};
 	$.POST = function(url, data, callback, alert_it) {
 		alert_it = typeof alert_it == 'undefined' ? false : alert_it;
-		return $.query.call(this, url, data, 'POST', callback, alert_it)
+		return $.query.call(this, url, data, 'POST', callback, alert_it);
 	};
 	$.PUT = function(url, data, callback, alert_it) {
 		alert_it = typeof alert_it == 'undefined' ? false : alert_it;
-		return $.query.call(this, url, data, 'PUT', callback, alert_it)
+		return $.query.call(this, url, data, 'PUT', callback, alert_it);
 	};
 	$.DELETE = function(url, data, callback, alert_it) {
 		alert_it = typeof alert_it == 'undefined' ? false : alert_it;
-		return $.query.call(this, url, data, 'DELETE', callback, alert_it)
+		return $.query.call(this, url, data, 'DELETE', callback, alert_it);
 	};
 	$.HEAD = function(url, data, callback, alert_it) {
 		alert_it = typeof alert_it == 'undefined' ? false : alert_it;
-		return $.query.call(this, url, data, 'HEAD', callback, alert_it)
+		return $.query.call(this, url, data, 'HEAD', callback, alert_it);
 	};
 	$.PATCH = function(url, data, callback, alert_it) {
 		alert_it = typeof alert_it == 'undefined' ? false : alert_it;
-		return $.query.call(this, url, data, 'PATCH', callback, alert_it)
+		return $.query.call(this, url, data, 'PATCH', callback, alert_it);
 	};
 
 	$.showtips = function(tips, redirect, config) {
@@ -179,7 +185,7 @@
 		} else
 			alert(_tips.message.content.noHTML());
 
-		if (_redirect && typeof _tips['url'] != 'undefined') {
+		if (_redirect && typeof _tips.url != 'undefined') {
 			if (_tips.url !== true && _tips.url !== false ) {
 				setTimeout(function() {
 					self.location.href = _tips.url;
@@ -200,7 +206,7 @@
 			show_loading = typeof show_loading != 'undefined' ? show_loading : true;
 			var validator = is_form ? $this.data('validator') : null;
 			if (validator) validator.settings.submitHandler = function(f,e) {};
-			$this.on(is_form ? 'submit': 'click', function(e){
+			$this.on(is_form ? 'submit query': 'click query', function(e){
 				var selector = $this.attr('selector');
 				if ($this.is('.disabled,[disabled]')) return false;
 				var $selector = is_form ? $this.add(selector) : $(selector);
@@ -227,9 +233,9 @@
 						$('.query-loading').remove();
 						$doms.prop('disabled',false).removeAttr('disabled');
 					});
-				}
+				};
 				if (msg) {
-					msg = msg.replace('%L', $selector.serializeArray().length)
+					msg = msg.replace('%L', $selector.serializeArray().length);
 					$.confirm(msg, query);
 				} else
 					query.call(this);
