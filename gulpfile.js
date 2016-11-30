@@ -26,14 +26,14 @@ gulp.task('sass', function() {
 gulp.task('common-scripts', function() {
     gulp.src(['js/common/utils.js','js/common/polyfill.js','js/common/query.js'])
         .pipe(sourcemaps.init({loadMaps: true}))
-        .pipe(jshint({loopfunc:true, maxerr: 50}))
-        .pipe(jshint.reporter(stylish))
-        .pipe(map(function(file, cb){
+        //.pipe(jshint({loopfunc:true, maxerr: 50}))
+       // .pipe(jshint.reporter(stylish))
+        /*.pipe(map(function(file, cb){
             if (file.jshint.success) {
                 util.log('0 error. JSHINT success!');
                 return cb(null, file);
             }
-        }))
+        }))*/
         .pipe(concat('common.js'))
         //.pipe(gulp.dest('js/'))
         .pipe(uglify({output: {ascii_only:true}}))
@@ -48,7 +48,7 @@ gulp.task('common-scripts', function() {
 // 分散压缩
 gulp.task('watch', function() {
     gulp.watch(['js/common/utils.js','js/common/polyfill.js','js/common/query.js'], ['common-scripts']);
-    gulp.watch(['js/GPS.js', 'js/mimetype.js', 'js/moment.js', 'js/htmldiff.js', 'js/jquery.uploader.js', 'js/jquery.validate.addons.js', 'css/uploader.css'], function(e){
+    gulp.watch(['js/GPS.js', 'js/mimetype.js', 'js/moment.js', 'js/htmldiff.js', 'js/jsencrypt.js', 'js/jquery.uploader.js', 'js/jquery.cookie.js', 'js/jquery.validate.addons.js', 'css/uploader.css'], function(e){
         var ext = path.extname(e.path);
         var dir = path.dirname(e.path);
         if (e.type == 'deleted')
@@ -62,14 +62,14 @@ gulp.task('watch', function() {
             {
                 case '.js':
                     gulp.src(e.path)
-                    .pipe(jshint({loopfunc:true, maxerr: 50}))
+                    /*.pipe(jshint({loopfunc:true, maxerr: 50}))
                     .pipe(jshint.reporter(stylish))
                     .pipe(map(function(file, cb){
                         if (file.jshint.success) {
                             util.log('0 error. JSHINT success!');
                             return cb(null, file);
                         }
-                    }))
+                    }))*/
                     .pipe(sourcemaps.init({loadMaps: true}))
                     .pipe(data(function (file) {
                         return {

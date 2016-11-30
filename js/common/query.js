@@ -30,8 +30,8 @@
 			data.message = {title: $.QUERY_LANGUAGE.error, content: content};
 			return JSON.stringify(data);
 		};
-		if (type.toLowerCase() == 'jsonp')
-			callback = '';
+		//if (type.toLowerCase() == 'jsonp') //unsupport jsonp
+		//	callback = '';
 		if (type.toLowerCase() == 'json') {
 			var json = $.parseJSON(data);
 			if (typeof json != 'undefined' && typeof json.result != 'undefined' && json.result == 'api' && typeof json.encrypt != 'undefined' && json.encrypt === true)
@@ -63,6 +63,7 @@
 						var decypted = aesjs.util.convertBytesToString(decryptedBytes);
 						//unserialize
 						json.data = unserialize(decypted);
+						delete json.key;
 					} catch(e) {
 						console.log(e.stack);
 						return jsonError($.QUERY_LANGUAGE.encrypt_unserialize + e.message);
@@ -73,6 +74,7 @@
 				else 
 					return jsonError($.QUERY_LANGUAGE.encrypt_js);
 			}
+			delete json.encrypt;
 			data = JSON.stringify(json);
 			if (typeof json.debug != 'undefined' && !!json.debug) console.log(json);
 			//delete json;
@@ -205,8 +207,8 @@
 			var is_form = $this.is('form');
 			show_loading = typeof show_loading != 'undefined' ? show_loading : true;
 			var validator = is_form ? $this.data('validator') : null;
-			if (validator) validator.settings.submitHandler = function(f,e) {};
-			$this.on(is_form ? 'submit query': 'click query', function(e){
+			if (validator) validator.settings.submitHandler = function(f, e) {};
+			$this.on(is_form ? 'submit': 'click', function(e) {
 				var selector = $this.attr('selector');
 				if ($this.is('.disabled,[disabled]')) return false;
 				var $selector = is_form ? $this.add(selector) : $(selector);
