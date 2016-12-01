@@ -5,8 +5,7 @@
 (function(){
 	//base uri
 	var thiscript = document.currentScript;
-	if (!document.currentScript)
-	{
+	if (!thiscript) {
 		var scripts = document.getElementsByTagName("script");
 		thiscript = scripts[ scripts.length - 1 ];
 	}

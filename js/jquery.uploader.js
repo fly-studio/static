@@ -26,9 +26,6 @@
 	};
 	if(typeof $.baseuri == 'undefined')
 		throw('this javascript file need behind \'common.js\'');
-	var scripts = document.getElementsByTagName("script");
-	var querys = $.deparam.querystring((scripts[ scripts.length - 1 ]).src);
-	$.session_id = querys.session_id;
 	
 	$.fn.extend({
 		uploader : function(max_width, max_height, filesize, filetype, filelimit, id) {
