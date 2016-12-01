@@ -102,7 +102,7 @@ jQuery.fn.extend({simplefloat:function(position,animate,parent){
 	if (rect.t != 'auto') rect.t = parseInt(rect.t);
 	if (rect.b != 'auto') rect.b = parseInt(rect.b);
 	var _pos = {left:rect.l,right:rect.r,top:rect.t,bottom:rect.b};
-	_pos = $.extend(_pos,position);
+	_pos = $.extend(true, _pos,position);
 	
 	rect.restore = function(){
 		if (is_ie && t.is(':visible')) {

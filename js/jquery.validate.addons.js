@@ -63,7 +63,7 @@ $.validator.addMethod('regex', function(value, element, params) {
 $.validator.addMethod('ansi',function(value, element, params){
 	return true;
 });
-$.extend(jQuery.validator.messages, {
+$.extend(true, jQuery.validator.messages, {
 	required: "必填字段",
 	remote: "已经存在，换一个试试？",
 	regex: "类型不正确",

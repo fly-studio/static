@@ -418,7 +418,7 @@
 							multiple: true
 						},
 						//表单附加数据
-						formData: $.extend($.session_id ? {"PHPSESSIONID": $.session_id} : {}, $.csrf ? {'_token': $.csrf} : {}, {}),
+						formData: $.extend(true, $.session_id ? {"PHPSESSIONID": $.session_id} : {}, $.csrf ? {'_token': $.csrf} : {}, {}),
 						//文件表单name
 						fileVal: 'Filedata',
 						//METHOD

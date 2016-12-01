@@ -102,7 +102,7 @@
 			negative:'',
 			direction:''
 		};
-		ctrl = $.extend(ctrl,control);
+		ctrl = $.extend(true, ctrl,control);
 		ctrl.forward = direction;
 		switch(direction){
 			case 'left':ctrl.negative = 'right';break;

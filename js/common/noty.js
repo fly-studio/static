@@ -56,11 +56,11 @@
 			] : false
 		};
 		if (typeof config == 'object')
-			setting = $.extend(setting, config);
+			setting = $.extend(true, setting, config);
 
 		var $noty = noty(setting);
 		$('button:eq(0)',$noty.$buttons).focus();
-	}
+	};
 	$.alert_interface = function(msg, confirm_callback, $dfd) {
 		var setting = {
 			text : '<div style="text-align:left;"><h4>' + $.TIPS_LANGUAGE.tips + '</h4><div style="word-break:break-all;word-wrap:break-word;text-align:left;">'+ msg +'</div></div>',

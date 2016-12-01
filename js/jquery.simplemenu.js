@@ -58,7 +58,7 @@
 		if ( isUndefined($.SimpleMenu.Active[namespace]) ) 
 			$.SimpleMenu.Active[namespace] = null;
 		var _menuRect = {left:null,top:null,_left:null,_top:null};
-		_menuRect = $.extend(_menuRect,menuRect);
+		_menuRect = $.extend(true, _menuRect,menuRect);
 		var m = {menu:$(!!menuObject ? menuObject : '#' + t.get(0).id + '_menu'),intelval:1000,'zIndex':zIndex > 2 ? zIndex : 1000};
 		if (!m.menu.get(0)) {
 			//throw('the menu is not exists');
