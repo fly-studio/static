@@ -34,12 +34,12 @@
 		//	callback = '';
 		if (type.toLowerCase() == 'json') {
 			var json = $.parseJSON(data);
-			if (typeof json != 'undefined' && typeof json.result != 'undefined' && json.result == 'api' && typeof json.encrypt != 'undefined' && json.encrypt === true)
+			if (typeof json != 'undefined' && typeof json.result != 'undefined' && json.result == 'api' && typeof json.encrypted == 'string')
 			{
-				var key,encrypt,encrypted_json;
-				if (typeof json.key != 'undefined' && typeof $.ssl != 'undefined' && !!json.key) {
+				var key,encrypted_json,encrypted;
+				if (typeof $.ssl != 'undefined') {
 				 	try{
-						key = $.ssl.decrypt(json.key);
+						key = $.ssl.decrypt(json.encrypted);
 					} catch (e) {
 						console.log(e.stack);
 						return jsonError($.QUERY_LANGUAGE.encrypt_key + e.message);
@@ -74,7 +74,7 @@
 				else 
 					return jsonError($.QUERY_LANGUAGE.encrypt_js);
 			}
-			delete json.encrypt;
+			delete json.encrypted;
 			data = JSON.stringify(json);
 			if (typeof json.debug != 'undefined' && !!json.debug) console.log(json);
 			//delete json;
