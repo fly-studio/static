@@ -46,7 +46,7 @@
  */
 function base(derive, baseSprite, baseArgs){  
 	var r = baseSprite.apply(derive, baseArgs);
-	  
+
 	for(var prop in baseSprite.prototype){  
 		var proto = derive.constructor.prototype;  
 		if(!proto[prop])
@@ -90,14 +90,14 @@ function clone(obj) {
  * @return {Int}
  */
 function rand(min, max) {
-  var argc = arguments.length;
-  if (argc === 0) {
+	var argc = arguments.length;
+	if (argc === 0) {
 	min = 0;
 	max = 2147483647;
-  } else if (argc === 1) {
+	} else if (argc === 1) {
 	throw new Error('Warning: rand() expects exactly 2 parameters, 1 given');
-  }
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+	}
+	return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 /**
  * 查找数组中的项，返回下标，没有找到返回-1
@@ -261,40 +261,40 @@ function print_r(array, return_val) {
  * @return {Object}                       返回Key已经大小写的Object
  */
 function array_change_key_case (array, cs) { // eslint-disable-line camelcase
-  //  discuss at: http://locutus.io/php/array_change_key_case/
-  // original by: Ates Goral (http://magnetiq.com)
-  // improved by: marrtins
-  // improved by: Brett Zamir (http://brett-zamir.me)
-  //   example 1: array_change_key_case(42)
-  //   returns 1: false
-  //   example 2: array_change_key_case([ 3, 5 ])
-  //   returns 2: [3, 5]
-  //   example 3: array_change_key_case({ FuBaR: 42 })
-  //   returns 3: {"fubar": 42}
-  //   example 4: array_change_key_case({ FuBaR: 42 }, 'CASE_LOWER')
-  //   returns 4: {"fubar": 42}
-  //   example 5: array_change_key_case({ FuBaR: 42 }, 'CASE_UPPER')
-  //   returns 5: {"FUBAR": 42}
-  //   example 6: array_change_key_case({ FuBaR: 42 }, 2)
-  //   returns 6: {"FUBAR": 42}
+	//  discuss at: http://locutus.io/php/array_change_key_case/
+	// original by: Ates Goral (http://magnetiq.com)
+	// improved by: marrtins
+	// improved by: Brett Zamir (http://brett-zamir.me)
+	//   example 1: array_change_key_case(42)
+	//   returns 1: false
+	//   example 2: array_change_key_case([ 3, 5 ])
+	//   returns 2: [3, 5]
+	//   example 3: array_change_key_case({ FuBaR: 42 })
+	//   returns 3: {"fubar": 42}
+	//   example 4: array_change_key_case({ FuBaR: 42 }, 'CASE_LOWER')
+	//   returns 4: {"fubar": 42}
+	//   example 5: array_change_key_case({ FuBaR: 42 }, 'CASE_UPPER')
+	//   returns 5: {"FUBAR": 42}
+	//   example 6: array_change_key_case({ FuBaR: 42 }, 2)
+	//   returns 6: {"FUBAR": 42}
 
-  var caseFnc;
-  var key;
-  var tmpArr = {};
+	var caseFnc;
+	var key;
+	var tmpArr = {};
 
-  if (Object.prototype.toString.call(array) === '[object Array]') {
-    return array;
-  }
+	if (Object.prototype.toString.call(array) === '[object Array]') {
+		return array;
+	}
 
-  if (array && typeof array === 'object') {
-    caseFnc = (!cs || cs === 'CASE_LOWER') ? 'toLowerCase' : 'toUpperCase';
-    for (key in array) {
-      tmpArr[key[caseFnc]()] = array[key];
-    }
-    return tmpArr;
-  }
+	if (array && typeof array === 'object') {
+		caseFnc = (!cs || cs === 'CASE_LOWER') ? 'toLowerCase' : 'toUpperCase';
+		for (key in array) {
+			tmpArr[key[caseFnc]()] = array[key];
+		}
+		return tmpArr;
+	}
 
-  return false;
+	return false;
 }
 /**
  * 序列化
@@ -302,138 +302,138 @@ function array_change_key_case (array, cs) { // eslint-disable-line camelcase
  * @return {String}           序列化后的字符串
  */
 function serialize (mixedValue) {
-  //  discuss at: http://locutus.io/php/serialize/
-  // original by: Arpad Ray (mailto:arpad@php.net)
-  // improved by: Dino
-  // improved by: Le Torbi (http://www.letorbi.de/)
-  // improved by: Kevin van Zonneveld (http://kvz.io/)
-  // bugfixed by: Andrej Pavlovic
-  // bugfixed by: Garagoth
-  // bugfixed by: Russell Walker (http://www.nbill.co.uk/)
-  // bugfixed by: Jamie Beck (http://www.terabit.ca/)
-  // bugfixed by: Kevin van Zonneveld (http://kvz.io/)
-  // bugfixed by: Ben (http://benblume.co.uk/)
-  // bugfixed by: Codestar (http://codestarlive.com/)
-  //    input by: DtTvB (http://dt.in.th/2008-09-16.string-length-in-bytes.html)
-  //    input by: Martin (http://www.erlenwiese.de/)
-  //      note 1: We feel the main purpose of this function should be to ease
-  //      note 1: the transport of data between php & js
-  //      note 1: Aiming for PHP-compatibility, we have to translate objects to arrays
-  //   example 1: serialize(['Kevin', 'van', 'Zonneveld'])
-  //   returns 1: 'a:3:{i:0;s:5:"Kevin";i:1;s:3:"van";i:2;s:9:"Zonneveld";}'
-  //   example 2: serialize({firstName: 'Kevin', midName: 'van'})
-  //   returns 2: 'a:2:{s:9:"firstName";s:5:"Kevin";s:7:"midName";s:3:"van";}'
+	//  discuss at: http://locutus.io/php/serialize/
+	// original by: Arpad Ray (mailto:arpad@php.net)
+	// improved by: Dino
+	// improved by: Le Torbi (http://www.letorbi.de/)
+	// improved by: Kevin van Zonneveld (http://kvz.io/)
+	// bugfixed by: Andrej Pavlovic
+	// bugfixed by: Garagoth
+	// bugfixed by: Russell Walker (http://www.nbill.co.uk/)
+	// bugfixed by: Jamie Beck (http://www.terabit.ca/)
+	// bugfixed by: Kevin van Zonneveld (http://kvz.io/)
+	// bugfixed by: Ben (http://benblume.co.uk/)
+	// bugfixed by: Codestar (http://codestarlive.com/)
+	//    input by: DtTvB (http://dt.in.th/2008-09-16.string-length-in-bytes.html)
+	//    input by: Martin (http://www.erlenwiese.de/)
+	//      note 1: We feel the main purpose of this function should be to ease
+	//      note 1: the transport of data between php & js
+	//      note 1: Aiming for PHP-compatibility, we have to translate objects to arrays
+	//   example 1: serialize(['Kevin', 'van', 'Zonneveld'])
+	//   returns 1: 'a:3:{i:0;s:5:"Kevin";i:1;s:3:"van";i:2;s:9:"Zonneveld";}'
+	//   example 2: serialize({firstName: 'Kevin', midName: 'van'})
+	//   returns 2: 'a:2:{s:9:"firstName";s:5:"Kevin";s:7:"midName";s:3:"van";}'
 
-  var val, key, okey;
-  var ktype = '';
-  var vals = '';
-  var count = 0;
+	var val, key, okey;
+	var ktype = '';
+	var vals = '';
+	var count = 0;
 
-  var _utf8Size = function (str) {
-    var size = 0;
-    var i = 0;
-    var l = str.length;
-    var code = '';
-    for (i = 0; i < l; i++) {
-      code = str.charCodeAt(i);
-      if (code < 0x0080) {
-        size += 1;
-      } else if (code < 0x0800) {
-        size += 2;
-      } else {
-        size += 3;
-      }
-    }
-    return size;
-  };
+	var _utf8Size = function (str) {
+		var size = 0;
+		var i = 0;
+		var l = str.length;
+		var code = '';
+		for (i = 0; i < l; i++) {
+			code = str.charCodeAt(i);
+			if (code < 0x0080) {
+				size += 1;
+			} else if (code < 0x0800) {
+				size += 2;
+			} else {
+				size += 3;
+			}
+		}
+		return size;
+	};
 
-  var _getType = function (inp) {
-    var match;
-    var key;
-    var cons;
-    var types;
-    var type = typeof inp;
+	var _getType = function (inp) {
+		var match;
+		var key;
+		var cons;
+		var types;
+		var type = typeof inp;
 
-    if (type === 'object' && !inp) {
-      return 'null';
-    }
+		if (type === 'object' && !inp) {
+			return 'null';
+		}
 
-    if (type === 'object') {
-      if (!inp.constructor) {
-        return 'object';
-      }
-      cons = inp.constructor.toString();
-      match = cons.match(/(\w+)\(/);
-      if (match) {
-        cons = match[1].toLowerCase();
-      }
-      types = ['boolean', 'number', 'string', 'array'];
-      for (key in types) {
-        if (cons === types[key]) {
-          type = types[key];
-          break;
-        }
-      }
-    }
-    return type;
-  };
+		if (type === 'object') {
+			if (!inp.constructor) {
+				return 'object';
+			}
+			cons = inp.constructor.toString();
+			match = cons.match(/(\w+)\(/);
+			if (match) {
+				cons = match[1].toLowerCase();
+			}
+			types = ['boolean', 'number', 'string', 'array'];
+			for (key in types) {
+				if (cons === types[key]) {
+					type = types[key];
+					break;
+				}
+			}
+		}
+		return type;
+	};
 
-  var type = _getType(mixedValue);
+	var type = _getType(mixedValue);
 
-  switch (type) {
-    case 'function':
-      val = '';
-      break;
-    case 'boolean':
-      val = 'b:' + (mixedValue ? '1' : '0');
-      break;
-    case 'number':
-      val = (Math.round(mixedValue) === mixedValue ? 'i' : 'd') + ':' + mixedValue;
-      break;
-    case 'string':
-      val = 's:' + _utf8Size(mixedValue) + ':"' + mixedValue + '"';
-      break;
-    case 'array':
-    case 'object':
-      val = 'a';
-      /*
-      if (type === 'object') {
-        var objname = mixedValue.constructor.toString().match(/(\w+)\(\)/);
-        if (objname === undefined) {
-          return;
-        }
-        objname[1] = serialize(objname[1]);
-        val = 'O' + objname[1].substring(1, objname[1].length - 1);
-      }
-      */
+	switch (type) {
+		case 'function':
+			val = '';
+			break;
+		case 'boolean':
+			val = 'b:' + (mixedValue ? '1' : '0');
+			break;
+		case 'number':
+			val = (Math.round(mixedValue) === mixedValue ? 'i' : 'd') + ':' + mixedValue;
+			break;
+		case 'string':
+			val = 's:' + _utf8Size(mixedValue) + ':"' + mixedValue + '"';
+			break;
+		case 'array':
+		case 'object':
+			val = 'a';
+			/*
+			if (type === 'object') {
+				var objname = mixedValue.constructor.toString().match(/(\w+)\(\)/);
+				if (objname === undefined) {
+					return;
+				}
+				objname[1] = serialize(objname[1]);
+				val = 'O' + objname[1].substring(1, objname[1].length - 1);
+			}
+			*/
 
-      for (key in mixedValue) {
-        if (mixedValue.hasOwnProperty(key)) {
-          ktype = _getType(mixedValue[key]);
-          if (ktype === 'function') {
-            continue;
-          }
+			for (key in mixedValue) {
+				if (mixedValue.hasOwnProperty(key)) {
+					ktype = _getType(mixedValue[key]);
+					if (ktype === 'function') {
+						continue;
+					}
 
-          okey = (key.match(/^[0-9]+$/) ? parseInt(key, 10) : key);
-          vals += serialize(okey) + serialize(mixedValue[key]);
-          count++;
-        }
-      }
-      val += ':' + count + ':{' + vals + '}';
-      break;
-    //case 'undefined':
-    default:
-      // Fall-through
-      // if the JS object has a property which contains a null value,
-      // the string cannot be unserialized by PHP
-      val = 'N';
-      break;
-  }
-  if (type !== 'object' && type !== 'array') {
-    val += ';';
-  }
+					okey = (key.match(/^[0-9]+$/) ? parseInt(key, 10) : key);
+					vals += serialize(okey) + serialize(mixedValue[key]);
+					count++;
+				}
+			}
+			val += ':' + count + ':{' + vals + '}';
+			break;
+		//case 'undefined':
+		default:
+			// Fall-through
+			// if the JS object has a property which contains a null value,
+			// the string cannot be unserialized by PHP
+			val = 'N';
+			break;
+	}
+	if (type !== 'object' && type !== 'array') {
+		val += ';';
+	}
 
-  return val;
+	return val;
 }
 /**
  * 反序列化
@@ -441,220 +441,220 @@ function serialize (mixedValue) {
  * @return {mixed}      得到的Object/Array/String/...
  */
 function unserialize (data) {
-  //  discuss at: http://locutus.io/php/unserialize/
-  // original by: Arpad Ray (mailto:arpad@php.net)
-  // improved by: Pedro Tainha (http://www.pedrotainha.com)
-  // improved by: Kevin van Zonneveld (http://kvz.io)
-  // improved by: Kevin van Zonneveld (http://kvz.io)
-  // improved by: Chris
-  // improved by: James
-  // improved by: Le Torbi
-  // improved by: Eli Skeggs
-  // bugfixed by: dptr1988
-  // bugfixed by: Kevin van Zonneveld (http://kvz.io)
-  // bugfixed by: Brett Zamir (http://brett-zamir.me)
-  //  revised by: d3x
-  //    input by: Brett Zamir (http://brett-zamir.me)
-  //    input by: Martin (http://www.erlenwiese.de/)
-  //    input by: kilops
-  //    input by: Jaroslaw Czarniak
-  //      note 1: We feel the main purpose of this function should be
-  //      note 1: to ease the transport of data between php & js
-  //      note 1: Aiming for PHP-compatibility, we have to translate objects to arrays
-  //   example 1: unserialize('a:3:{i:0;s:5:"Kevin";i:1;s:3:"van";i:2;s:9:"Zonneveld";}')
-  //   returns 1: ['Kevin', 'van', 'Zonneveld']
-  //   example 2: unserialize('a:2:{s:9:"firstName";s:5:"Kevin";s:7:"midName";s:3:"van";}')
-  //   returns 2: {firstName: 'Kevin', midName: 'van'}
+	//  discuss at: http://locutus.io/php/unserialize/
+	// original by: Arpad Ray (mailto:arpad@php.net)
+	// improved by: Pedro Tainha (http://www.pedrotainha.com)
+	// improved by: Kevin van Zonneveld (http://kvz.io)
+	// improved by: Kevin van Zonneveld (http://kvz.io)
+	// improved by: Chris
+	// improved by: James
+	// improved by: Le Torbi
+	// improved by: Eli Skeggs
+	// bugfixed by: dptr1988
+	// bugfixed by: Kevin van Zonneveld (http://kvz.io)
+	// bugfixed by: Brett Zamir (http://brett-zamir.me)
+	//  revised by: d3x
+	//    input by: Brett Zamir (http://brett-zamir.me)
+	//    input by: Martin (http://www.erlenwiese.de/)
+	//    input by: kilops
+	//    input by: Jaroslaw Czarniak
+	//      note 1: We feel the main purpose of this function should be
+	//      note 1: to ease the transport of data between php & js
+	//      note 1: Aiming for PHP-compatibility, we have to translate objects to arrays
+	//   example 1: unserialize('a:3:{i:0;s:5:"Kevin";i:1;s:3:"van";i:2;s:9:"Zonneveld";}')
+	//   returns 1: ['Kevin', 'van', 'Zonneveld']
+	//   example 2: unserialize('a:2:{s:9:"firstName";s:5:"Kevin";s:7:"midName";s:3:"van";}')
+	//   returns 2: {firstName: 'Kevin', midName: 'van'}
 
-  var $global = (typeof window !== 'undefined' ? window : global)
+	var $global = (typeof window !== 'undefined' ? window : global)
 
-  var utf8Overhead = function (chr) {
-    // http://locutus.io/php/unserialize:571#comment_95906
-    var code = chr.charCodeAt(0)
-    var zeroCodes = [
-      338,
-      339,
-      352,
-      353,
-      376,
-      402,
-      8211,
-      8212,
-      8216,
-      8217,
-      8218,
-      8220,
-      8221,
-      8222,
-      8224,
-      8225,
-      8226,
-      8230,
-      8240,
-      8364,
-      8482
-    ]
-    if (code < 0x0080 || code >= 0x00A0 && code <= 0x00FF || zeroCodes.indexOf(code) !== -1) {
-      return 0
-    }
-    if (code < 0x0800) {
-      return 1
-    }
-    return 2
-  }
-  var error = function (type,
-    msg, filename, line) {
-    throw new $global[type](msg, filename, line)
-  }
-  var readUntil = function (data, offset, stopchr) {
-    var i = 2
-    var buf = []
-    var chr = data.slice(offset, offset + 1)
+	var utf8Overhead = function (chr) {
+		// http://locutus.io/php/unserialize:571#comment_95906
+		var code = chr.charCodeAt(0)
+		var zeroCodes = [
+			338,
+			339,
+			352,
+			353,
+			376,
+			402,
+			8211,
+			8212,
+			8216,
+			8217,
+			8218,
+			8220,
+			8221,
+			8222,
+			8224,
+			8225,
+			8226,
+			8230,
+			8240,
+			8364,
+			8482
+		]
+		if (code < 0x0080 || code >= 0x00A0 && code <= 0x00FF || zeroCodes.indexOf(code) !== -1) {
+			return 0
+		}
+		if (code < 0x0800) {
+			return 1
+		}
+		return 2
+	}
+	var error = function (type,
+		msg, filename, line) {
+		throw new $global[type](msg, filename, line)
+	}
+	var readUntil = function (data, offset, stopchr) {
+		var i = 2
+		var buf = []
+		var chr = data.slice(offset, offset + 1)
 
-    while (chr !== stopchr) {
-      if ((i + offset) > data.length) {
-        error('Error', 'Invalid')
-      }
-      buf.push(chr)
-      chr = data.slice(offset + (i - 1), offset + i)
-      i += 1
-    }
-    return [buf.length, buf.join('')]
-  }
-  var readChrs = function (data, offset, length) {
-    var i, chr, buf
+		while (chr !== stopchr) {
+			if ((i + offset) > data.length) {
+				error('Error', 'Invalid')
+			}
+			buf.push(chr)
+			chr = data.slice(offset + (i - 1), offset + i)
+			i += 1
+		}
+		return [buf.length, buf.join('')]
+	}
+	var readChrs = function (data, offset, length) {
+		var i, chr, buf
 
-    buf = []
-    for (i = 0; i < length; i++) {
-      chr = data.slice(offset + (i - 1), offset + i)
-      buf.push(chr)
-      length -= utf8Overhead(chr)
-    }
-    return [buf.length, buf.join('')]
-  }
-  var _unserialize = function (data, offset) {
-    var dtype
-    var dataoffset
-    var keyandchrs
-    var keys
-    var contig
-    var length
-    var array
-    var readdata
-    var readData
-    var ccount
-    var stringlength
-    var i
-    var key
-    var kprops
-    var kchrs
-    var vprops
-    var vchrs
-    var value
-    var chrs = 0
-    var typeconvert = function (x) {
-      return x
-    }
+		buf = []
+		for (i = 0; i < length; i++) {
+			chr = data.slice(offset + (i - 1), offset + i)
+			buf.push(chr)
+			length -= utf8Overhead(chr)
+		}
+		return [buf.length, buf.join('')]
+	}
+	var _unserialize = function (data, offset) {
+		var dtype
+		var dataoffset
+		var keyandchrs
+		var keys
+		var contig
+		var length
+		var array
+		var readdata
+		var readData
+		var ccount
+		var stringlength
+		var i
+		var key
+		var kprops
+		var kchrs
+		var vprops
+		var vchrs
+		var value
+		var chrs = 0
+		var typeconvert = function (x) {
+			return x
+		}
 
-    if (!offset) {
-      offset = 0
-    }
-    dtype = (data.slice(offset, offset + 1)).toLowerCase()
+		if (!offset) {
+			offset = 0
+		}
+		dtype = (data.slice(offset, offset + 1)).toLowerCase()
 
-    dataoffset = offset + 2
+		dataoffset = offset + 2
 
-    switch (dtype) {
-      case 'i':
-        typeconvert = function (x) {
-          return parseInt(x, 10)
-        }
-        readData = readUntil(data, dataoffset, ';')
-        chrs = readData[0]
-        readdata = readData[1]
-        dataoffset += chrs + 1
-        break
-      case 'b':
-        typeconvert = function (x) {
-          return parseInt(x, 10) !== 0
-        }
-        readData = readUntil(data, dataoffset, ';')
-        chrs = readData[0]
-        readdata = readData[1]
-        dataoffset += chrs + 1
-        break
-      case 'd':
-        typeconvert = function (x) {
-          return parseFloat(x)
-        }
-        readData = readUntil(data, dataoffset, ';')
-        chrs = readData[0]
-        readdata = readData[1]
-        dataoffset += chrs + 1
-        break
-      case 'n':
-        readdata = null
-        break
-      case 's':
-        ccount = readUntil(data, dataoffset, ':')
-        chrs = ccount[0]
-        stringlength = ccount[1]
-        dataoffset += chrs + 2
+		switch (dtype) {
+			case 'i':
+				typeconvert = function (x) {
+					return parseInt(x, 10)
+				}
+				readData = readUntil(data, dataoffset, ';')
+				chrs = readData[0]
+				readdata = readData[1]
+				dataoffset += chrs + 1
+				break
+			case 'b':
+				typeconvert = function (x) {
+					return parseInt(x, 10) !== 0
+				}
+				readData = readUntil(data, dataoffset, ';')
+				chrs = readData[0]
+				readdata = readData[1]
+				dataoffset += chrs + 1
+				break
+			case 'd':
+				typeconvert = function (x) {
+					return parseFloat(x)
+				}
+				readData = readUntil(data, dataoffset, ';')
+				chrs = readData[0]
+				readdata = readData[1]
+				dataoffset += chrs + 1
+				break
+			case 'n':
+				readdata = null
+				break
+			case 's':
+				ccount = readUntil(data, dataoffset, ':')
+				chrs = ccount[0]
+				stringlength = ccount[1]
+				dataoffset += chrs + 2
 
-        readData = readChrs(data, dataoffset + 1, parseInt(stringlength, 10))
-        chrs = readData[0]
-        readdata = readData[1]
-        dataoffset += chrs + 2
-        if (chrs !== parseInt(stringlength, 10) && chrs !== readdata.length) {
-          error('SyntaxError', 'String length mismatch')
-        }
-        break
-      case 'a':
-        readdata = {}
+				readData = readChrs(data, dataoffset + 1, parseInt(stringlength, 10))
+				chrs = readData[0]
+				readdata = readData[1]
+				dataoffset += chrs + 2
+				if (chrs !== parseInt(stringlength, 10) && chrs !== readdata.length) {
+					error('SyntaxError', 'String length mismatch')
+				}
+				break
+			case 'a':
+				readdata = {}
 
-        keyandchrs = readUntil(data, dataoffset, ':')
-        chrs = keyandchrs[0]
-        keys = keyandchrs[1]
-        dataoffset += chrs + 2
+				keyandchrs = readUntil(data, dataoffset, ':')
+				chrs = keyandchrs[0]
+				keys = keyandchrs[1]
+				dataoffset += chrs + 2
 
-        length = parseInt(keys, 10)
-        contig = true
+				length = parseInt(keys, 10)
+				contig = true
 
-        for (i = 0; i < length; i++) {
-          kprops = _unserialize(data, dataoffset)
-          kchrs = kprops[1]
-          key = kprops[2]
-          dataoffset += kchrs
+				for (i = 0; i < length; i++) {
+					kprops = _unserialize(data, dataoffset)
+					kchrs = kprops[1]
+					key = kprops[2]
+					dataoffset += kchrs
 
-          vprops = _unserialize(data, dataoffset)
-          vchrs = vprops[1]
-          value = vprops[2]
-          dataoffset += vchrs
+					vprops = _unserialize(data, dataoffset)
+					vchrs = vprops[1]
+					value = vprops[2]
+					dataoffset += vchrs
 
-          if (key !== i) {
-            contig = false
-          }
+					if (key !== i) {
+						contig = false
+					}
 
-          readdata[key] = value
-        }
+					readdata[key] = value
+				}
 
-        if (contig) {
-          array = new Array(length)
-          for (i = 0; i < length; i++) {
-            array[i] = readdata[i]
-          }
-          readdata = array
-        }
+				if (contig) {
+					array = new Array(length)
+					for (i = 0; i < length; i++) {
+						array[i] = readdata[i]
+					}
+					readdata = array
+				}
 
-        dataoffset += 1
-        break
-      default:
-        error('SyntaxError', 'Unknown / Unhandled data type(s): ' + dtype)
-        break
-    }
-    return [dtype, dataoffset - offset, typeconvert(readdata)]
-  }
+				dataoffset += 1
+				break
+			default:
+				error('SyntaxError', 'Unknown / Unhandled data type(s): ' + dtype)
+				break
+		}
+		return [dtype, dataoffset - offset, typeconvert(readdata)]
+	}
 
-  return _unserialize((data + ''), 0)[2]
+	return _unserialize((data + ''), 0)[2]
 }
 /**
  * 转义字符串的HTML字符，主要有 < > " ' &
@@ -851,48 +851,54 @@ Date.prototype.toDate = function() {
 Date.prototype.toString = function(format_string) {
 	var array_week = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', '&#26085;', '&#19968;', '&#20108;', '&#19977;', '&#22235;', '&#20116;', '&#20845;'];
 	var array_month = ['', 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
-  
+
 	var y, m, d, h, i, s, ms, w, t;
-	y = this.getFullYear();
-	m = this.getMonth() + 1;
-	d = this.getDate();
-	h = this.getHours();
-	i = this.getMinutes();
-	s = this.getSeconds();
-	ms = this.getMilliseconds();
-	w = this.getDay();
-	t = parseInt(this.getTime() / 1000);
+	y = ~~this.getFullYear();
+	m = ~~this.getMonth() + 1;
+	d = ~~this.getDate();
+	h = ~~this.getHours();
+	i = ~~this.getMinutes();
+	s = ~~this.getSeconds();
+	ms = ~~this.getMilliseconds();
+	w = ~~this.getDay();
+	t = ~~(this.getTime() / 1000);
 
 	format_string = format_string === undefined ? '%c' : format_string;
-	var f = format_string.toString();
-	f = f.replace(/%%/g, '{-+-+-}%{/-+-+-}');
-	f = f.replace(/%D/g, '%m/%d/%y');
-	f = f.replace(/%T/g, '%H:%M:%S'); 
-	f = f.replace(/%F/g, '%y-%m-%d');
-	f = f.replace(/%R/g, '%H:%M');
-	f = f.replace(/%h/g, '%b');
-	f = f.replace(/%n/g, '\n');
-	f = f.replace(/%t/g, '\t');
-	f = f.replace(/%S/g, s.pad(2,'0')); //Second
-	f = f.replace(/%s/g, t.toString()); //Stamp
-	f = f.replace(/%MS/g, ms.toString()); //Millisecond
-	f = f.replace(/%M/g, i.pad(2,'0')); //Minute
-	f = f.replace(/%H/g, h.pad(2,'0')); //Hour
-	f = f.replace(/%d/g, d.pad(2,'0')); //Day
-	f = f.replace(/%m/g, m.pad(2,'0')); //Month(Int)
-	f = f.replace(/%B/g, array_month[m]); //January
-	f = f.replace(/%b/g, array_month[m + 12]); //Jan
-	f = f.replace(/%Y/g, y.toString()); //Year
-	f = f.replace(/%y/g, (y % 100).pad(2,'0')); //Year 00~99
-	f = f.replace(/%w/g, w.toString()); //Week(Int)
-	f = f.replace(/%W/g, w.toString()); //Week(Int)
-	f = f.replace(/%A/g, array_week[w]); //Monday
-	f = f.replace(/%a/g, array_week[w + 7]); //Mon
-	f = f.replace(/%x/g, this.toLocaleDateString()); 
-	f = f.replace(/%X/g, this.toLocaleTimeString());
-	f = f.replace(/%c/g, this.toLocaleString());
-	f = f.replace('{-+-+-}%{/-+-+-}', '%');
-	return f;
+	var _aggregates = {
+		'D': '%m/%d/%y',
+		'T': '%H:%M:%S', 
+		'F': '%y-%m-%d',
+		'R': '%H:%M',
+		'h': '%b'
+	}
+	var f = {
+		'%' : '%',
+		'n': "\n",
+		't': "\t",
+		'S': s.pad(2,'0'),//Second
+		's': t.toString(), //Stamp
+		'MS': ms.toString(), //Millisecond
+		'M': i.pad(2,'0'), //Minute
+		'H': h.pad(2,'0'), //Hour
+		'd': d.pad(2,'0'), //Day
+		'm': m.pad(2,'0'), //Month(Int)
+		'B': array_month[m], //January
+		'b': array_month[m + 12], //Jan
+		'Y': y.toString(), //Year
+		'y': (y % 100).pad(2,'0'), //Year 00~99
+		'w': w.toString(), //Week(Int)
+		'W': w.toString(), //Week(Int)
+		'A': array_week[w], //Monday
+		'a': array_week[w + 7], //Mon
+		'x': this.toLocaleDateString(), 
+		'X': this.toLocaleTimeString(),
+		'c': this.toLocaleString()
+	};
+	return format_string.toString().replace(/%[a-z]/ig, function($0, $1){
+		return _aggregates[$1] ? _aggregates[$1] : $0;
+	}).replace(/%([a-z]|%|MS)/ig, function($0, $1){
+		return f[$1] ? f[$1] : $0;
+	});
 };
 /**
  * 同上，但此函数会先尝试toDate
