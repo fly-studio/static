@@ -1,21 +1,34 @@
+var TIPS_LANGUAGE = {
+	'tip' : '\u63d0\u793a', //提示
+	'ok' : '\u786e\u5b9a', //确定
+	'cancel' : '\u53d6\u6d88', //取消
+	'back' : '\u8fd4\u56de' //返回
+};
 (function($){
-	$.TIPS_LANGUAGE = {
-		'tips' : '\u63d0\u793a', //提示
-		'ok' : '\u786e\u5b9a', //确定
-		'cancel' : '\u53d6\u6d88', //取消
-		'back' : '\u8fd4\u56de' //返回
-	}
+
 	$.showtips_interface = function(json, config) {
 		var _config = {
 			content: '<div style="word-break:break-all;word-wrap:break-word;text-align:left;">' + json.message.content + '</div>',
-			title: json.message.title ? json.message.title : $.TIPS_LANGUAGE.tips,
+			title: json.message.title ? json.message.title : TIPS_LANGUAGE.tip,
 			time: json.url === false ? false : 1500,
-			btn: json.url === false ? [$.TIPS_LANGUAGE.back] : false,
+			btn: json.url === false ? [TIPS_LANGUAGE.back] : false,
 			yes: function (index, layero) {
 				layer.close(index);
 			}
 		};
 		layer.open($.extend(_config, config));
+	};
+	$.lptip_interface = function(result, message, tipType, extraConfig) {
+		var _config = {
+			content: '<div style="word-break:break-all;word-wrap:break-word;text-align:left;">' + message.content + '</div>',
+			title: typeof message.title != 'undefined' ? message.title : TIPS_LANGUAGE.tip,
+			time: tipType.timeout,
+			btn: tipType.type == 'back' ? [TIPS_LANGUAGE.back] : false,
+			yes: function (index, layero) {
+				layer.close(index);
+			}
+		};
+		layer.open($.extend(_config, extraConfig));
 	};
 	$.alert_interface = function(msg, confirm_callback, $dfd) {
 		layer.alert(msg, function(index){
@@ -25,6 +38,13 @@
 		});
 	};
 	$.tips_interface = function(msg, timeout, $dfd) {
+		layer.msg(msg, {
+			time: timeout
+		}, function(){
+			$dfd.resolve();
+		});
+	};
+	$.toast_interface = function(msg, timeout, $dfd) {
 		layer.msg(msg, {
 			time: timeout
 		}, function(){

@@ -24,7 +24,7 @@ gulp.task('sass', function() {
 
 // 合并，压缩common
 gulp.task('common-scripts', function() {
-    gulp.src(['js/common/utils.js','js/common/polyfill.js','js/common/query.js'])
+    gulp.src(['js/common/utils.js','js/common/polyfill.js'])
         .pipe(sourcemaps.init({loadMaps: true}))
         //.pipe(jshint({loopfunc:true, maxerr: 50}))
        // .pipe(jshint.reporter(stylish))
@@ -34,10 +34,10 @@ gulp.task('common-scripts', function() {
                 return cb(null, file);
             }
         }))*/
-        .pipe(concat('common.js'))
+        .pipe(concat('common-2.0.js'))
         //.pipe(gulp.dest('js/'))
         .pipe(uglify({output: {ascii_only:true}}))
-        .pipe(header('/*! ${name} ${date}*/\n', { name : 'common', date : (new Date).toLocaleString()} ))
+        .pipe(header('/*! ${name} ${date}*/\n', { name : 'common-2.0', date : (new Date).toLocaleString()} ))
         .pipe(sourcemaps.write('./common'))
         .pipe(gulp.dest('js/'))
         .pipe(map(function(file, cb){
@@ -47,8 +47,8 @@ gulp.task('common-scripts', function() {
 });
 // 分散压缩
 gulp.task('watch', function() {
-    gulp.watch(['js/common/utils.js','js/common/polyfill.js','js/common/query.js'], ['common-scripts']);
-    gulp.watch(['js/GPS.js', 'js/mimetype.js', 'js/moment.js', 'js/htmldiff.js', 'js/jsencrypt.js', 'js/jquery.uploader.js', 'js/jquery.cookie.js', 'js/jquery.validate.addons.js', 'css/uploader.css'], function(e){
+    gulp.watch(['js/common/utils.js','js/common/polyfill.js'], ['common-scripts']);
+    gulp.watch(['js/GPS.js', 'js/mimetype.js', 'js/moment.js', 'js/htmldiff.js', 'js/jsencrypt.js', 'js/jquery.uploader-2.0.js', 'js/jquery.cookie.js', 'js/jquery.validate.addons.js', 'css/uploader.css'], function(e){
         var ext = path.extname(e.path);
         var dir = path.dirname(e.path);
         if (e.type == 'deleted')

@@ -992,7 +992,7 @@ function flash_version()
 	return a ? b : false;
 }
 /**
- * 将图片等比压缩到制定宽高
+ * 将图片等比缩放到制定宽高
  * <img src="xxx" onload="resizeImg(this, 300, 200);">
  *  
  * @param  {ImageElement} imgObj  图片
@@ -1067,16 +1067,18 @@ window.location.query = function(param) {
 		}
 		return $dfd.promise();
 	};
-	$.tips = function(msg, timeout) {
+
+	$.toast = function(msg, timeout) {
 		var $dfd = jQuery.Deferred();
-		if (typeof $.tips_interface != 'undefined')
-			$.tips_interface(msg, timeout, $dfd);
+		if (typeof $.toast_interface != 'undefined')
+			$.toast_interface(msg, timeout, $dfd);
 		else {
 			alert(msg);
 			$dfd.resolve();
 		}
 		return $dfd.promise();
 	};
+
 	$.confirm = function(msg, confirm_callback, cancel_callback) {
 		var $dfd = jQuery.Deferred();
 		if (typeof $.confirm_interface != 'undefined')

@@ -2,17 +2,7 @@
  * @author Fly Mirage
  * 
  */
-(function(){
-	//base uri
-	var thiscript = document.currentScript;
-	if (!thiscript) {
-		var scripts = document.getElementsByTagName("script");
-		thiscript = scripts[ scripts.length - 1 ];
-	}
-	window.baseuri = thiscript.src.toString().match(/[^\/:](\/.*)static\/js\/common\.js/i) ? thiscript.src.toString().match(/[^\/:](\/.*)static\/js\/common\.js/i)[1] : thiscript.src.toString().replace(/\\/g, '/').replace(/\/[^\/]*\/?$/, '') + '/';
-	if (!window.baseuri) window.baseuri = '/';if (jQuery) jQuery.baseuri = window.baseuri;
 
-})();
 (function(){
 	//OS
 	window.OS = {
@@ -46,42 +36,6 @@
 				|| document.body.clientHeight,
 			};
 	};
-})();
-(function(){
-	//ssl
-	if (typeof JSEncrypt != 'undefined' && window.sessionStorage) {
-		var getRSAKey = function() {
-			var rsa = window.sessionStorage.getItem('l+rsa');
-			if (rsa) rsa = JSON.parse(rsa);
-			if (!rsa)
-			{
-				var crypt = new JSEncrypt({default_key_size:1024});
-				var key = crypt.getKey();
-
-				rsa = {
-					private: key.getPrivateKey(),
-					public: key.getPublicKey(),
-				};
-				window.sessionStorage.setItem('l+rsa',JSON.stringify(rsa));
-			}
-			return rsa;
-		};
-		window.ssl = (new function()
-		{
-			this.rsa = getRSAKey();
-			this.encrypt = function(text) {
-				var crypt = new JSEncrypt();
-				crypt.setKey(this.rsa.public);
-				return crypt.encrypt(text);
-			}
-			this.decrypt = function(text) {
-				var crypt = new JSEncrypt();
-				crypt.setKey(this.rsa.private);
-				return crypt.decrypt(text);
-			}
-		});
-		if (jQuery) jQuery.ssl = window.ssl;
-	}
 })();
 
 /**
