@@ -1,4 +1,4 @@
-/*! WebUploader 0.1.7-alpha */
+/*! WebUploader 0.1.5 */
 
 
 /**
@@ -131,16 +131,9 @@
 
     /**
      * @fileOverview jQuery or Zepto
-     * @require "jquery"
-     * @require "zepto"
      */
     define('dollar-third',[],function() {
-        var req = window.require;
-        var $ = window.__dollar || 
-            window.jQuery || 
-            window.Zepto || 
-            req('jquery') || 
-            req('zepto');
+        var $ = window.__dollar || window.jQuery || window.Zepto;
     
         if ( !$ ) {
             throw new Error('jQuery or Zepto not found!');
@@ -148,7 +141,6 @@
     
         return $;
     });
-    
     /**
      * @fileOverview Dom 操作相关
      */
@@ -244,7 +236,7 @@
             /**
              * @property {String} version 当前版本号。
              */
-            version: '0.1.7-alpha',
+            version: '0.1.5',
     
             /**
              * @property {jQuery|Zepto} $ 引用依赖的jQuery或者Zepto对象。
@@ -1692,7 +1684,7 @@
         'base',
         'runtime/client',
         'lib/file'
-    ], function( Base, RuntimeClient, File ) {
+    ], function( Base, RuntimeClent, File ) {
     
         var $ = Base.$;
     
@@ -1712,7 +1704,7 @@
             opts.button.html( opts.innerHTML );
             opts.container.html( opts.button );
     
-            RuntimeClient.call( this, 'FilePicker', true );
+            RuntimeClent.call( this, 'FilePicker', true );
         }
     
         FilePicker.options = {
@@ -1722,34 +1714,29 @@
             innerHTML: null,
             multiple: true,
             accept: null,
-            name: 'file',
-            style: 'webuploader-pick'   //pick element class attribute, default is "webuploader-pick"
+            name: 'file'
         };
     
-        Base.inherits( RuntimeClient, {
+        Base.inherits( RuntimeClent, {
             constructor: FilePicker,
     
             init: function() {
                 var me = this,
                     opts = me.options,
-                    button = opts.button,
-                    style = opts.style;
+                    button = opts.button;
     
-                if (style)
-                    button.addClass('webuploader-pick');
+                button.addClass('webuploader-pick');
     
                 me.on( 'all', function( type ) {
                     var files;
     
                     switch ( type ) {
                         case 'mouseenter':
-                            if (style)
-                                button.addClass('webuploader-pick-hover');
+                            button.addClass('webuploader-pick-hover');
                             break;
     
                         case 'mouseleave':
-                            if (style)
-                                button.removeClass('webuploader-pick-hover');
+                            button.removeClass('webuploader-pick-hover');
                             break;
     
                         case 'change':
@@ -1890,13 +1877,13 @@
             },
     
             /**
-             * @method addBtn
+             * @method addButton
              * @for Uploader
-             * @grammar addBtn( pick ) => Promise
+             * @grammar addButton( pick ) => Promise
              * @description
              * 添加文件选择按钮，如果一个按钮不够，需要调用此方法来添加。参数跟[options.pick](#WebUploader:Uploader:options)一致。
              * @example
-             * uploader.addBtn({
+             * uploader.addButton({
              *     id: '#btnContainer',
              *     innerHTML: '选择文件'
              * });
@@ -1932,9 +1919,6 @@
                     picker.once( 'ready', deferred.resolve );
                     picker.on( 'select', function( files ) {
                         me.owner.request( 'add-file', [ files ]);
-                    });
-                    picker.on('dialogopen', function() {
-                        me.owner.trigger('dialogOpen', picker.button);
                     });
                     picker.init();
     
@@ -2721,19 +2705,21 @@
     
                 if ( existing ) {
                     delete this._map[ file.id ];
-                    this._delFile(file);
                     file.destroy();
                     this.stats.numofDeleted++;
-                    
                 }
             },
     
-            _delFile : function(file){
-                for(var i = this._queue.length - 1 ; i >= 0 ; i-- ){
-                    if(this._queue[i] == file){
-                        this._queue.splice(i,1); 
-                        break;
-                    }
+            _fileAdded: function( file ) {
+                var me = this,
+                    existing = this._map[ file.id ];
+    
+                if ( !existing ) {
+                    this._map[ file.id ] = file;
+    
+                    file.on( 'statuschange', function( cur, pre ) {
+                        me._onFileStatusChange( cur, pre );
+                    });
                 }
             },
     
@@ -2800,7 +2786,6 @@
     
         return Queue;
     });
-    
     /**
      * @fileOverview 队列
      */
@@ -2970,16 +2955,13 @@
                 files = $.map( files, function( file ) {
                     return me._addFile( file );
                 });
-    			
-    			if ( files.length ) {
     
-                    me.owner.trigger( 'filesQueued', files );
+                me.owner.trigger( 'filesQueued', files );
     
-    				if ( me.options.auto ) {
-    					setTimeout(function() {
-    						me.request('start-upload');
-    					}, 20 );
-    				}
+                if ( me.options.auto ) {
+                    setTimeout(function() {
+                        me.request('start-upload');
+                    }, 20 );
                 }
             },
     
@@ -3375,6 +3357,13 @@
              */
     
             /**
+             * @property {Object} [method='POST']
+             * @namespace options
+             * @for Uploader
+             * @description 文件上传方式，`POST`或者`GET`。
+             */
+    
+            /**
              * @property {Object} [sendAsBinary=false]
              * @namespace options
              * @for Uploader
@@ -3461,7 +3450,6 @@
                 this.remaning = 0;
                 this.__tick = Base.bindFn( this._tick, this );
     
-                // 销毁上传相关的属性。
                 owner.on( 'uploadComplete', function( file ) {
     
                     // 把其他块取消了。
@@ -3509,13 +3497,11 @@
                     me.request( 'remove-file', this );
                 });
     
-                // 如果指定了开始某个文件，则只开始指定的文件。
+                // 如果指定了开始某个文件，则只开始指定文件。
                 if ( file ) {
                     file = file.id ? file : me.request( 'get-file', file );
     
                     if (file.getStatus() === Status.INTERRUPT) {
-                        file.setStatus( Status.QUEUED );
-    
                         $.each( me.pool, function( _, v ) {
     
                             // 之前暂停过。
@@ -3524,11 +3510,12 @@
                             }
     
                             v.transport && v.transport.send();
-                            file.setStatus( Status.PROGRESS );
                         });
     
-                        
-                    } else if (file.getStatus() !== Status.PROGRESS) {
+                        file.setStatus( Status.QUEUED );
+                    } else if (file.getStatus() === Status.PROGRESS) {
+                        return;
+                    } else {
                         file.setStatus( Status.QUEUED );
                     }
                 } else {
@@ -3538,27 +3525,28 @@
                 }
     
                 if ( me.runing ) {
-                    me.owner.trigger('startUpload', file);// 开始上传或暂停恢复的，trigger event
-                    return Base.nextTick( me.__tick );
+                    return;
                 }
     
                 me.runing = true;
+    
                 var files = [];
     
                 // 如果有暂停的，则续传
-                file || $.each( me.pool, function( _, v ) {
+                $.each( me.pool, function( _, v ) {
                     var file = v.file;
     
                     if ( file.getStatus() === Status.INTERRUPT ) {
-                        me._trigged = false;
                         files.push(file);
+                        me._trigged = false;
                         v.transport && v.transport.send();
                     }
                 });
     
-                $.each(files, function() {
-                    this.setStatus( Status.PROGRESS );
-                });
+                var file;
+                while ( (file = files.shift()) ) {
+                    file.setStatus( Status.PROGRESS );
+                }
     
                 file || $.each( me.request( 'get-files',
                         Status.INTERRUPT ), function() {
@@ -3608,29 +3596,23 @@
                     }
     
                     file.setStatus( Status.INTERRUPT );
-    
-    
                     $.each( me.pool, function( _, v ) {
     
-                        // 只 abort 指定的文件，每一个分片。
-                        if (v.file === file) {
-                            v.transport && v.transport.abort();
-    
-                            if (interrupt) {
-                                me._putback(v);
-                                me._popBlock(v);
-                            }
+                        // 只 abort 指定的文件。
+                        if (v.file !== file) {
+                            return;
                         }
-                    });
     
-                    me.owner.trigger('stopUpload', file);// 暂停，trigger event
+                        v.transport && v.transport.abort();
+                        me._putback(v);
+                        me._popBlock(v);
+                    });
     
                     return Base.nextTick( me.__tick );
                 }
     
                 me.runing = false;
     
-                // 正在准备中的文件。
                 if (this._promise && this._promise.file) {
                     this._promise.file.setStatus( Status.INTERRUPT );
                 }
@@ -4147,7 +4129,6 @@
     
         });
     });
-    
     /**
      * @fileOverview 各种验证，包括文件总大小是否超出、单文件是否超出和文件是否重复。
      */
@@ -4220,10 +4201,7 @@
             }
     
             uploader.on( 'beforeFileQueued', function( file ) {
-                    // 增加beforeFileQueuedCheckfileNumLimit验证,主要为了再次加载时(已存在历史文件)验证数量是否超过设置项
-                if (!this.trigger('beforeFileQueuedCheckfileNumLimit', file,count)) {
-                    return false;
-                }
+    
                 if ( count >= max && flag ) {
                     flag = false;
                     this.trigger( 'error', 'Q_EXCEED_NUM_LIMIT', max, file );
@@ -4603,10 +4581,7 @@
                 } catch( err ) {
                 }
     
-                me.dndOver = false;
-                me.elem.removeClass( prefix + 'over' );
-    
-                if ( !dataTransfer || data ) {
+                if ( data ) {
                     return;
                 }
     
@@ -4616,6 +4591,8 @@
                     }) );
                 });
     
+                me.dndOver = false;
+                me.elem.removeClass( prefix + 'over' );
                 return false;
             },
     
@@ -4691,7 +4668,7 @@
                 if (!elem) {
                     return;
                 }
-    
+                
                 elem.off( 'dragenter', this.dragEnterHandler );
                 elem.off( 'dragover', this.dragOverHandler );
                 elem.off( 'dragleave', this.dragLeaveHandler );
@@ -4790,17 +4767,14 @@
                     opts = me.options,
                     label = this.label = $( document.createElement('label') ),
                     input =  this.input = $( document.createElement('input') ),
-                    arr, i, len, mouseHandler, changeHandler;
+                    arr, i, len, mouseHandler;
     
                 input.attr( 'type', 'file' );
-                input.attr( 'capture', 'camera');
                 input.attr( 'name', opts.name );
                 input.addClass('webuploader-element-invisible');
     
-                label.on( 'click', function(e) {
+                label.on( 'click', function() {
                     input.trigger('click');
-                    e.stopPropagation();
-                    owner.trigger('dialogopen');
                 });
     
                 label.css({
@@ -4834,17 +4808,11 @@
                     owner.trigger( e.type );
                 };
     
-                changeHandler = function( e ) {
-                    var clone;
+                input.on( 'change', function( e ) {
+                    var fn = arguments.callee,
+                        clone;
     
-                    // 解决chrome 56 第二次打开文件选择器，然后点击取消，依然会触发change事件的问题
-                    if (e.target.files.length === 0){
-                        return false;
-                    }
-    
-                    // 第一次上传图片后，第二次再点击弹出文件选择器窗，等待
                     me.files = e.target.files;
-    
     
                     // reset input
                     clone = this.cloneNode( true );
@@ -4856,8 +4824,8 @@
                             .on( 'mouseenter mouseleave', mouseHandler );
     
                     owner.trigger('change');
-                }
-                input.on( 'change', changeHandler);
+                });
+    
                 label.on( 'mouseenter mouseleave', mouseHandler );
     
             },
@@ -4873,7 +4841,6 @@
             }
         });
     });
-    
     /**
      * Terms:
      *
@@ -5449,8 +5416,6 @@
                         height: this.height
                     };
     
-                    //debugger;
-    
                     // 读取meta信息。
                     if ( !me._metas && 'image/jpeg' === me.type ) {
                         Util.parseMeta( me._blob, function( error, ret ) {
@@ -5596,12 +5561,12 @@
     
                 // setter
                 if ( val ) {
-                    this._metas = val;
+                    this._meta = val;
                     return this;
                 }
     
                 // getter
-                return this._metas;
+                return this._meta;
             },
     
             destroy: function() {
@@ -5856,7 +5821,6 @@
             })()
         });
     });
-    
     /**
      * @fileOverview Transport
      * @todo 支持chunked传输，优势：
@@ -5999,11 +5963,11 @@
                         return me.trigger('load');
                     } else if ( xhr.status >= 500 && xhr.status < 600 ) {
                         me._response = xhr.responseText;
-                        return me.trigger( 'error', 'server-'+status );
+                        return me.trigger( 'error', 'server' );
                     }
     
     
-                    return me.trigger( 'error', me._status ? 'http-'+status : 'abort' );
+                    return me.trigger( 'error', me._status ? 'http' : 'abort' );
                 };
     
                 me._xhr = xhr;
@@ -6029,7 +5993,6 @@
             }
         });
     });
-    
     /**
      * @fileOverview 只有html5实现的文件版本。
      */

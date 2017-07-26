@@ -73,7 +73,7 @@
 					'<div class="drop-tips text-info"><h2>'+ $.UPLOADER_LANGUAGE.drop_container +'</h2><br /><br /><div class="btn btn-info" onclick="javascript:jQuery(this).parent().hide().parent(\'.uploader-container\').removeClass(\'webuploader-dnd-over\');"><i class="glyphicon glyphicon-remove"></i> '+$.UPLOADER_LANGUAGE.close+'</div></div>' +
 					'<div class="pull-left"><span id="'+ pick_id +'">'+ $.UPLOADER_LANGUAGE.select_file +'(≤ '+ bytesToSize(options.filesize) +')</span></div>' +
 					'<div class="pull-left tags">&nbsp;<span class="label label-success">.' + options.filetype.replace(/,/g,'</span>&nbsp;<span class="label label-success">.') + '</span>' +
-					'&nbsp;<!--<span class="label label-warning enable-tooltip" data-placement="top" title="'+ $.UPLOADER_LANGUAGE.ctrl_v_tips +'"><small class="glyphicon glyphicon-info-sign"></small> '+ $.UPLOADER_LANGUAGE.ctrl_v_button +'</span>&nbsp;--><span class="label label-warning enable-tooltip" data-placement="top" title="'+ $.UPLOADER_LANGUAGE.drop_container +'"><small class="glyphicon glyphicon-info-sign"></small> '+ $.UPLOADER_LANGUAGE.drop_button +'</span>' +
+					'&nbsp;<!--<span class="label label-warning enable-tooltip" data-placement="top" title="'+ $.UPLOADER_LANGUAGE.ctrl_v_tips +'"><small class="glyphicon glyphicon-info-sign"></small> '+ $.UPLOADER_LANGUAGE.ctrl_v_button +'</span>&nbsp;<span class="label label-warning enable-tooltip" data-placement="top" title="'+ $.UPLOADER_LANGUAGE.drop_container +'"><small class="glyphicon glyphicon-info-sign"></small> '+ $.UPLOADER_LANGUAGE.drop_button +'</span>-->' +
 					(options.max_width > 0 && options.max_height > 0 ? '<br /><small>&nbsp;'+ $.UPLOADER_LANGUAGE.resize.replace('{0}', options.max_width.toString().toHTML() + 'x' + options.max_height.toString().toHTML()) + '</small>' : '') +
 					'</div><div class="clearfix"></div>' +
 					'<div id="' + progresses_id + '" class="progresses"></div><div class="clearfix"></div>' +
@@ -241,7 +241,7 @@
 						},
 						rebuildAll: function() {
 							//remove all files
-							files = flex_uploader.uploader.getFiles();
+							var files = flex_uploader.uploader.getFiles();
 							for(var i = 0;i < files.length;i++)
 								flex_uploader.uploader.removeFile(files[i], true);
 							//remove all preview
@@ -258,7 +258,7 @@
 				var attachment = function() {
 					var aid = t.val();
 					if (aid == '0') aid = '';
-					aids = aid ? ( aid instanceof Array ? aid : aid.split(',') ) : [];
+					var aids = aid ? ( aid instanceof Array ? aid : aid.split(',') ) : [];
 					return {
 						write: function() {
 							if (t.is('select')){
