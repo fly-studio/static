@@ -7,10 +7,10 @@
 		var script = document.createElement('script');
 		script.src = baseuri + 'static/js/debug/eruda.min.js';
 		script.onload = function(){
-			var script1 = document.createElement('script');
+			/*var script1 = document.createElement('script');
 			script1.src = baseuri + 'static/js/debug/eruda-fps.min.js';
-			document.getElementsByTagName('head')[0].appendChild(script1);
+			document.getElementsByTagName('head')[0].appendChild(script1);*/
 		}
-		document.getElementsByTagName('head')[0].appendChild(script);		
+		document.getElementsByTagName('head')[0].appendChild(script);
 	}
 })();
